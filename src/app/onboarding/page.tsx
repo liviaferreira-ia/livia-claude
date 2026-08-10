@@ -130,8 +130,12 @@ export default function OnboardingPage() {
         )}
 
         <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
-          {step > 0 && (
+          {step > 0 ? (
             <button className="btn ghost" onClick={() => setStep((s) => s - 1)}>
+              ← Voltar
+            </button>
+          ) : (
+            <button className="btn ghost" onClick={() => router.back()}>
               ← Voltar
             </button>
           )}

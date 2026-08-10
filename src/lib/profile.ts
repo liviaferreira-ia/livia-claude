@@ -3,7 +3,34 @@
 import type { User } from "@supabase/supabase-js";
 import { useCallback, useEffect, useState } from "react";
 import type { Kind } from "@/data/exercises";
+import { LEVEL_ORDER, levelBadge, type CefrLevel } from "@/data/placement";
 import { createClient } from "@/lib/supabase/client";
+
+const CEFR_RE = /^[ABC][12]$/;
+
+/**
+ * Extrai o código CEFR de `profile.level`, que pode estar em formatos antigos:
+ * "C1" (atual), "C1 · Avançado" (formato anterior) ou palavras livres do
+ * primeiro onboarding ("Iniciante"/"Intermediário"/"Avançado").
+ */
+export function parseCefrLevel(raw: string): CefrLevel | null {
+  if (!raw) return null;
+  const first = raw.split("·")[0].trim().toUpperCase();
+  if ((LEVEL_ORDER as string[]).includes(first) && CEFR_RE.test(first)) {
+    return first as CefrLevel;
+  }
+  const word = raw.trim().toLowerCase();
+  if (word.startsWith("inici")) return "A1";
+  if (word.startsWith("interm")) return "B1";
+  if (word.startsWith("avan")) return "C1";
+  return null;
+}
+
+/** Formata `profile.level` pra exibição ("C1 · Avançado"), aceitando formatos antigos. */
+export function levelDisplay(raw: string): string {
+  const cefr = parseCefrLevel(raw);
+  return cefr ? levelBadge(cefr) : raw;
+}
 
 export type PracticeStat = { done: number; correct: number };
 

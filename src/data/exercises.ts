@@ -443,7 +443,69 @@ const ORDER_A1: Order[] = [
   { id: "a1-o12", words: ["car", "not", "is", "this", "my"], answer: "this is not my car", pt: "Isso não é meu carro." },
 ];
 
-const EMPTY_BANK: LevelBank = { mc: [], fill: [], translate: [], order: [] };
+// ================= C2 =================
+// Temas: retórica, persuasão, nuance, redação avançada — inversão enfática,
+// condicionais invertidos, cleft sentences, subjuntivo, collocations sofisticadas.
+
+const MC_C2: MC[] = [
+  { id: "c2-mc1", prompt: "Little ___ that his speech would spark such controversy.", options: ["he did know", "did he know", "he had known", "knowing he"], answer: 1, explain: "Inversão depois de advérbio negativo 'Little' no início da frase: did he know." },
+  { id: "c2-mc2", prompt: "Were the deal to fall through, we ___ heavy losses.", options: ["will face", "would face", "faced", "are facing"], answer: 1, explain: "Condicional invertido (Were... to = If... were to): consequência com would." },
+  { id: "c2-mc3", prompt: "It was not until much later ___ the full implications became clear.", options: ["when", "which", "that", "then"], answer: 2, explain: "Cleft sentence: It was not until... that..." },
+  { id: "c2-mc4", prompt: "The committee's decision, ___ controversial, was ultimately upheld.", options: ["despite", "however", "while", "being"], answer: 2, explain: "'while' reduzido tem sentido concessivo (= embora) antes de adjetivo." },
+  { id: "c2-mc5", prompt: "Had the warning signs been heeded, the crisis ___ averted.", options: ["can be", "could be", "could have been", "could been"], answer: 2, explain: "3ª condicional invertida: consequência com could have + particípio." },
+  { id: "c2-mc6", prompt: "She spoke with such eloquence ___ even her critics were moved.", options: ["as", "so", "that", "which"], answer: 2, explain: "such + substantivo + that = tão... que." },
+  { id: "c2-mc7", prompt: "What he lacks in experience, he ___ for in enthusiasm.", options: ["makes up", "made up", "makes", "is making"], answer: 0, explain: "make up for = compensar." },
+  { id: "c2-mc8", prompt: "The proposal, far from ___ the problem, only made it worse.", options: ["solve", "to solve", "having solved", "solving"], answer: 3, explain: "far from + gerúndio." },
+  { id: "c2-mc9", prompt: "So great was the pressure ___ he eventually resigned.", options: ["that", "than", "as", "which"], answer: 0, explain: "Inversão enfática: So + adjetivo + verbo + sujeito + that." },
+  { id: "c2-mc10", prompt: "He is, ___ all appearances, a man of considerable integrity.", options: ["for", "on", "in", "by"], answer: 3, explain: "by all appearances = pelo que tudo indica." },
+  { id: "c2-mc11", prompt: "The board demanded that the report ___ submitted immediately.", options: ["be", "is", "was", "will be"], answer: 0, explain: "demand that + subjuntivo (forma base): be submitted." },
+  { id: "c2-mc12", prompt: "Not only ___ the plan flawed, but it was also poorly executed.", options: ["is", "did", "has", "was"], answer: 3, explain: "Not only + inversão: was the plan flawed." },
+];
+
+const FILL_C2: Fill[] = [
+  { id: "c2-f1", prompt: "Little ___ (know) that his speech would spark such controversy.", hint: "inversão com advérbio negativo", answers: ["did he know"], explain: "did he know." },
+  { id: "c2-f2", prompt: "Were the deal ___ (fall) through, we would face heavy losses.", hint: "condicional invertido", answers: ["to fall"], explain: "Were... to fall = If... were to fall." },
+  { id: "c2-f3", prompt: "It was not until much later ___ the full implications became clear.", hint: "cleft sentence", answers: ["that"], explain: "that." },
+  { id: "c2-f4", prompt: "Had the warning signs been heeded, the crisis ___ (avert).", hint: "3ª condicional invertida", answers: ["could have been averted"], explain: "could have been averted." },
+  { id: "c2-f5", prompt: "She spoke with such eloquence ___ even her critics were moved.", hint: "such...that", answers: ["that"], explain: "that." },
+  { id: "c2-f6", prompt: "What he lacks in experience, he ___ (make) up for in enthusiasm.", hint: "presente simples, sujeito he", answers: ["makes"], explain: "makes up for." },
+  { id: "c2-f7", prompt: "The proposal, far from ___ (solve) the problem, only made it worse.", hint: "far from + gerúndio", answers: ["solving"], explain: "solving." },
+  { id: "c2-f8", prompt: "So great was the pressure ___ he eventually resigned.", hint: "inversão enfática", answers: ["that"], explain: "that." },
+  { id: "c2-f9", prompt: "He is, by all ___, a man of considerable integrity.", hint: "expressão fixa", answers: ["appearances"], explain: "by all appearances." },
+  { id: "c2-f10", prompt: "The board demanded that the report ___ (be) submitted immediately.", hint: "subjuntivo depois de demand that", answers: ["be"], explain: "be submitted (subjuntivo)." },
+  { id: "c2-f11", prompt: "Not only ___ (be) the plan flawed, but it was also poorly executed.", hint: "inversão com Not only", answers: ["was"], explain: "was the plan flawed." },
+  { id: "c2-f12", prompt: "No sooner ___ (he / arrive) than the meeting was cancelled.", hint: "inversão com No sooner", answers: ["had he arrived"], explain: "had he arrived." },
+];
+
+const TRANSLATE_C2: Translate[] = [
+  { id: "c2-t1", pt: "Mal ele sabia que seu discurso geraria tanta polêmica.", answers: ["little did he know that his speech would spark such controversy", "little did he know his speech would spark such controversy"], explain: "Little did he know that his speech would spark such controversy." },
+  { id: "c2-t2", pt: "Se o negócio fracassasse, teríamos prejuízos enormes.", answers: ["were the deal to fall through, we would face heavy losses", "were the deal to fall through we would face heavy losses", "if the deal fell through, we would face heavy losses"], explain: "Were the deal to fall through, we would face heavy losses." },
+  { id: "c2-t3", pt: "Foi só bem mais tarde que as implicações ficaram claras.", answers: ["it was not until much later that the full implications became clear", "it wasn't until much later that the full implications became clear"], explain: "It was not until much later that the full implications became clear." },
+  { id: "c2-t4", pt: "Se os sinais de alerta tivessem sido levados a sério, a crise poderia ter sido evitada.", answers: ["had the warning signs been heeded, the crisis could have been averted", "had the warning signs been heeded the crisis could have been averted"], explain: "Had the warning signs been heeded, the crisis could have been averted." },
+  { id: "c2-t5", pt: "Ela falou com tanta eloquência que até seus críticos se comoveram.", answers: ["she spoke with such eloquence that even her critics were moved"], explain: "She spoke with such eloquence that even her critics were moved." },
+  { id: "c2-t6", pt: "O que lhe falta em experiência, ele compensa em entusiasmo.", answers: ["what he lacks in experience, he makes up for in enthusiasm", "what he lacks in experience he makes up for in enthusiasm"], explain: "What he lacks in experience, he makes up for in enthusiasm." },
+  { id: "c2-t7", pt: "A proposta, longe de resolver o problema, só piorou as coisas.", answers: ["the proposal, far from solving the problem, only made it worse", "the proposal far from solving the problem only made it worse"], explain: "The proposal, far from solving the problem, only made it worse." },
+  { id: "c2-t8", pt: "Era tanta a pressão que ele acabou renunciando.", answers: ["so great was the pressure that he eventually resigned"], explain: "So great was the pressure that he eventually resigned." },
+  { id: "c2-t9", pt: "Ele é, pelo que tudo indica, um homem de grande integridade.", answers: ["he is, by all appearances, a man of considerable integrity", "he is by all appearances a man of considerable integrity"], explain: "He is, by all appearances, a man of considerable integrity." },
+  { id: "c2-t10", pt: "A diretoria exigiu que o relatório fosse entregue imediatamente.", answers: ["the board demanded that the report be submitted immediately"], explain: "The board demanded that the report be submitted immediately." },
+  { id: "c2-t11", pt: "O plano não só era falho, como também foi mal executado.", answers: ["not only was the plan flawed, but it was also poorly executed", "not only was the plan flawed but it was also poorly executed"], explain: "Not only was the plan flawed, but it was also poorly executed." },
+  { id: "c2-t12", pt: "Mal ele tinha chegado quando a reunião foi cancelada.", answers: ["no sooner had he arrived than the meeting was cancelled", "no sooner had he arrived than the meeting was canceled"], explain: "No sooner had he arrived than the meeting was cancelled." },
+];
+
+const ORDER_C2: Order[] = [
+  { id: "c2-o1", words: ["did", "little", "he", "know", "that", "his", "speech", "would", "spark", "such", "controversy"], answer: "little did he know that his speech would spark such controversy", pt: "Mal ele sabia que seu discurso geraria tanta polêmica." },
+  { id: "c2-o2", words: ["were", "the", "deal", "to", "fall", "through", "we", "would", "face", "heavy", "losses"], answer: "were the deal to fall through we would face heavy losses", pt: "Se o negócio fracassasse, teríamos prejuízos enormes." },
+  { id: "c2-o3", words: ["it", "was", "not", "until", "much", "later", "that", "the", "full", "implications", "became", "clear"], answer: "it was not until much later that the full implications became clear", pt: "Foi só bem mais tarde que as implicações ficaram claras." },
+  { id: "c2-o4", words: ["had", "the", "warning", "signs", "been", "heeded", "the", "crisis", "could", "have", "been", "averted"], answer: "had the warning signs been heeded the crisis could have been averted", pt: "Se os sinais de alerta tivessem sido levados a sério, a crise poderia ter sido evitada." },
+  { id: "c2-o5", words: ["she", "spoke", "with", "such", "eloquence", "that", "even", "her", "critics", "were", "moved"], answer: "she spoke with such eloquence that even her critics were moved", pt: "Ela falou com tanta eloquência que até seus críticos se comoveram." },
+  { id: "c2-o6", words: ["what", "he", "lacks", "in", "experience", "he", "makes", "up", "for", "in", "enthusiasm"], answer: "what he lacks in experience he makes up for in enthusiasm", pt: "O que lhe falta em experiência, ele compensa em entusiasmo." },
+  { id: "c2-o7", words: ["the", "proposal", "far", "from", "solving", "the", "problem", "only", "made", "it", "worse"], answer: "the proposal far from solving the problem only made it worse", pt: "A proposta, longe de resolver o problema, só piorou as coisas." },
+  { id: "c2-o8", words: ["so", "great", "was", "the", "pressure", "that", "he", "eventually", "resigned"], answer: "so great was the pressure that he eventually resigned", pt: "Era tanta a pressão que ele acabou renunciando." },
+  { id: "c2-o9", words: ["he", "is", "by", "all", "appearances", "a", "man", "of", "considerable", "integrity"], answer: "he is by all appearances a man of considerable integrity", pt: "Ele é, pelo que tudo indica, um homem de grande integridade." },
+  { id: "c2-o10", words: ["the", "board", "demanded", "that", "the", "report", "be", "submitted", "immediately"], answer: "the board demanded that the report be submitted immediately", pt: "A diretoria exigiu que o relatório fosse entregue imediatamente." },
+  { id: "c2-o11", words: ["not", "only", "was", "the", "plan", "flawed", "but", "it", "was", "also", "poorly", "executed"], answer: "not only was the plan flawed but it was also poorly executed", pt: "O plano não só era falho, como também foi mal executado." },
+  { id: "c2-o12", words: ["no", "sooner", "had", "he", "arrived", "than", "the", "meeting", "was", "cancelled"], answer: "no sooner had he arrived than the meeting was cancelled", pt: "Mal ele tinha chegado quando a reunião foi cancelada." },
+];
 
 export const EXERCISES: Record<CefrLevel, LevelBank> = {
   A1: { mc: MC_A1, fill: FILL_A1, translate: TRANSLATE_A1, order: ORDER_A1 },
@@ -451,7 +513,7 @@ export const EXERCISES: Record<CefrLevel, LevelBank> = {
   B1: { mc: MC_B1, fill: FILL_B1, translate: TRANSLATE_B1, order: ORDER_B1 },
   B2: { mc: MC_B2, fill: FILL_B2, translate: TRANSLATE_B2, order: ORDER_B2 },
   C1: { mc: MC_C1, fill: FILL_C1, translate: TRANSLATE_C1, order: ORDER_C1 },
-  C2: EMPTY_BANK,
+  C2: { mc: MC_C2, fill: FILL_C2, translate: TRANSLATE_C2, order: ORDER_C2 },
 };
 
 export const CATEGORY_META: Record<Kind, { title: string; desc: string }> = {

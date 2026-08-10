@@ -19,6 +19,54 @@ export type Course = { pct: number; units: Unit[] };
 
 const EMPTY_COURSE: Course = { pct: 0, units: [] };
 
+const COURSE_A1: Course = {
+  pct: 8,
+  units: [
+    {
+      n: 1,
+      title: "Primeiros passos",
+      objective: "Apresentar-se e usar o verbo to be.",
+      status: "current",
+      pct: 25,
+      lessons: [
+        { title: "Verbo to be (am/is/are)", meta: "Gramática · 8 min", status: "done" },
+        {
+          title: "Múltipla escolha e completar (A1)",
+          meta: "Prática · 10 min",
+          status: "now",
+          href: "/aluno/praticar",
+        },
+        { title: "Se apresentando", meta: "Conversa · 6 min", status: "locked" },
+        { title: "Roleplay: primeiro encontro", meta: "Voz · 5 min", status: "locked" },
+      ],
+    },
+    {
+      n: 2,
+      title: "Minha família",
+      objective: "Falar sobre a família usando possessivos e have/has.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Possessivos (my, your, his...)", meta: "Gramática · 7 min", status: "locked" },
+        { title: "have / has", meta: "Gramática · 7 min", status: "locked" },
+        { title: "Roleplay: apresentando a família", meta: "Voz · 5 min", status: "locked" },
+      ],
+    },
+    {
+      n: 3,
+      title: "Números e rotina simples",
+      objective: "Usar números, idade e frases afirmativas/negativas simples.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Números e idade", meta: "Vocabulário · 6 min", status: "locked" },
+        { title: "Frases afirmativas e negativas", meta: "Gramática · 7 min", status: "locked" },
+        { title: "Tradução e ordenar frases (A1)", meta: "Prática · 8 min", status: "locked" },
+      ],
+    },
+  ],
+};
+
 const COURSE_A2: Course = {
   pct: 58,
   units: [
@@ -224,7 +272,7 @@ const COURSE_C1: Course = {
 };
 
 export const COURSES: Record<CefrLevel, Course> = {
-  A1: EMPTY_COURSE,
+  A1: COURSE_A1,
   A2: COURSE_A2,
   B1: COURSE_B1,
   B2: COURSE_B2,

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { initials, useProfile } from "@/lib/profile";
+import { initials, levelDisplay, useProfile } from "@/lib/profile";
 
 export default function MinhaContaPage() {
   const { profile, email, ready, updateIdentity, uploadAvatar, signOut } = useProfile();
@@ -82,7 +82,7 @@ export default function MinhaContaPage() {
             <div className="profile-hero-info">
               <h2>{profile.name || "Aluno(a)"}</h2>
               <div className="profile-hero-tags">
-                {profile.level && <span className="level-badge">{profile.level}</span>}
+                {profile.level && <span className="level-badge">{levelDisplay(profile.level)}</span>}
                 <span className="muted">{email}</span>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function MinhaContaPage() {
               </span>
               <span className="m-body">
                 <b>Nível</b>
-                <span>{profile.level || "Não definido"}</span>
+                <span>{(profile.level && levelDisplay(profile.level)) || "Não definido"}</span>
               </span>
             </div>
           </div>

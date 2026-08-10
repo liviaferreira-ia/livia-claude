@@ -3,13 +3,18 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { initials, totalExercises, useProfile } from "@/lib/profile";
+import { initials, levelDisplay, parseCefrLevel, totalExercises, useProfile } from "@/lib/profile";
 import { listMyMessages, sendMessage, type Message } from "@/lib/messages";
-import { CATEGORIES } from "@/data/exercises";
+import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
+import { resolveCourseLevel } from "@/data/curso";
 
 export default function AlunoDashboard() {
   const { profile, ready, reset, signOut } = useProfile();
   const router = useRouter();
+  const studentLevel = parseCefrLevel(profile.level) ?? "A2";
+  const contentLevel = resolveExerciseLevel(studentLevel);
+  const categories = categoriesFor(contentLevel);
+  const courseLevel = resolveCourseLevel(studentLevel);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
@@ -105,7 +110,7 @@ export default function AlunoDashboard() {
           <div className="profile-hero-info">
             <h2>{profile.name}</h2>
             <div className="profile-hero-tags">
-              {profile.level && <span className="level-badge">{profile.level}</span>}
+              {profile.level && <span className="level-badge">{levelDisplay(profile.level)}</span>}
               {profile.goal && <span className="muted">🎯 {profile.goal}</span>}
             </div>
           </div>
@@ -145,8 +150,8 @@ export default function AlunoDashboard() {
             <div className="eyebrow">Comece por aqui</div>
             <h2>{totals.done === 0 ? "Seu primeiro exercício" : "Continuar praticando"}</h2>
             <p>
-              Mais de 30 exercícios de cada tipo (múltipla escolha, completar, tradução e ordenar
-              palavras), no seu nível.
+              Exercícios de múltipla escolha, completar, tradução e ordenar palavras, no nível{" "}
+              {contentLevel}.
             </p>
             <Link href="/aluno/praticar" className="btn light">
               Praticar agora →
@@ -158,7 +163,7 @@ export default function AlunoDashboard() {
             <span className="muted">escolha por onde começar</span>
           </div>
           <div className="card" style={{ padding: 8 }}>
-            {CATEGORIES.map((cat) => {
+            {categories.map((cat) => {
               const stat = profile.stats.practice[cat.kind];
               return (
                 <Link key={cat.kind} href="/aluno/praticar" className="m-item">
@@ -183,7 +188,7 @@ export default function AlunoDashboard() {
           </div>
           <div className="card" style={{ padding: 8 }}>
             <Link href="/aluno/curso" className="m-item">
-              <span className="m-ic tint-gold" style={{ fontWeight: 800, fontSize: 11 }}>A2</span>
+              <span className="m-ic tint-gold" style={{ fontWeight: 800, fontSize: 11 }}>{courseLevel}</span>
               <span className="m-body">
                 <b>Meu curso</b>
                 <span>Trilha de unidades e lições</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LEVEL_ORDER, PASS_THRESHOLD, PLACEMENT_BANK, levelBadge } from "@/data/placement";
+import { LEVEL_ORDER, LEVEL_LABEL, PASS_THRESHOLD, PLACEMENT_BANK } from "@/data/placement";
 
 type Phase = "quiz" | "result";
 
@@ -37,10 +37,9 @@ export function PlacementTest({
 
   function finish(finalIdx: number) {
     const finalLevel = LEVEL_ORDER[Math.max(finalIdx, 0)];
-    const badge = levelBadge(finalLevel);
-    setResultLevel(badge);
+    setResultLevel(finalLevel);
     setPhase("result");
-    onComplete(badge);
+    onComplete(finalLevel);
   }
 
   function next() {
@@ -74,10 +73,10 @@ export function PlacementTest({
   }
 
   if (phase === "result") {
-    const [cefr, label] = resultLevel.split(" · ");
+    const label = LEVEL_LABEL[resultLevel as keyof typeof LEVEL_LABEL];
     return (
       <div>
-        <h2 style={{ fontSize: 21, textAlign: "center" }}>Seu nível é {cefr || resultLevel}! 🎉</h2>
+        <h2 style={{ fontSize: 21, textAlign: "center" }}>Seu nível é {resultLevel}! 🎉</h2>
         <p className="muted" style={{ fontSize: 14, textAlign: "center", margin: "6px 0 20px" }}>
           {label ? `${label} — vamos calibrar sua trilha nesse ponto.` : "Vamos calibrar sua trilha nesse ponto."}
         </p>

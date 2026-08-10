@@ -3,26 +3,18 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  CATEGORIES,
-  FILL,
-  MULTIPLE_CHOICE,
-  ORDER,
-  TRANSLATE,
+  EXERCISES,
+  categoriesFor,
   normalize,
+  resolveExerciseLevel,
   type Fill,
   type Kind,
+  type LevelBank,
   type MC,
   type Order,
   type Translate,
 } from "@/data/exercises";
-import { useProfile } from "@/lib/profile";
-
-const BANK = {
-  mc: MULTIPLE_CHOICE,
-  fill: FILL,
-  translate: TRANSLATE,
-  order: ORDER,
-} as const;
+import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 const TINTS: Record<Kind, string> = {
   mc: "tint-navy",
@@ -44,6 +36,11 @@ export default function PraticarPage() {
   const { profile, ready, bumpPractice } = useProfile();
   const [kind, setKind] = useState<Kind | null>(null);
 
+  const studentLevel = parseCefrLevel(profile.level) ?? "A2";
+  const contentLevel = resolveExerciseLevel(studentLevel);
+  const categories = categoriesFor(contentLevel);
+  const bank = EXERCISES[contentLevel];
+
   if (!kind) {
     return (
       <div className="view">
@@ -52,10 +49,16 @@ export default function PraticarPage() {
         </div>
         <h2 style={{ fontSize: 24, marginBottom: 4 }}>Escolha um tipo de exercício</h2>
         <p className="muted" style={{ margin: "0 0 22px" }}>
-          Cada tipo tem mais de 30 exercícios (nível A2), embaralhados a cada rodada.
+          Exercícios do nível {contentLevel}, embaralhados a cada rodada.
         </p>
+        {contentLevel !== studentLevel && (
+          <p className="muted" style={{ margin: "-14px 0 22px", fontSize: 13 }}>
+            Ainda não temos exercícios específicos pro nível {studentLevel} — praticando com os de{" "}
+            {contentLevel} por enquanto.
+          </p>
+        )}
         <div className="cat-grid">
-          {CATEGORIES.map((cat) => {
+          {categories.map((cat) => {
             const stat = ready ? profile.stats.practice[cat.kind] : { done: 0, correct: 0 };
             return (
               <button key={cat.kind} className="cat-card" onClick={() => setKind(cat.kind)}>
@@ -76,21 +79,33 @@ export default function PraticarPage() {
     );
   }
 
-  return <Runner kind={kind} onExit={() => setKind(null)} bump={bumpPractice} />;
+  return (
+    <Runner
+      kind={kind}
+      bank={bank}
+      categories={categories}
+      onExit={() => setKind(null)}
+      bump={bumpPractice}
+    />
+  );
 }
 
 function Runner({
   kind,
+  bank,
+  categories,
   onExit,
   bump,
 }: {
   kind: Kind;
+  bank: LevelBank;
+  categories: { kind: Kind; title: string; desc: string; count: number }[];
   onExit: () => void;
   bump: (k: Kind, correct: boolean) => void;
 }) {
   const queue = useMemo(
-    () => shuffle(BANK[kind] as readonly (MC | Fill | Translate | Order)[]),
-    [kind],
+    () => shuffle(bank[kind] as readonly (MC | Fill | Translate | Order)[]),
+    [bank, kind],
   );
   const [i, setI] = useState(0);
   const [answered, setAnswered] = useState(false);
@@ -104,7 +119,7 @@ function Runner({
   const [built, setBuilt] = useState<number[]>([]);
 
   const item = queue[i];
-  const title = CATEGORIES.find((c) => c.kind === kind)!.title;
+  const title = categories.find((c) => c.kind === kind)!.title;
 
   function resetInputs() {
     setSelected(null);

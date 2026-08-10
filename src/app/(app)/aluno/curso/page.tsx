@@ -1,77 +1,9 @@
+"use client";
+
 import Link from "next/link";
-
-type LessonStatus = "done" | "now" | "locked";
-type Lesson = { title: string; meta: string; status: LessonStatus; href?: string };
-type UnitStatus = "done" | "current" | "locked";
-type Unit = {
-  n: number;
-  title: string;
-  objective: string;
-  status: UnitStatus;
-  pct: number;
-  lessons: Lesson[];
-};
-
-const course: { level: string; pct: number; units: Unit[] } = {
-  level: "Inglês · Nível A2",
-  pct: 58,
-  units: [
-    {
-      n: 1,
-      title: "Apresentações",
-      objective: "Cumprimentar, falar seu nome e de onde você é.",
-      status: "done",
-      pct: 100,
-      lessons: [
-        { title: "Olá e tchau", meta: "Vocabulário · 6 min", status: "done" },
-        { title: "Verbo to be", meta: "Gramática · 9 min", status: "done" },
-        { title: "Diga de onde você é", meta: "Conversa · 7 min", status: "done" },
-      ],
-    },
-    {
-      n: 2,
-      title: "Rotina diária",
-      objective: "Falar sobre horários e atividades do dia a dia.",
-      status: "done",
-      pct: 100,
-      lessons: [
-        { title: "Present simple", meta: "Gramática · 10 min", status: "done" },
-        { title: "Que horas são?", meta: "Vocabulário · 7 min", status: "done" },
-        { title: "Minha rotina", meta: "Escrita · 8 min", status: "done" },
-      ],
-    },
-    {
-      n: 3,
-      title: "No hotel",
-      objective: "Reservar, fazer check-in e pedir informações.",
-      status: "current",
-      pct: 40,
-      lessons: [
-        { title: "Vocabulário do hotel", meta: "Vocabulário · 8 min", status: "done" },
-        {
-          title: "Reservas e check-in",
-          meta: "Gramática + prática · 10 min",
-          status: "now",
-          href: "/aluno/licao",
-        },
-        { title: "Pedindo informações", meta: "Conversa · 8 min", status: "locked" },
-        { title: "Roleplay: check-in", meta: "Voz · 5 min", status: "locked" },
-      ],
-    },
-    {
-      n: 4,
-      title: "No restaurante",
-      objective: "Pedir comida, tirar dúvidas e pagar a conta.",
-      status: "locked",
-      pct: 0,
-      lessons: [
-        { title: "Vocabulário de comida", meta: "Vocabulário · 8 min", status: "locked" },
-        { title: "Fazendo um pedido", meta: "Conversa · 9 min", status: "locked" },
-        { title: "Roleplay: no restaurante", meta: "Voz · 5 min", status: "locked" },
-      ],
-    },
-  ],
-};
+import { COURSES, resolveCourseLevel } from "@/data/curso";
+import { levelBadge } from "@/data/placement";
+import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 const icons = {
   done: (
@@ -93,15 +25,34 @@ const icons = {
 };
 
 export default function CursoPage() {
+  const { profile, ready } = useProfile();
+  const studentLevel = parseCefrLevel(profile.level) ?? "A2";
+  const contentLevel = resolveCourseLevel(studentLevel);
+  const course = COURSES[contentLevel];
+
+  if (!ready) {
+    return (
+      <div className="view">
+        <p className="muted">Carregando…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="view" style={{ maxWidth: 760 }}>
       <div className="eyebrow" style={{ marginBottom: 8 }}>
         Meu curso
       </div>
-      <h2 style={{ fontSize: 24, marginBottom: 6 }}>{course.level}</h2>
+      <h2 style={{ fontSize: 24, marginBottom: 6 }}>Inglês · {levelBadge(contentLevel)}</h2>
       <p className="muted" style={{ margin: "0 0 6px" }}>
         Sua trilha de aprendizado. Conclua uma lição para desbloquear a próxima.
       </p>
+      {contentLevel !== studentLevel && (
+        <p className="muted" style={{ margin: "0 0 6px", fontSize: 13 }}>
+          Ainda não temos trilha própria pro nível {studentLevel} — mostrando a de {contentLevel} por
+          enquanto.
+        </p>
+      )}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0 22px" }}>
         <div style={{ flex: 1, maxWidth: 320 }} className="unit-bar">
           <i style={{ width: `${course.pct}%` }} />

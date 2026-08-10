@@ -28,6 +28,26 @@ export function levelBadge(level: CefrLevel): string {
   return `${level} · ${LEVEL_LABEL[level]}`;
 }
 
+/**
+ * Encontra o nível populado mais próximo de `level` segundo `hasContent`.
+ * Usado por praticar/curso enquanto nem todo nível tem conteúdo próprio ainda.
+ */
+export function nearestLevelWithContent(
+  level: CefrLevel,
+  hasContent: (l: CefrLevel) => boolean,
+  fallback: CefrLevel,
+): CefrLevel {
+  if (hasContent(level)) return level;
+  const idx = LEVEL_ORDER.indexOf(level);
+  for (let d = 1; d < LEVEL_ORDER.length; d++) {
+    const lower = LEVEL_ORDER[idx - d];
+    if (lower && hasContent(lower)) return lower;
+    const upper = LEVEL_ORDER[idx + d];
+    if (upper && hasContent(upper)) return upper;
+  }
+  return fallback;
+}
+
 export const QUESTIONS_PER_LEVEL = 3;
 export const PASS_THRESHOLD = 2; // mínimo de acertos no bloco para subir de nível
 

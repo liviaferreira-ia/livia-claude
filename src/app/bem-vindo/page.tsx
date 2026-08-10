@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import { SceneArt } from "@/components/SceneArt";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useProfile } from "@/lib/profile";
+import { levelDisplay, useProfile } from "@/lib/profile";
 
 type Step = { eyebrow: string; title: string; desc: string; tint: string; icon: ReactNode };
 
@@ -86,7 +86,7 @@ export default function BemVindoPage() {
 
         {first && (
           <div className="wc-personal">
-            Sua trilha começa no nível <b>{profile.level || "inicial"}</b>
+            Sua trilha começa no nível <b>{(profile.level && levelDisplay(profile.level)) || "inicial"}</b>
             {profile.goal ? (
               <>
                 {" "}

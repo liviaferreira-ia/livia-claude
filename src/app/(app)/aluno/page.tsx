@@ -2,12 +2,40 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { totalExercises, useProfile } from "@/lib/profile";
+import { useEffect, useState } from "react";
+import { initials, totalExercises, useProfile } from "@/lib/profile";
+import { listMyMessages, sendMessage, type Message } from "@/lib/messages";
 import { CATEGORIES } from "@/data/exercises";
 
 export default function AlunoDashboard() {
   const { profile, ready, reset, signOut } = useProfile();
   const router = useRouter();
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
+  const [msgErr, setMsgErr] = useState("");
+
+  useEffect(() => {
+    if (!ready || !profile.onboarded) return;
+    listMyMessages().then(({ data }) => setMessages(data));
+  }, [ready, profile.onboarded]);
+
+  async function handleSend() {
+    const text = draft.trim();
+    if (!text) return;
+    setSending(true);
+    setMsgErr("");
+    const { error } = await sendMessage(text);
+    setSending(false);
+    if (error) {
+      setMsgErr("Não consegui enviar agora. Tente de novo.");
+      return;
+    }
+    setDraft("");
+    const { data } = await listMyMessages();
+    setMessages(data);
+  }
 
   async function handleSignOut() {
     await signOut();
@@ -127,6 +155,51 @@ export default function AlunoDashboard() {
               <span className="m-state todo">Abrir</span>
             </Link>
           </div>
+
+          <div className="sec-h" style={{ marginTop: 26 }}>
+            <h3>Fale com seu tutor</h3>
+            <span className="muted">um professor de verdade acompanha você</span>
+          </div>
+          <div className="card">
+            {messages.length > 0 && (
+              <div className="tutor-thread">
+                {messages.map((m) => (
+                  <div key={m.id} className={`tutor-msg ${m.sender}`}>
+                    <p>{m.body}</p>
+                    <time>
+                      {new Date(m.created_at).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </time>
+                  </div>
+                ))}
+              </div>
+            )}
+            <textarea
+              className="tutor-input"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="Escreva um recado, uma dúvida ou peça ajuda ao seu tutor…"
+              rows={3}
+            />
+            {msgErr && <p className="auth-msg err" style={{ maxWidth: "none" }}>{msgErr}</p>}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+              <span className="muted" style={{ fontSize: 12.5 }}>
+                Seu tutor responde em breve.
+              </span>
+              <button
+                className="btn primary"
+                onClick={handleSend}
+                disabled={sending || !draft.trim()}
+                style={{ opacity: sending || !draft.trim() ? 0.6 : 1 }}
+              >
+                {sending ? "Enviando…" : "Enviar recado"}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div>
@@ -152,14 +225,27 @@ export default function AlunoDashboard() {
 
           <div className="card stat" style={{ marginTop: 18 }}>
             <div className="eyebrow">Seu perfil</div>
-            <div style={{ marginTop: 10, fontSize: 14, lineHeight: 1.9 }}>
-              <div><b>Nome:</b> {profile.name}</div>
-              <div><b>Objetivo:</b> {profile.goal || "—"}</div>
-              <div><b>Nível:</b> {profile.level || "—"}</div>
+            <div style={{ display: "flex", gap: 14, alignItems: "center", marginTop: 12 }}>
+              <div className="avatar-lg sm">
+                {profile.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profile.avatarUrl} alt="Foto de perfil" />
+                ) : (
+                  <span>{initials(profile.name)}</span>
+                )}
+              </div>
+              <div style={{ fontSize: 14, lineHeight: 1.7 }}>
+                <div><b>{profile.name}</b></div>
+                <div className="muted">{profile.goal || "—"} · {profile.level || "—"}</div>
+              </div>
             </div>
-            <p className="est-note" style={{ marginTop: 8 }}>
-              Suas habilidades por skill aparecerão aqui conforme você praticar.
-            </p>
+            <Link
+              href="/aluno/conta"
+              className="btn ghost"
+              style={{ width: "100%", marginTop: 14 }}
+            >
+              Ver minha conta
+            </Link>
           </div>
 
           <div className="card stat" style={{ marginTop: 18 }}>

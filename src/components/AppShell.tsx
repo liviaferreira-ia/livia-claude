@@ -72,6 +72,10 @@ const studentNav: { section: string; items: NavItem[] }[] = [
     section: "Progresso",
     items: [{ href: "/aluno/revisao", label: "Revisão", icon: I.review, badge: "8" }],
   },
+  {
+    section: "Você",
+    items: [{ href: "/aluno/conta", label: "Minha conta", icon: I.user }],
+  },
 ];
 
 const teacherNav: { section: string; items: NavItem[] }[] = [
@@ -93,6 +97,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/roleplay": "Roleplay por voz",
   "/aluno/pronuncia": "Pronúncia",
   "/aluno/revisao": "Revisão",
+  "/aluno/conta": "Minha conta",
   "/professor": "Minha turma",
   "/professor/marina": "Aluna: Marina",
 };
@@ -219,7 +224,12 @@ export function AppShell({ children }: { children: ReactNode }) {
               </>
             )}
             <ThemeToggle />
-            <span className="avatar">{isTeacher ? "PF" : initials(profile.name)}</span>
+            {!isTeacher && profile.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="avatar" src={profile.avatarUrl} alt="Foto de perfil" />
+            ) : (
+              <span className="avatar">{isTeacher ? "PF" : initials(profile.name)}</span>
+            )}
           </div>
         </div>
         {children}

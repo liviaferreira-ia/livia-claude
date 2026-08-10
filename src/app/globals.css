@@ -713,6 +713,96 @@ h3 {
   text-decoration: underline;
 }
 
+/* ---------- Minha conta / casa do aluno ---------- */
+img.avatar {
+  object-fit: cover;
+  padding: 0;
+}
+.avatar-lg {
+  width: 84px;
+  height: 84px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 26px;
+  overflow: hidden;
+}
+.avatar-lg.sm {
+  width: 56px;
+  height: 56px;
+  font-size: 18px;
+}
+.avatar-lg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.level-badge {
+  align-self: flex-start;
+  background: var(--gold);
+  color: #201a08;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.tutor-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.tutor-msg {
+  border-radius: 12px;
+  padding: 10px 13px;
+  font-size: 14px;
+  max-width: 88%;
+}
+.tutor-msg p {
+  margin: 0;
+}
+.tutor-msg time {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+.tutor-msg.student {
+  align-self: flex-end;
+  background: var(--navy);
+  color: #fff;
+}
+.tutor-msg.tutor {
+  align-self: flex-start;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.tutor-input {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  font-family: inherit;
+  resize: vertical;
+}
+.tutor-input:focus {
+  outline: 2px solid var(--navy);
+  border-color: var(--navy);
+}
+
 /* ---------- Lesson player ---------- */
 .lesson-head {
   display: flex;

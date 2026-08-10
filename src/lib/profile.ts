@@ -18,6 +18,7 @@ export type Profile = {
   name: string;
   goal: string;
   level: string;
+  avatarUrl: string;
   stats: Stats;
 };
 
@@ -39,7 +40,7 @@ export function emptyStats(): Stats {
 }
 
 export function emptyProfile(): Profile {
-  return { onboarded: false, name: "", goal: "", level: "", stats: emptyStats() };
+  return { onboarded: false, name: "", goal: "", level: "", avatarUrl: "", stats: emptyStats() };
 }
 
 export function loadStats(): Stats {
@@ -124,8 +125,11 @@ export function useProfile() {
     name: metaString(user, "name"),
     goal: metaString(user, "goal"),
     level: metaString(user, "level"),
+    avatarUrl: metaString(user, "avatar_url"),
     stats,
   };
+
+  const email = user?.email ?? "";
 
   /** Salva parte da identidade na conta (nome, objetivo, nível, onboarded). */
   const updateIdentity = useCallback(
@@ -160,11 +164,46 @@ export function useProfile() {
     setStats(fresh);
   }, []);
 
+  /** Envia a foto para o Supabase Storage e salva a URL na conta. */
+  const uploadAvatar = useCallback(
+    async (file: File): Promise<{ error: string | null }> => {
+      if (!user) return { error: "Você precisa estar logado." };
+      const supabase = createClient();
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `${user.id}/avatar.${ext}`;
+
+      const up = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, cacheControl: "3600" });
+      if (up.error) return { error: up.error.message };
+
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      // ?t= força o navegador a recarregar a imagem quando ela é trocada.
+      const url = `${pub.publicUrl}?t=${Date.now()}`;
+
+      const { data, error } = await supabase.auth.updateUser({ data: { avatar_url: url } });
+      if (error) return { error: error.message };
+      if (data.user) setUser(data.user);
+      return { error: null };
+    },
+    [user],
+  );
+
   const signOut = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
   }, []);
 
-  return { profile, user, ready, updateIdentity, bumpPractice, reset, signOut };
+  return {
+    profile,
+    user,
+    email,
+    ready,
+    updateIdentity,
+    uploadAvatar,
+    bumpPractice,
+    reset,
+    signOut,
+  };
 }

@@ -17,8 +17,6 @@ export type Unit = {
 };
 export type Course = { pct: number; units: Unit[] };
 
-const EMPTY_COURSE: Course = { pct: 0, units: [] };
-
 const COURSE_A1: Course = {
   pct: 8,
   units: [
@@ -271,13 +269,61 @@ const COURSE_C1: Course = {
   ],
 };
 
+const COURSE_C2: Course = {
+  pct: 8,
+  units: [
+    {
+      n: 1,
+      title: "Retórica e persuasão",
+      objective: "Usar inversão enfática e condicionais invertidos para argumentar com sofisticação.",
+      status: "current",
+      pct: 25,
+      lessons: [
+        { title: "Inversão enfática e condicionais invertidos", meta: "Gramática · 10 min", status: "done" },
+        {
+          title: "Múltipla escolha e completar (C2)",
+          meta: "Prática · 12 min",
+          status: "now",
+          href: "/aluno/praticar",
+        },
+        { title: "Construindo um argumento persuasivo", meta: "Conversa · 8 min", status: "locked" },
+        { title: "Roleplay: debate de alto nível", meta: "Voz · 6 min", status: "locked" },
+      ],
+    },
+    {
+      n: 2,
+      title: "Nuance e registro",
+      objective: "Ajustar o tom entre formal e informal e usar expressões idiomáticas sofisticadas.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Subjuntivo e verbos de exigência", meta: "Gramática · 9 min", status: "locked" },
+        { title: "Collocations e expressões fixas", meta: "Vocabulário · 8 min", status: "locked" },
+        { title: "Roleplay: negociação de alto nível", meta: "Voz · 6 min", status: "locked" },
+      ],
+    },
+    {
+      n: 3,
+      title: "Redação avançada",
+      objective: "Escrever com coesão e precisão em contextos acadêmicos e profissionais.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Cleft sentences e ênfase", meta: "Gramática · 9 min", status: "locked" },
+        { title: "Conectivos de alto registro", meta: "Escrita · 8 min", status: "locked" },
+        { title: "Tradução e ordenar frases (C2)", meta: "Prática · 10 min", status: "locked" },
+      ],
+    },
+  ],
+};
+
 export const COURSES: Record<CefrLevel, Course> = {
   A1: COURSE_A1,
   A2: COURSE_A2,
   B1: COURSE_B1,
   B2: COURSE_B2,
   C1: COURSE_C1,
-  C2: EMPTY_COURSE,
+  C2: COURSE_C2,
 };
 
 export function courseHasContent(level: CefrLevel): boolean {

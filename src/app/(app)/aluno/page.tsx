@@ -80,16 +80,64 @@ export default function AlunoDashboard() {
   const totals = totalExercises(profile);
   const first = profile.name.split(" ")[0];
 
+  const badges = [
+    { emoji: "🌱", label: "Primeiro passo", got: totals.done >= 1, hint: "Faça 1 exercício" },
+    { emoji: "📚", label: "Praticante", got: totals.done >= 10, hint: "Faça 10 exercícios" },
+    { emoji: "🎯", label: "Pontaria", got: totals.done >= 5 && totals.pct >= 80, hint: "80% de acerto em 5+ exercícios" },
+    { emoji: "🔥", label: "Chama acesa", got: profile.stats.streak >= 3, hint: "3 dias seguidos" },
+    { emoji: "🏅", label: "Dedicado", got: totals.done >= 30, hint: "Faça 30 exercícios" },
+    { emoji: "🎓", label: "Primeira lição", got: profile.stats.lessonsCompleted >= 1, hint: "Conclua 1 lição" },
+  ];
+
   return (
     <div className="view">
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{ fontSize: 26 }}>Olá, {first}! 👋</h2>
-        <p className="muted" style={{ marginTop: 2 }}>
-          {totals.done === 0
-            ? "Seu perfil está pronto. Que tal começar com alguns exercícios?"
-            : `Você já fez ${totals.done} exercícios. Continue assim!`}
-        </p>
+      <div className="profile-hero">
+        <div className="profile-hero-banner" />
+        <div className="profile-hero-body">
+          <div className="profile-hero-avatar">
+            {profile.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profile.avatarUrl} alt="Foto de perfil" />
+            ) : (
+              <span>{initials(profile.name)}</span>
+            )}
+          </div>
+          <div className="profile-hero-info">
+            <h2>{profile.name}</h2>
+            <div className="profile-hero-tags">
+              {profile.level && <span className="level-badge">{profile.level}</span>}
+              {profile.goal && <span className="muted">🎯 {profile.goal}</span>}
+            </div>
+          </div>
+          <Link href="/aluno/conta" className="btn ghost profile-hero-btn">
+            Ver minha conta
+          </Link>
+        </div>
+        <div className="profile-stats">
+          <div>
+            <b>{totals.done}</b>
+            <span>exercícios</span>
+          </div>
+          <div>
+            <b>{totals.done ? `${totals.pct}%` : "—"}</b>
+            <span>de acerto</span>
+          </div>
+          <div>
+            <b>{profile.stats.streak}</b>
+            <span>dias seguidos</span>
+          </div>
+          <div>
+            <b>{profile.stats.lessonsCompleted}</b>
+            <span>lições</span>
+          </div>
+        </div>
       </div>
+
+      <p className="muted" style={{ margin: "14px 2px 20px" }}>
+        {totals.done === 0
+          ? `Bem-vindo(a), ${first}! Que tal começar com alguns exercícios?`
+          : `Continue assim, ${first}! Você já fez ${totals.done} exercícios.`}
+      </p>
 
       <div className="grid cols-2">
         <div>
@@ -204,48 +252,20 @@ export default function AlunoDashboard() {
 
         <div>
           <div className="card stat">
-            <div className="eyebrow">Seu progresso</div>
-            <div style={{ display: "flex", gap: 20, marginTop: 14 }}>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 800, color: "var(--navy)" }}>{totals.done}</div>
-                <div className="muted" style={{ fontSize: 12.5 }}>exercícios feitos</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 800, color: "var(--gold)" }}>
-                  {totals.done ? `${totals.pct}%` : "—"}
+            <div className="sec-h" style={{ marginBottom: 4 }}>
+              <h3 style={{ fontSize: 15 }}>Conquistas</h3>
+              <span className="muted">
+                {badges.filter((b) => b.got).length}/{badges.length}
+              </span>
+            </div>
+            <div className="badges">
+              {badges.map((b) => (
+                <div key={b.label} className={`badge-item${b.got ? " got" : ""}`} title={b.hint}>
+                  <span className="badge-emoji">{b.got ? b.emoji : "🔒"}</span>
+                  <span className="badge-label">{b.label}</span>
                 </div>
-                <div className="muted" style={{ fontSize: 12.5 }}>de acerto</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 800, color: "var(--ink)" }}>{profile.stats.streak}</div>
-                <div className="muted" style={{ fontSize: 12.5 }}>dias seguidos</div>
-              </div>
+              ))}
             </div>
-          </div>
-
-          <div className="card stat" style={{ marginTop: 18 }}>
-            <div className="eyebrow">Seu perfil</div>
-            <div style={{ display: "flex", gap: 14, alignItems: "center", marginTop: 12 }}>
-              <div className="avatar-lg sm">
-                {profile.avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profile.avatarUrl} alt="Foto de perfil" />
-                ) : (
-                  <span>{initials(profile.name)}</span>
-                )}
-              </div>
-              <div style={{ fontSize: 14, lineHeight: 1.7 }}>
-                <div><b>{profile.name}</b></div>
-                <div className="muted">{profile.goal || "—"} · {profile.level || "—"}</div>
-              </div>
-            </div>
-            <Link
-              href="/aluno/conta"
-              className="btn ghost"
-              style={{ width: "100%", marginTop: 14 }}
-            >
-              Ver minha conta
-            </Link>
           </div>
 
           <div className="card stat" style={{ marginTop: 18 }}>

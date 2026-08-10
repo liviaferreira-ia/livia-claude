@@ -803,6 +803,139 @@ img.avatar {
   border-color: var(--navy);
 }
 
+/* ---------- Cabeçalho de perfil (estilo rede social) ---------- */
+.profile-hero {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.profile-hero-banner {
+  height: 96px;
+  background:
+    radial-gradient(120% 160% at 85% -20%, rgba(184, 145, 47, 0.55), transparent 55%),
+    linear-gradient(120deg, var(--navy), var(--navy-deep));
+}
+.profile-hero-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  padding: 0 24px 16px;
+  margin-top: -44px;
+}
+.profile-hero-avatar {
+  width: 96px;
+  height: 96px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 30px;
+  overflow: hidden;
+  border: 4px solid var(--panel);
+  box-shadow: var(--shadow);
+}
+.profile-hero-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.profile-hero-info {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 4px;
+}
+.profile-hero-info h2 {
+  font-size: 23px;
+  margin: 0;
+}
+.profile-hero-tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 13.5px;
+}
+.profile-hero-btn {
+  margin-bottom: 4px;
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+}
+.profile-stats > div {
+  text-align: center;
+  padding: 14px 8px;
+  border-left: 1px solid var(--line);
+}
+.profile-stats > div:first-child {
+  border-left: 0;
+}
+.profile-stats b {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--navy);
+}
+.profile-stats span {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+:root[data-theme="dark"] .profile-stats b {
+  color: var(--gold);
+}
+.badges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  padding: 12px 6px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  opacity: 0.55;
+}
+.badge-item.got {
+  opacity: 1;
+  border-color: var(--gold);
+}
+.badge-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+.badge-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.badge-item.got .badge-label {
+  color: var(--ink);
+}
+@media (max-width: 560px) {
+  .profile-hero-body {
+    flex-wrap: wrap;
+  }
+  .profile-hero-btn {
+    width: 100%;
+  }
+  .profile-stats b {
+    font-size: 20px;
+  }
+}
+
 /* ---------- Caixa de entrada do professor ---------- */
 .inbox {
   display: grid;

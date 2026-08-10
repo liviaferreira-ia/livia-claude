@@ -61,43 +61,46 @@ export default function MinhaContaPage() {
 
   return (
     <div className="view">
-      <div style={{ maxWidth: 640 }}>
+      <div style={{ maxWidth: 680 }}>
         <h2 style={{ fontSize: 26, marginBottom: 4 }}>Minha conta</h2>
         <p className="muted" style={{ marginBottom: 22 }}>
           Seus dados ficam salvos na sua conta e acompanham você em qualquer aparelho.
         </p>
 
         {/* Cabeçalho com foto */}
-        <div className="card" style={{ display: "flex", gap: 18, alignItems: "center" }}>
-          <div className="avatar-lg">
-            {profile.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.avatarUrl} alt="Foto de perfil" />
-            ) : (
-              <span>{initials(profile.name)}</span>
-            )}
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 20, fontWeight: 800 }}>{profile.name || "Aluno(a)"}</div>
-            <div className="muted" style={{ fontSize: 13.5 }}>{email}</div>
-            <div style={{ marginTop: 8 }}>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                onChange={handlePhoto}
-                style={{ display: "none" }}
-              />
-              <button
-                className="btn ghost"
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-              >
-                {uploading ? "Enviando…" : profile.avatarUrl ? "Trocar foto" : "Adicionar foto"}
-              </button>
+        <div className="profile-hero">
+          <div className="profile-hero-banner" />
+          <div className="profile-hero-body">
+            <div className="profile-hero-avatar">
+              {profile.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profile.avatarUrl} alt="Foto de perfil" />
+              ) : (
+                <span>{initials(profile.name)}</span>
+              )}
             </div>
+            <div className="profile-hero-info">
+              <h2>{profile.name || "Aluno(a)"}</h2>
+              <div className="profile-hero-tags">
+                {profile.level && <span className="level-badge">{profile.level}</span>}
+                <span className="muted">{email}</span>
+              </div>
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhoto}
+              style={{ display: "none" }}
+            />
+            <button
+              className="btn ghost profile-hero-btn"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? "Enviando…" : profile.avatarUrl ? "Trocar foto" : "Adicionar foto"}
+            </button>
           </div>
-          {profile.level && <span className="level-badge">{profile.level}</span>}
         </div>
 
         {msg && (
@@ -107,7 +110,7 @@ export default function MinhaContaPage() {
         )}
 
         {/* Dados */}
-        <div className="card" style={{ marginTop: 18 }}>
+        <div className="card" style={{ marginTop: 18, padding: 22 }}>
           <div className="eyebrow">Seus dados</div>
           <div className="field" style={{ marginTop: 12 }}>
             <label htmlFor="nome">Nome</label>
@@ -121,25 +124,41 @@ export default function MinhaContaPage() {
           >
             {savingName ? "Salvando…" : "Salvar nome"}
           </button>
+        </div>
 
-          <div style={{ marginTop: 18, fontSize: 14, lineHeight: 2 }}>
-            <div>
-              <b>Objetivo:</b> {profile.goal || "—"}
+        {/* Objetivo e nível */}
+        <div className="card" style={{ marginTop: 18, padding: 22 }}>
+          <div className="sec-h" style={{ marginBottom: 2 }}>
+            <h3 style={{ fontSize: 15 }}>Objetivo e nível</h3>
+            <span className="muted">seu diagnóstico de entrada</span>
+          </div>
+          <div style={{ marginTop: 6 }}>
+            <div className="m-item" style={{ cursor: "default" }}>
+              <span className="m-ic tint-navy" style={{ fontSize: 18 }}>
+                🎯
+              </span>
+              <span className="m-body">
+                <b>Objetivo</b>
+                <span>{profile.goal || "Não definido"}</span>
+              </span>
             </div>
-            <div>
-              <b>Nível:</b> {profile.level || "—"}
+            <div className="m-item" style={{ cursor: "default" }}>
+              <span className="m-ic tint-gold" style={{ fontSize: 18 }}>
+                📈
+              </span>
+              <span className="m-body">
+                <b>Nível</b>
+                <span>{profile.level || "Não definido"}</span>
+              </span>
             </div>
           </div>
-          <p className="muted" style={{ fontSize: 13, marginTop: 8 }}>
-            Quer mudar seu objetivo ou nível?{" "}
-            <Link href="/onboarding" style={{ color: "var(--navy)", fontWeight: 700 }}>
-              Refazer o diagnóstico
-            </Link>
-          </p>
+          <Link href="/onboarding" className="btn ghost" style={{ width: "100%", marginTop: 14 }}>
+            ↺ Refazer o diagnóstico
+          </Link>
         </div>
 
         {/* Conta */}
-        <div className="card" style={{ marginTop: 18 }}>
+        <div className="card" style={{ marginTop: 18, padding: 22 }}>
           <div className="eyebrow">Conta</div>
           <p className="muted" style={{ fontSize: 13, margin: "10px 0 12px" }}>
             Sair encerra a sessão neste aparelho. Você pode entrar de novo quando quiser.

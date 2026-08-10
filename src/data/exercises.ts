@@ -1,5 +1,9 @@
-// Banco de exercícios — nível A2. Cada tipo tem 30+ itens.
-// Temas: apresentações, rotina, hotel, restaurante, viagem, compras, direções.
+// Banco de exercícios, organizado por nível CEFR (A1-C2). Cada nível tem seu
+// próprio conjunto de múltipla escolha, completar lacuna, tradução e ordenar
+// palavras. Nem todo nível tem conteúdo ainda — veja `resolveExerciseLevel`,
+// que cai pro nível populado mais próximo enquanto o resto é construído.
+
+import { nearestLevelWithContent, type CefrLevel } from "@/data/placement";
 
 export type Kind = "mc" | "fill" | "translate" | "order";
 
@@ -33,7 +37,17 @@ export type Order = {
   pt: string;
 };
 
-export const MULTIPLE_CHOICE: MC[] = [
+export type LevelBank = {
+  mc: MC[];
+  fill: Fill[];
+  translate: Translate[];
+  order: Order[];
+};
+
+// ================= A2 =================
+// Temas: apresentações, rotina, hotel, restaurante, viagem, compras, direções.
+
+const MC_A2: MC[] = [
   { id: "mc1", prompt: "She ___ coffee every morning.", options: ["drink", "drinks", "drinking", "drank"], answer: 1, explain: "3ª pessoa (she) no present simple leva -s: drinks." },
   { id: "mc2", prompt: "___ you speak English?", options: ["Do", "Does", "Are", "Is"], answer: 0, explain: "Com 'you' usamos Do para perguntas." },
   { id: "mc3", prompt: "There ___ two beds in the room.", options: ["is", "are", "am", "be"], answer: 1, explain: "Plural (two beds) usa are." },
@@ -68,7 +82,7 @@ export const MULTIPLE_CHOICE: MC[] = [
   { id: "mc32", prompt: "She has ___ homework today.", options: ["many", "a lot of", "a few", "some of"], answer: 1, explain: "Homework é incontável: a lot of." },
 ];
 
-export const FILL: Fill[] = [
+const FILL_A2: Fill[] = [
   { id: "f1", prompt: "I ___ (be) a student.", hint: "verbo to be, presente", answers: ["am"], explain: "I am." },
   { id: "f2", prompt: "She ___ (go) to school by bus.", hint: "3ª pessoa, present simple", answers: ["goes"], explain: "go → goes." },
   { id: "f3", prompt: "They ___ (not / like) fish.", hint: "negativa", answers: ["don't like", "do not like"], explain: "don't like." },
@@ -103,7 +117,7 @@ export const FILL: Fill[] = [
   { id: "f32", prompt: "How ___ is this shirt? (preço)", hint: "quantidade incontável", answers: ["much"], explain: "How much...?" },
 ];
 
-export const TRANSLATE: Translate[] = [
+const TRANSLATE_A2: Translate[] = [
   { id: "t1", pt: "Eu estudo inglês todos os dias.", answers: ["i study english every day"], explain: "I study English every day." },
   { id: "t2", pt: "Ela mora em São Paulo.", answers: ["she lives in são paulo", "she lives in sao paulo"], explain: "She lives in São Paulo." },
   { id: "t3", pt: "Eu tenho uma reserva.", answers: ["i have a reservation"], explain: "I have a reservation." },
@@ -138,7 +152,7 @@ export const TRANSLATE: Translate[] = [
   { id: "t32", pt: "Ela tem duas irmãs.", answers: ["she has two sisters"], explain: "She has two sisters." },
 ];
 
-export const ORDER: Order[] = [
+const ORDER_A2: Order[] = [
   { id: "o1", words: ["every", "she", "coffee", "drinks", "morning"], answer: "she drinks coffee every morning", pt: "Ela bebe café toda manhã." },
   { id: "o2", words: ["a", "have", "I", "reservation"], answer: "i have a reservation", pt: "Eu tenho uma reserva." },
   { id: "o3", words: ["you", "do", "English", "speak"], answer: "do you speak english", pt: "Você fala inglês?" },
@@ -173,17 +187,106 @@ export const ORDER: Order[] = [
   { id: "o32", words: ["happy", "were", "they", "yesterday"], answer: "they were happy yesterday", pt: "Eles estavam felizes ontem." },
 ];
 
-export const CATEGORIES: {
-  kind: Kind;
-  title: string;
-  desc: string;
-  count: number;
-}[] = [
-  { kind: "mc", title: "Múltipla escolha", desc: "Escolha a opção correta em frases de gramática e vocabulário.", count: MULTIPLE_CHOICE.length },
-  { kind: "fill", title: "Completar a lacuna", desc: "Complete a frase com a forma certa do verbo ou palavra.", count: FILL.length },
-  { kind: "translate", title: "Tradução PT → EN", desc: "Traduza a frase para o inglês.", count: TRANSLATE.length },
-  { kind: "order", title: "Ordenar palavras", desc: "Toque nas palavras para montar a frase correta.", count: ORDER.length },
+// ================= C1 =================
+// Temas: trabalho, opiniões, notícias, negociações — gramática avançada
+// (condicionais mistos, inversão, voz passiva, discurso indireto, coesão).
+
+const MC_C1: MC[] = [
+  { id: "c1-mc1", prompt: "Had I known about the delay, I ___ earlier.", options: ["would leave", "would have left", "had left", "was leaving"], answer: 1, explain: "3ª condicional invertida (Had I known = If I had known): would have left." },
+  { id: "c1-mc2", prompt: "We ___ the report by the time you arrive.", options: ["will finish", "will have finished", "finish", "are finishing"], answer: 1, explain: "Future perfect: ação concluída antes de outro momento futuro." },
+  { id: "c1-mc3", prompt: "She admitted ___ the vase, though she tried to blame the cat.", options: ["to break", "breaking", "broke", "break"], answer: 1, explain: "admit + gerúndio: admitted breaking." },
+  { id: "c1-mc4", prompt: "___ the pandemic, the company managed to grow.", options: ["Despite of", "In spite", "Despite", "Although of"], answer: 2, explain: "Despite + substantivo, sem 'of'." },
+  { id: "c1-mc5", prompt: "He must ___ the email — I can see it in his sent folder.", options: ["send", "have sent", "be sending", "sent"], answer: 1, explain: "Modal de dedução no passado: must have sent." },
+  { id: "c1-mc6", prompt: "The bridge, ___ was built in 1889, is now a tourist attraction.", options: ["that", "which", "who", "what"], answer: 1, explain: "Oração relativa não-restritiva (com vírgulas) usa which, não that." },
+  { id: "c1-mc7", prompt: "Not until she apologized ___ willing to speak to her.", options: ["I was", "was I", "I am", "am I"], answer: 1, explain: "Inversão depois de advérbio negativo no início: Not until... was I." },
+  { id: "c1-mc8", prompt: "The new policy has come ___ a lot of criticism.", options: ["under", "over", "across", "along"], answer: 0, explain: "Collocation: come under criticism." },
+  { id: "c1-mc9", prompt: "If the manager had listened to us, the project ___ on time.", options: ["would finish", "would have finished", "finished", "will finish"], answer: 1, explain: "3ª condicional: if + past perfect, would have + particípio." },
+  { id: "c1-mc10", prompt: "It's about time you ___ some responsibility for your actions.", options: ["take", "took", "taken", "will take"], answer: 1, explain: "'It's (about) time' + passado simples, com sentido de presente/cobrança." },
+  { id: "c1-mc11", prompt: "The committee is looking ___ several proposals before deciding.", options: ["into", "for", "at", "up"], answer: 0, explain: "look into = investigar, analisar." },
+  { id: "c1-mc12", prompt: "Rarely ___ such a compelling argument.", options: ["I have heard", "have I heard", "I heard", "did I hear"], answer: 1, explain: "Inversão depois de advérbio de frequência negativo (Rarely) no início da frase." },
 ];
+
+const FILL_C1: Fill[] = [
+  { id: "c1-f1", prompt: "If she ___ (know) about the meeting, she would have attended.", hint: "3ª condicional", answers: ["had known"], explain: "If + past perfect: had known." },
+  { id: "c1-f2", prompt: "The results ___ (announce) next week.", hint: "voz passiva, futuro", answers: ["will be announced"], explain: "Futuro passivo: will be announced." },
+  { id: "c1-f3", prompt: "He denied ___ (take) the money.", hint: "deny + gerúndio", answers: ["taking"], explain: "deny + -ing: denied taking." },
+  { id: "c1-f4", prompt: "___ (Not / only) did he arrive late, he also forgot his notes.", hint: "inversão no início da frase", answers: ["Not only", "not only"], explain: "Not only + inversão (did he arrive)." },
+  { id: "c1-f5", prompt: "By next year, she ___ (work) here for a decade.", hint: "future perfect", answers: ["will have worked"], explain: "will have + particípio: will have worked." },
+  { id: "c1-f6", prompt: "The manager insisted that the report ___ (submit) by Friday.", hint: "subjuntivo depois de insist that", answers: ["be submitted"], explain: "insist that + sujeito + forma base (subjuntivo): be submitted." },
+  { id: "c1-f7", prompt: "I'd rather you ___ (not / mention) this to anyone.", hint: "would rather + passado simples", answers: ["didn't mention", "did not mention"], explain: "would rather + passado simples com sentido de presente." },
+  { id: "c1-f8", prompt: "Scarcely ___ (he / sit) down when the phone rang.", hint: "inversão com scarcely", answers: ["had he sat"], explain: "Scarcely + inversão: had he sat." },
+  { id: "c1-f9", prompt: "The findings, ___ surprised everyone, will be published soon.", hint: "pronome relativo (oração não-restritiva)", answers: ["which"], explain: "which, para retomar 'the findings' numa oração não-restritiva." },
+  { id: "c1-f10", prompt: "She's used to ___ (work) under pressure.", hint: "used to + gerúndio", answers: ["working"], explain: "be used to + -ing: used to working." },
+  { id: "c1-f11", prompt: "It's high time the company ___ (update) its policies.", hint: "it's (high) time + passado simples", answers: ["updated"], explain: "it's high time + passado simples: updated." },
+  { id: "c1-f12", prompt: "Were it not for his support, the project ___ (fail).", hint: "condicional invertido", answers: ["would have failed"], explain: "Were it not for = If it weren't for; consequência: would have failed." },
+];
+
+const TRANSLATE_C1: Translate[] = [
+  { id: "c1-t1", pt: "Se eu tivesse sabido, eu teria ajudado.", answers: ["if i had known, i would have helped", "if i had known i would have helped", "had i known, i would have helped", "had i known i would have helped"], explain: "If I had known, I would have helped. / Had I known, I would have helped." },
+  { id: "c1-t2", pt: "Ele admitiu ter cometido um erro.", answers: ["he admitted making a mistake", "he admitted to making a mistake"], explain: "He admitted making a mistake." },
+  { id: "c1-t3", pt: "Mal ela tinha chegado quando o telefone tocou.", answers: ["hardly had she arrived when the phone rang", "no sooner had she arrived than the phone rang"], explain: "Hardly had she arrived when the phone rang." },
+  { id: "c1-t4", pt: "Está na hora de você assumir mais responsabilidade.", answers: ["it's time you took more responsibility", "it's about time you took more responsibility", "it is time you took more responsibility"], explain: "It's (about) time you took more responsibility." },
+  { id: "c1-t5", pt: "O relatório será divulgado até sexta-feira.", answers: ["the report will be released by friday", "the report will have been released by friday"], explain: "The report will be released by Friday." },
+  { id: "c1-t6", pt: "Ela é acostumada a trabalhar sob pressão.", answers: ["she's used to working under pressure", "she is used to working under pressure"], explain: "She's used to working under pressure." },
+  { id: "c1-t7", pt: "Não fosse pela sua ajuda, eu teria falhado.", answers: ["were it not for your help, i would have failed", "were it not for your help i would have failed", "if it weren't for your help, i would have failed", "if it weren't for your help i would have failed"], explain: "Were it not for your help, I would have failed." },
+  { id: "c1-t8", pt: "Ele insistiu que a reunião fosse adiada.", answers: ["he insisted that the meeting be postponed"], explain: "He insisted that the meeting be postponed." },
+  { id: "c1-t9", pt: "Raramente vi um argumento tão convincente.", answers: ["rarely have i seen such a compelling argument", "i have rarely seen such a compelling argument"], explain: "Rarely have I seen such a compelling argument." },
+  { id: "c1-t10", pt: "A ponte, que foi construída em 1889, é um ponto turístico.", answers: ["the bridge, which was built in 1889, is a tourist attraction", "the bridge which was built in 1889 is a tourist attraction"], explain: "The bridge, which was built in 1889, is a tourist attraction." },
+  { id: "c1-t11", pt: "Prefiro que você não mencione isso.", answers: ["i'd rather you didn't mention this", "i would rather you didn't mention this"], explain: "I'd rather you didn't mention this." },
+  { id: "c1-t12", pt: "A nova política recebeu muitas críticas.", answers: ["the new policy has come under a lot of criticism", "the new policy received a lot of criticism"], explain: "The new policy has come under a lot of criticism." },
+];
+
+const ORDER_C1: Order[] = [
+  { id: "c1-o1", words: ["would", "known", "have", "had", "I", "helped", "I"], answer: "had i known i would have helped", pt: "Se eu tivesse sabido, eu teria ajudado." },
+  { id: "c1-o2", words: ["making", "mistake", "she", "a", "admitted"], answer: "she admitted making a mistake", pt: "Ela admitiu ter cometido um erro." },
+  { id: "c1-o3", words: ["had", "hardly", "she", "arrived", "when", "rang", "the", "phone"], answer: "hardly had she arrived when the phone rang", pt: "Mal ela tinha chegado quando o telefone tocou." },
+  { id: "c1-o4", words: ["time", "it's", "you", "took", "responsibility", "more"], answer: "it's time you took more responsibility", pt: "Está na hora de você assumir mais responsabilidade." },
+  { id: "c1-o5", words: ["report", "the", "will", "released", "have", "been", "by", "Friday"], answer: "the report will have been released by friday", pt: "O relatório será divulgado até sexta-feira." },
+  { id: "c1-o6", words: ["used", "she's", "working", "under", "to", "pressure"], answer: "she's used to working under pressure", pt: "Ela é acostumada a trabalhar sob pressão." },
+  { id: "c1-o7", words: ["it", "were", "help", "not", "your", "for", "would", "have", "failed", "I"], answer: "were it not for your help i would have failed", pt: "Não fosse pela sua ajuda, eu teria falhado." },
+  { id: "c1-o8", words: ["insisted", "he", "meeting", "that", "postponed", "be", "the"], answer: "he insisted that the meeting be postponed", pt: "Ele insistiu que a reunião fosse adiada." },
+  { id: "c1-o9", words: ["have", "rarely", "seen", "I", "argument", "compelling", "a", "such"], answer: "rarely have i seen such a compelling argument", pt: "Raramente vi um argumento tão convincente." },
+  { id: "c1-o10", words: ["bridge", "the", "was", "which", "built", "in", "1889", "is", "attraction", "a", "tourist"], answer: "the bridge which was built in 1889 is a tourist attraction", pt: "A ponte, que foi construída em 1889, é um ponto turístico." },
+  { id: "c1-o11", words: ["rather", "I'd", "didn't", "mention", "you", "this"], answer: "i'd rather you didn't mention this", pt: "Prefiro que você não mencione isso." },
+  { id: "c1-o12", words: ["policy", "the", "new", "come", "has", "under", "criticism", "a", "lot", "of"], answer: "the new policy has come under a lot of criticism", pt: "A nova política recebeu muitas críticas." },
+];
+
+const EMPTY_BANK: LevelBank = { mc: [], fill: [], translate: [], order: [] };
+
+export const EXERCISES: Record<CefrLevel, LevelBank> = {
+  A1: EMPTY_BANK,
+  A2: { mc: MC_A2, fill: FILL_A2, translate: TRANSLATE_A2, order: ORDER_A2 },
+  B1: EMPTY_BANK,
+  B2: EMPTY_BANK,
+  C1: { mc: MC_C1, fill: FILL_C1, translate: TRANSLATE_C1, order: ORDER_C1 },
+  C2: EMPTY_BANK,
+};
+
+export const CATEGORY_META: Record<Kind, { title: string; desc: string }> = {
+  mc: { title: "Múltipla escolha", desc: "Escolha a opção correta em frases de gramática e vocabulário." },
+  fill: { title: "Completar a lacuna", desc: "Complete a frase com a forma certa do verbo ou palavra." },
+  translate: { title: "Tradução PT → EN", desc: "Traduza a frase para o inglês." },
+  order: { title: "Ordenar palavras", desc: "Toque nas palavras para montar a frase correta." },
+};
+
+export function levelHasContent(level: CefrLevel): boolean {
+  const bank = EXERCISES[level];
+  return bank.mc.length > 0 || bank.fill.length > 0 || bank.translate.length > 0 || bank.order.length > 0;
+}
+
+/** Nível de exercícios a mostrar: o do aluno, ou o mais próximo já populado. */
+export function resolveExerciseLevel(level: CefrLevel): CefrLevel {
+  return nearestLevelWithContent(level, levelHasContent, "A2");
+}
+
+export function categoriesFor(level: CefrLevel): { kind: Kind; title: string; desc: string; count: number }[] {
+  const bank = EXERCISES[level];
+  return (Object.keys(CATEGORY_META) as Kind[]).map((kind) => ({
+    kind,
+    ...CATEGORY_META[kind],
+    count: bank[kind].length,
+  }));
+}
 
 export function normalize(s: string) {
   return (s ?? "")

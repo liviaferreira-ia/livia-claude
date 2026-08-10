@@ -92,8 +92,11 @@ function metaString(user: User | null, key: string): string {
  * Lê a identidade da conta Supabase e as estatísticas do navegador.
  * `ready` fica true depois que a sessão foi verificada, evitando "piscar".
  */
+export type Role = "student" | "teacher";
+
 export function useProfile() {
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<Role>("student");
   const [stats, setStats] = useState<Stats>(emptyStats());
   const [ready, setReady] = useState(false);
 
@@ -103,9 +106,17 @@ export function useProfile() {
 
     setStats(loadStats());
 
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (!mounted) return;
       setUser(data.user);
+      if (data.user) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .maybeSingle();
+        if (mounted) setRole((prof?.role as Role) ?? "student");
+      }
       setReady(true);
     });
 
@@ -199,6 +210,8 @@ export function useProfile() {
     profile,
     user,
     email,
+    role,
+    isTeacher: role === "teacher",
     ready,
     updateIdentity,
     uploadAvatar,

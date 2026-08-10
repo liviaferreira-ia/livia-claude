@@ -82,8 +82,8 @@ const teacherNav: { section: string; items: NavItem[] }[] = [
   {
     section: "Professor",
     items: [
-      { href: "/professor", label: "Minha turma", icon: I.users },
-      { href: "/professor/marina", label: "Aluna: Marina", icon: I.user },
+      { href: "/professor", label: "Recados dos alunos", icon: I.chat },
+      { href: "/professor/marina", label: "Exemplo: Marina", icon: I.user },
     ],
   },
 ];
@@ -98,8 +98,8 @@ const CRUMBS: Record<string, string> = {
   "/aluno/pronuncia": "Pronúncia",
   "/aluno/revisao": "Revisão",
   "/aluno/conta": "Minha conta",
-  "/professor": "Minha turma",
-  "/professor/marina": "Aluna: Marina",
+  "/professor": "Recados dos alunos",
+  "/professor/marina": "Exemplo: Marina",
 };
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -214,7 +214,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <div className="top-right">
             {isTeacher ? (
-              <span className="chip">Prof. Fernanda</span>
+              <span className="chip">
+                {profile.name ? `Prof. ${profile.name.split(" ")[0]}` : "Professor(a)"}
+              </span>
             ) : (
               <>
                 {profile.stats.streak > 0 && (
@@ -224,11 +226,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               </>
             )}
             <ThemeToggle />
-            {!isTeacher && profile.avatarUrl ? (
+            {profile.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img className="avatar" src={profile.avatarUrl} alt="Foto de perfil" />
             ) : (
-              <span className="avatar">{isTeacher ? "PF" : initials(profile.name)}</span>
+              <span className="avatar">{initials(profile.name)}</span>
             )}
           </div>
         </div>

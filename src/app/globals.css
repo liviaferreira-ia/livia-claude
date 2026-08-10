@@ -803,6 +803,71 @@ img.avatar {
   border-color: var(--navy);
 }
 
+/* ---------- Caixa de entrada do professor ---------- */
+.inbox {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.inbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+.inbox-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  padding: 10px 11px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--ink);
+}
+.inbox-item:hover {
+  background: var(--panel-2);
+}
+.inbox-item.on {
+  background: var(--panel-2);
+  box-shadow: inset 3px 0 0 var(--navy);
+}
+.inbox-item-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.inbox-item-body b {
+  font-size: 14px;
+}
+.inbox-item-body span {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inbox-thread-head {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
+}
+@media (max-width: 860px) {
+  .inbox {
+    grid-template-columns: 1fr;
+  }
+  .inbox-list {
+    max-height: 220px;
+  }
+}
+
 /* ---------- Lesson player ---------- */
 .lesson-head {
   display: flex;

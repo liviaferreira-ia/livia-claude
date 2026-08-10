@@ -647,6 +647,72 @@ h3 {
   border-color: var(--navy);
 }
 
+/* ---------- Auth (login / cadastro) ---------- */
+.auth-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 18px 0 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px;
+}
+.auth-tabs button {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.auth-tabs button.on {
+  background: var(--navy);
+  color: #fff;
+}
+.auth-msg {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 12px;
+  padding: 9px 12px;
+  border-radius: 9px;
+}
+.auth-msg.err {
+  color: #8a1f1f;
+  background: #fbe9e9;
+  border: 1px solid #f3c9c9;
+}
+.auth-msg.ok {
+  color: #1f5a34;
+  background: #e8f6ec;
+  border: 1px solid #c6e7d1;
+}
+:root[data-theme="dark"] .auth-msg.err {
+  color: #ffb4b4;
+  background: rgba(138, 31, 31, 0.22);
+  border-color: rgba(243, 201, 201, 0.25);
+}
+:root[data-theme="dark"] .auth-msg.ok {
+  color: #a9e6bd;
+  background: rgba(31, 90, 52, 0.22);
+  border-color: rgba(198, 231, 209, 0.25);
+}
+.link-btn {
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
 /* ---------- Lesson player ---------- */
 .lesson-head {
   display: flex;

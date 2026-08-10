@@ -6,18 +6,23 @@ import { totalExercises, useProfile } from "@/lib/profile";
 import { CATEGORIES } from "@/data/exercises";
 
 export default function AlunoDashboard() {
-  const { profile, ready, reset } = useProfile();
+  const { profile, ready, reset, signOut } = useProfile();
   const router = useRouter();
 
-  function fullReset() {
-    if (!confirm("Recomeçar do zero? Isto apaga o perfil e o progresso deste navegador para você se cadastrar de novo.")) {
+  async function handleSignOut() {
+    await signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
+  function clearProgress() {
+    if (!confirm("Zerar o progresso deste navegador? Sua conta e seu perfil continuam salvos.")) {
       return;
     }
     try {
       window.localStorage.removeItem("central_lesson_sections_v1");
     } catch {}
     reset();
-    router.push("/onboarding");
   }
 
   if (!ready) {
@@ -158,13 +163,20 @@ export default function AlunoDashboard() {
           </div>
 
           <div className="card stat" style={{ marginTop: 18 }}>
-            <div className="eyebrow">Modo teste</div>
+            <div className="eyebrow">Sua conta</div>
             <p className="muted" style={{ fontSize: 13, margin: "10px 0 12px" }}>
-              Quer recomeçar do zero e se cadastrar de novo? Isto apaga o perfil e o progresso deste
-              navegador.
+              Seu perfil e progresso ficam salvos na sua conta e acompanham você em qualquer
+              aparelho.
             </p>
-            <button className="btn ghost" style={{ width: "100%" }} onClick={fullReset}>
-              ↺ Zerar e cadastrar de novo
+            <button className="btn primary" style={{ width: "100%" }} onClick={handleSignOut}>
+              ↩ Sair da conta
+            </button>
+            <button
+              className="btn ghost"
+              style={{ width: "100%", marginTop: 8 }}
+              onClick={clearProgress}
+            >
+              Zerar progresso deste navegador
             </button>
           </div>
         </div>

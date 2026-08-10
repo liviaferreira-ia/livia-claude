@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Crest } from "@/components/Crest";
-import { loadProfile, saveProfile } from "@/lib/profile";
+import { createClient } from "@/lib/supabase/client";
 
 type Option = { emoji: string; label: string; desc: string };
 
@@ -33,18 +33,30 @@ export default function OnboardingPage() {
   const [goal, setGoal] = useState("");
   const [level, setLevel] = useState("");
   const [time, setTime] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const total = 4;
 
-  function finish() {
-    const p = loadProfile();
-    saveProfile({
-      ...p,
-      onboarded: true,
-      name: name.trim(),
-      goal,
-      level,
+  // Pré-preenche o nome com o que foi informado no cadastro da conta.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      const n = data.user?.user_metadata?.name;
+      if (typeof n === "string" && n) setName(n);
     });
+  }, []);
+
+  async function finish() {
+    setSaving(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({
+      data: { onboarded: true, name: name.trim(), goal, level },
+    });
+    setSaving(false);
+    if (error) {
+      alert("Não consegui salvar seu perfil agora. Tente de novo em instantes.");
+      return;
+    }
     router.push("/bem-vindo");
   }
 
@@ -135,11 +147,11 @@ export default function OnboardingPage() {
           ) : (
             <button
               className="btn primary"
-              style={{ flex: 1, opacity: canAdvance ? 1 : 0.5 }}
-              disabled={!canAdvance}
+              style={{ flex: 1, opacity: canAdvance && !saving ? 1 : 0.5 }}
+              disabled={!canAdvance || saving}
               onClick={finish}
             >
-              Começar a estudar →
+              {saving ? "Salvando…" : "Começar a estudar →"}
             </button>
           )}
         </div>

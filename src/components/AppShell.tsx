@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { Crest } from "./Crest";
 import { ThemeToggle } from "./ThemeToggle";
@@ -99,8 +99,15 @@ const CRUMBS: Record<string, string> = {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { profile } = useProfile();
+  const router = useRouter();
+  const { profile, signOut } = useProfile();
   const isTeacher = pathname.startsWith("/professor");
+
+  async function handleSignOut() {
+    await signOut();
+    router.push("/login");
+    router.refresh();
+  }
   const nav = isTeacher ? teacherNav : studentNav;
   const crumb = CRUMBS[pathname] ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
@@ -167,6 +174,16 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             {isTeacher ? "Ver como aluno" : "Ver como professor"}
           </Link>
+          <button
+            className="btn ghost"
+            style={{ width: "100%", marginTop: 6 }}
+            onClick={() => {
+              setMenuOpen(false);
+              handleSignOut();
+            }}
+          >
+            ↩ Sair
+          </button>
         </div>
       </aside>
 

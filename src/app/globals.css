@@ -852,6 +852,7 @@ img.avatar {
 .profile-hero-info h2 {
   font-size: 23px;
   margin: 0;
+  color: #fff;
 }
 .profile-hero-tags {
   display: flex;

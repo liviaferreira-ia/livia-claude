@@ -379,10 +379,74 @@ const ORDER_C1: Order[] = [
   { id: "c1-o12", words: ["policy", "the", "new", "come", "has", "under", "criticism", "a", "lot", "of"], answer: "the new policy has come under a lot of criticism", pt: "A nova política recebeu muitas críticas." },
 ];
 
+// ================= A1 =================
+// Temas: verbo to be, apresentações, família, posse (have/has), números —
+// a base antes de A2.
+
+const MC_A1: MC[] = [
+  { id: "a1-mc1", prompt: "I ___ Ana.", options: ["am", "is", "are", "be"], answer: 0, explain: "Com 'I' usamos am." },
+  { id: "a1-mc2", prompt: "She ___ a teacher.", options: ["am", "is", "are", "be"], answer: 1, explain: "Com 'she' usamos is." },
+  { id: "a1-mc3", prompt: "They ___ my friends.", options: ["is", "am", "are", "be"], answer: 2, explain: "Com 'they' usamos are." },
+  { id: "a1-mc4", prompt: "This ___ my book.", options: ["is", "are", "am", "be"], answer: 0, explain: "Com 'this' (singular) usamos is." },
+  { id: "a1-mc5", prompt: "___ you a student?", options: ["Am", "Is", "Are", "Do"], answer: 2, explain: "Com 'you' usamos Are." },
+  { id: "a1-mc6", prompt: "I have ___ brother.", options: ["a", "an", "the", "some"], answer: 0, explain: "Antes de som de consoante usamos a." },
+  { id: "a1-mc7", prompt: "My mother ___ a doctor.", options: ["is", "are", "am", "be"], answer: 0, explain: "3ª pessoa do singular: is." },
+  { id: "a1-mc8", prompt: "We ___ from Brazil.", options: ["is", "am", "are", "be"], answer: 2, explain: "Com 'we' usamos are." },
+  { id: "a1-mc9", prompt: "He ___ two sisters.", options: ["have", "has", "is", "are"], answer: 1, explain: "3ª pessoa do singular: has." },
+  { id: "a1-mc10", prompt: "___ is your name?", options: ["What", "Who", "Where", "How"], answer: 0, explain: "Para nome usamos What." },
+  { id: "a1-mc11", prompt: "This is ___ apple.", options: ["a", "an", "the", "some"], answer: 1, explain: "Antes de som de vogal usamos an." },
+  { id: "a1-mc12", prompt: "I ___ 20 years old.", options: ["am", "is", "are", "have"], answer: 0, explain: "Idade com verbo to be: I am." },
+];
+
+const FILL_A1: Fill[] = [
+  { id: "a1-f1", prompt: "I ___ (be) Brazilian.", hint: "verbo to be, com 'I'", answers: ["am"], explain: "I am." },
+  { id: "a1-f2", prompt: "She ___ (be) my sister.", hint: "3ª pessoa", answers: ["is"], explain: "is." },
+  { id: "a1-f3", prompt: "We ___ (be) friends.", hint: "plural", answers: ["are"], explain: "are." },
+  { id: "a1-f4", prompt: "He ___ (have) a car.", hint: "3ª pessoa de have", answers: ["has"], explain: "has." },
+  { id: "a1-f5", prompt: "I ___ (have) two brothers.", hint: "com 'I'", answers: ["have"], explain: "have." },
+  { id: "a1-f6", prompt: "My name ___ (be) Carlos.", hint: "singular", answers: ["is"], explain: "is." },
+  { id: "a1-f7", prompt: "They ___ (be) students.", hint: "plural", answers: ["are"], explain: "are." },
+  { id: "a1-f8", prompt: "This ___ (be) my house.", hint: "singular", answers: ["is"], explain: "is." },
+  { id: "a1-f9", prompt: "___ (be) you ready? (pergunta)", hint: "com 'you'", answers: ["Are", "are"], explain: "Are you ready?" },
+  { id: "a1-f10", prompt: "I ___ (not / be) tired.", hint: "negativa, com 'I'", answers: ["am not", "'m not"], explain: "am not." },
+  { id: "a1-f11", prompt: "She ___ (not / be) here.", hint: "negativa, 3ª pessoa", answers: ["isn't", "is not"], explain: "isn't." },
+  { id: "a1-f12", prompt: "We ___ (not / be) late.", hint: "negativa, plural", answers: ["aren't", "are not"], explain: "aren't." },
+];
+
+const TRANSLATE_A1: Translate[] = [
+  { id: "a1-t1", pt: "Eu sou brasileiro.", answers: ["i am brazilian", "i'm brazilian"], explain: "I'm Brazilian." },
+  { id: "a1-t2", pt: "Ela é minha irmã.", answers: ["she is my sister", "she's my sister"], explain: "She's my sister." },
+  { id: "a1-t3", pt: "Nós somos amigos.", answers: ["we are friends", "we're friends"], explain: "We're friends." },
+  { id: "a1-t4", pt: "Este é meu livro.", answers: ["this is my book"], explain: "This is my book." },
+  { id: "a1-t5", pt: "Qual é o seu nome?", answers: ["what is your name", "what's your name"], explain: "What's your name?" },
+  { id: "a1-t6", pt: "Eu tenho dois irmãos.", answers: ["i have two brothers"], explain: "I have two brothers." },
+  { id: "a1-t7", pt: "Minha mãe é médica.", answers: ["my mother is a doctor"], explain: "My mother is a doctor." },
+  { id: "a1-t8", pt: "Eles são estudantes.", answers: ["they are students", "they're students"], explain: "They're students." },
+  { id: "a1-t9", pt: "Eu tenho vinte anos.", answers: ["i am twenty years old", "i'm twenty years old"], explain: "I'm twenty years old." },
+  { id: "a1-t10", pt: "Isso não é meu carro.", answers: ["this is not my car", "this isn't my car"], explain: "This isn't my car." },
+  { id: "a1-t11", pt: "Você é meu amigo.", answers: ["you are my friend", "you're my friend"], explain: "You're my friend." },
+  { id: "a1-t12", pt: "Nós somos do Brasil.", answers: ["we are from brazil", "we're from brazil"], explain: "We're from Brazil." },
+];
+
+const ORDER_A1: Order[] = [
+  { id: "a1-o1", words: ["Brazilian", "I", "am"], answer: "i am brazilian", pt: "Eu sou brasileiro." },
+  { id: "a1-o2", words: ["is", "sister", "she", "my"], answer: "she is my sister", pt: "Ela é minha irmã." },
+  { id: "a1-o3", words: ["are", "we", "friends"], answer: "we are friends", pt: "Nós somos amigos." },
+  { id: "a1-o4", words: ["book", "this", "my", "is"], answer: "this is my book", pt: "Este é meu livro." },
+  { id: "a1-o5", words: ["name", "what", "your", "is"], answer: "what is your name", pt: "Qual é o seu nome?" },
+  { id: "a1-o6", words: ["have", "brothers", "I", "two"], answer: "i have two brothers", pt: "Eu tenho dois irmãos." },
+  { id: "a1-o7", words: ["mother", "is", "my", "doctor", "a"], answer: "my mother is a doctor", pt: "Minha mãe é médica." },
+  { id: "a1-o8", words: ["students", "they", "are"], answer: "they are students", pt: "Eles são estudantes." },
+  { id: "a1-o9", words: ["old", "am", "I", "years", "twenty"], answer: "i am twenty years old", pt: "Eu tenho vinte anos." },
+  { id: "a1-o10", words: ["friend", "you", "my", "are"], answer: "you are my friend", pt: "Você é meu amigo." },
+  { id: "a1-o11", words: ["from", "we", "are", "Brazil"], answer: "we are from brazil", pt: "Nós somos do Brasil." },
+  { id: "a1-o12", words: ["car", "not", "is", "this", "my"], answer: "this is not my car", pt: "Isso não é meu carro." },
+];
+
 const EMPTY_BANK: LevelBank = { mc: [], fill: [], translate: [], order: [] };
 
 export const EXERCISES: Record<CefrLevel, LevelBank> = {
-  A1: EMPTY_BANK,
+  A1: { mc: MC_A1, fill: FILL_A1, translate: TRANSLATE_A1, order: ORDER_A1 },
   A2: { mc: MC_A2, fill: FILL_A2, translate: TRANSLATE_A2, order: ORDER_A2 },
   B1: { mc: MC_B1, fill: FILL_B1, translate: TRANSLATE_B1, order: ORDER_B1 },
   B2: { mc: MC_B2, fill: FILL_B2, translate: TRANSLATE_B2, order: ORDER_B2 },

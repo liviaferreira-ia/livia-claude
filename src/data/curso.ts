@@ -79,6 +79,54 @@ const COURSE_A2: Course = {
   ],
 };
 
+const COURSE_B1: Course = {
+  pct: 8,
+  units: [
+    {
+      n: 1,
+      title: "Experiências de vida",
+      objective: "Falar sobre experiências e vivências usando present perfect.",
+      status: "current",
+      pct: 25,
+      lessons: [
+        { title: "Present perfect x passado simples", meta: "Gramática · 10 min", status: "done" },
+        {
+          title: "Múltipla escolha e completar (B1)",
+          meta: "Prática · 12 min",
+          status: "now",
+          href: "/aluno/praticar",
+        },
+        { title: "Contando uma experiência", meta: "Conversa · 8 min", status: "locked" },
+        { title: "Roleplay: entrevista de experiências", meta: "Voz · 6 min", status: "locked" },
+      ],
+    },
+    {
+      n: 2,
+      title: "Planos e hipóteses",
+      objective: "Fazer planos, dar conselhos e imaginar situações hipotéticas.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Segunda condicional", meta: "Gramática · 9 min", status: "locked" },
+        { title: "Conselhos com should/must", meta: "Gramática · 8 min", status: "locked" },
+        { title: "Roleplay: pedindo conselho", meta: "Voz · 6 min", status: "locked" },
+      ],
+    },
+    {
+      n: 3,
+      title: "Recomendações e opiniões",
+      objective: "Usar voz passiva simples, relative clauses e discurso indireto básico.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Voz passiva no dia a dia", meta: "Gramática · 9 min", status: "locked" },
+        { title: "Relative clauses (who/which)", meta: "Gramática · 8 min", status: "locked" },
+        { title: "Tradução e ordenar frases (B1)", meta: "Prática · 10 min", status: "locked" },
+      ],
+    },
+  ],
+};
+
 const COURSE_C1: Course = {
   pct: 8,
   units: [
@@ -130,7 +178,7 @@ const COURSE_C1: Course = {
 export const COURSES: Record<CefrLevel, Course> = {
   A1: EMPTY_COURSE,
   A2: COURSE_A2,
-  B1: EMPTY_COURSE,
+  B1: COURSE_B1,
   B2: EMPTY_COURSE,
   C1: COURSE_C1,
   C2: EMPTY_COURSE,

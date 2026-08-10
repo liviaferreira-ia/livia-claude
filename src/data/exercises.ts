@@ -187,6 +187,70 @@ const ORDER_A2: Order[] = [
   { id: "o32", words: ["happy", "were", "they", "yesterday"], answer: "they were happy yesterday", pt: "Eles estavam felizes ontem." },
 ];
 
+// ================= B1 =================
+// Temas: experiências, planos, conselhos, opiniões simples — present perfect,
+// condicionais 1ª/2ª, modais de obrigação, voz passiva básica, relative clauses.
+
+const MC_B1: MC[] = [
+  { id: "b1-mc1", prompt: "I ___ never been to Japan.", options: ["have", "has", "had", "having"], answer: 0, explain: "Present perfect com I: have." },
+  { id: "b1-mc2", prompt: "She has worked here ___ 2019.", options: ["for", "since", "from", "at"], answer: 1, explain: "since + ponto no tempo: since 2019." },
+  { id: "b1-mc3", prompt: "If I ___ more money, I would travel more.", options: ["have", "had", "has", "will have"], answer: 1, explain: "2ª condicional: if + passado simples." },
+  { id: "b1-mc4", prompt: "You ___ smoke in here — it's not allowed.", options: ["shouldn't", "mustn't", "don't have to", "can't"], answer: 1, explain: "mustn't = proibição." },
+  { id: "b1-mc5", prompt: "This book was written ___ a famous author.", options: ["by", "from", "with", "of"], answer: 0, explain: "Voz passiva: agente introduzido por by." },
+  { id: "b1-mc6", prompt: "He said he ___ tired.", options: ["is", "was", "be", "been"], answer: 1, explain: "Discurso indireto: presente vira passado (backshift)." },
+  { id: "b1-mc7", prompt: "The woman ___ lives next door is a doctor.", options: ["who", "which", "whose", "where"], answer: 0, explain: "Pronome relativo para pessoas: who." },
+  { id: "b1-mc8", prompt: "I enjoy ___ new places.", options: ["visit", "visiting", "to visit", "visited"], answer: 1, explain: "enjoy + gerúndio: visiting." },
+  { id: "b1-mc9", prompt: "I ___ live in Rio, but now I live in São Paulo.", options: ["use to", "used to", "am used to", "was used"], answer: 1, explain: "used to + forma base, para hábito no passado." },
+  { id: "b1-mc10", prompt: "We ___ to the cinema tonight — I already bought the tickets.", options: ["will go", "are going", "go", "went"], answer: 1, explain: "Plano já decidido: present continuous com valor de futuro." },
+  { id: "b1-mc11", prompt: "This is the ___ restaurant I've ever been to.", options: ["good", "better", "best", "most good"], answer: 2, explain: "Superlativo irregular: best." },
+  { id: "b1-mc12", prompt: "You've finished your homework, ___?", options: ["haven't you", "don't you", "didn't you", "aren't you"], answer: 0, explain: "Question tag acompanha o auxiliar da frase (present perfect): haven't you." },
+];
+
+const FILL_B1: Fill[] = [
+  { id: "b1-f1", prompt: "I ___ (never / be) to Japan.", hint: "present perfect", answers: ["have never been", "'ve never been"], explain: "have never been." },
+  { id: "b1-f2", prompt: "She ___ (work) here since 2019.", hint: "present perfect", answers: ["has worked"], explain: "has worked." },
+  { id: "b1-f3", prompt: "If I ___ (have) more money, I would travel more.", hint: "2ª condicional", answers: ["had"], explain: "if + passado simples: had." },
+  { id: "b1-f4", prompt: "You ___ (not / smoke) in here.", hint: "proibição", answers: ["mustn't smoke", "must not smoke"], explain: "mustn't smoke." },
+  { id: "b1-f5", prompt: "This book ___ (write) by a famous author.", hint: "voz passiva, passado", answers: ["was written"], explain: "was written." },
+  { id: "b1-f6", prompt: "He said he ___ (be) tired.", hint: "discurso indireto", answers: ["was"], explain: "backshift: was." },
+  { id: "b1-f7", prompt: "The woman ___ (live) next door is a doctor.", hint: "relative clause + 3ª pessoa", answers: ["who lives", "that lives"], explain: "who lives." },
+  { id: "b1-f8", prompt: "I enjoy ___ (visit) new places.", hint: "enjoy + gerúndio", answers: ["visiting"], explain: "visiting." },
+  { id: "b1-f9", prompt: "I ___ (use) to live in Rio.", hint: "hábito no passado", answers: ["used"], explain: "used to." },
+  { id: "b1-f10", prompt: "We ___ (go) to the cinema tonight.", hint: "plano já decidido", answers: ["are going", "'re going"], explain: "are going." },
+  { id: "b1-f11", prompt: "This is the ___ (good) restaurant I've ever been to.", hint: "superlativo irregular", answers: ["best"], explain: "best." },
+  { id: "b1-f12", prompt: "You've finished your homework, ___ you?", hint: "question tag", answers: ["haven't"], explain: "haven't you." },
+];
+
+const TRANSLATE_B1: Translate[] = [
+  { id: "b1-t1", pt: "Eu nunca fui ao Japão.", answers: ["i've never been to japan", "i have never been to japan"], explain: "I've never been to Japan." },
+  { id: "b1-t2", pt: "Ela trabalha aqui desde 2019.", answers: ["she has worked here since 2019", "she's worked here since 2019"], explain: "She has worked here since 2019." },
+  { id: "b1-t3", pt: "Se eu tivesse mais dinheiro, eu viajaria mais.", answers: ["if i had more money, i would travel more", "if i had more money i would travel more"], explain: "If I had more money, I would travel more." },
+  { id: "b1-t4", pt: "Você não pode fumar aqui.", answers: ["you mustn't smoke here", "you can't smoke here"], explain: "You mustn't smoke here." },
+  { id: "b1-t5", pt: "Este livro foi escrito por um autor famoso.", answers: ["this book was written by a famous author"], explain: "This book was written by a famous author." },
+  { id: "b1-t6", pt: "Ele disse que estava cansado.", answers: ["he said he was tired", "he said that he was tired"], explain: "He said he was tired." },
+  { id: "b1-t7", pt: "A mulher que mora ao lado é médica.", answers: ["the woman who lives next door is a doctor", "the woman that lives next door is a doctor"], explain: "The woman who lives next door is a doctor." },
+  { id: "b1-t8", pt: "Eu gosto de visitar lugares novos.", answers: ["i enjoy visiting new places"], explain: "I enjoy visiting new places." },
+  { id: "b1-t9", pt: "Eu costumava morar no Rio.", answers: ["i used to live in rio"], explain: "I used to live in Rio." },
+  { id: "b1-t10", pt: "Nós vamos ao cinema hoje à noite.", answers: ["we are going to the cinema tonight", "we're going to the cinema tonight"], explain: "We're going to the cinema tonight." },
+  { id: "b1-t11", pt: "Este é o melhor restaurante que eu já fui.", answers: ["this is the best restaurant i've ever been to", "this is the best restaurant i have ever been to"], explain: "This is the best restaurant I've ever been to." },
+  { id: "b1-t12", pt: "Você terminou o dever de casa, não terminou?", answers: ["you've finished your homework, haven't you", "you have finished your homework, haven't you"], explain: "You've finished your homework, haven't you?" },
+];
+
+const ORDER_B1: Order[] = [
+  { id: "b1-o1", words: ["never", "I've", "Japan", "to", "been"], answer: "i've never been to japan", pt: "Eu nunca fui ao Japão." },
+  { id: "b1-o2", words: ["has", "she", "here", "worked", "since", "2019"], answer: "she has worked here since 2019", pt: "Ela trabalha aqui desde 2019." },
+  { id: "b1-o3", words: ["had", "if", "I", "more", "money", "I", "would", "travel", "more"], answer: "if i had more money i would travel more", pt: "Se eu tivesse mais dinheiro, eu viajaria mais." },
+  { id: "b1-o4", words: ["mustn't", "you", "here", "smoke"], answer: "you mustn't smoke here", pt: "Você não pode fumar aqui." },
+  { id: "b1-o5", words: ["book", "this", "written", "was", "by", "a", "famous", "author"], answer: "this book was written by a famous author", pt: "Este livro foi escrito por um autor famoso." },
+  { id: "b1-o6", words: ["said", "he", "was", "he", "tired"], answer: "he said he was tired", pt: "Ele disse que estava cansado." },
+  { id: "b1-o7", words: ["woman", "the", "who", "lives", "next", "door", "is", "a", "doctor"], answer: "the woman who lives next door is a doctor", pt: "A mulher que mora ao lado é médica." },
+  { id: "b1-o8", words: ["enjoy", "I", "visiting", "places", "new"], answer: "i enjoy visiting new places", pt: "Eu gosto de visitar lugares novos." },
+  { id: "b1-o9", words: ["used", "I", "to", "live", "in", "Rio"], answer: "i used to live in rio", pt: "Eu costumava morar no Rio." },
+  { id: "b1-o10", words: ["going", "we", "are", "to", "the", "cinema", "tonight"], answer: "we are going to the cinema tonight", pt: "Nós vamos ao cinema hoje à noite." },
+  { id: "b1-o11", words: ["is", "this", "the", "best", "restaurant", "I've", "ever", "been", "to"], answer: "this is the best restaurant i've ever been to", pt: "Este é o melhor restaurante que eu já fui." },
+  { id: "b1-o12", words: ["finished", "you've", "your", "homework", "haven't", "you"], answer: "you've finished your homework haven't you", pt: "Você terminou o dever de casa, não terminou?" },
+];
+
 // ================= C1 =================
 // Temas: trabalho, opiniões, notícias, negociações — gramática avançada
 // (condicionais mistos, inversão, voz passiva, discurso indireto, coesão).
@@ -256,7 +320,7 @@ const EMPTY_BANK: LevelBank = { mc: [], fill: [], translate: [], order: [] };
 export const EXERCISES: Record<CefrLevel, LevelBank> = {
   A1: EMPTY_BANK,
   A2: { mc: MC_A2, fill: FILL_A2, translate: TRANSLATE_A2, order: ORDER_A2 },
-  B1: EMPTY_BANK,
+  B1: { mc: MC_B1, fill: FILL_B1, translate: TRANSLATE_B1, order: ORDER_B1 },
   B2: EMPTY_BANK,
   C1: { mc: MC_C1, fill: FILL_C1, translate: TRANSLATE_C1, order: ORDER_C1 },
   C2: EMPTY_BANK,

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Crest } from "@/components/Crest";
+import { PlacementTest } from "@/components/PlacementTest";
 import { createClient } from "@/lib/supabase/client";
 
 type Option = { emoji: string; label: string; desc: string };
@@ -12,12 +13,6 @@ const GOALS: Option[] = [
   { emoji: "💼", label: "Trabalho", desc: "Reuniões, e-mails e entrevistas." },
   { emoji: "💬", label: "Conversação", desc: "Falar no dia a dia com mais confiança." },
   { emoji: "🎓", label: "Provas", desc: "Preparar para exames e certificações." },
-];
-
-const LEVELS: Option[] = [
-  { emoji: "🌱", label: "Iniciante", desc: "Sei pouca coisa (A1–A2)." },
-  { emoji: "🌿", label: "Intermediário", desc: "Me viro em conversas simples (A2–B1)." },
-  { emoji: "🌳", label: "Avançado", desc: "Falo bem, quero fluência (B2+)." },
 ];
 
 const TIMES: Option[] = [
@@ -109,15 +104,7 @@ export default function OnboardingPage() {
           />
         )}
 
-        {step === 2 && (
-          <StepOptions
-            title="Como você avalia seu inglês hoje?"
-            subtitle="Sem estresse — vamos ajustar isso conforme você pratica."
-            options={LEVELS}
-            selected={level}
-            onSelect={setLevel}
-          />
-        )}
+        {step === 2 && <PlacementTest value={level} onComplete={setLevel} />}
 
         {step === 3 && (
           <StepOptions

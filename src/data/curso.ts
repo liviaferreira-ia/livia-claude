@@ -127,6 +127,54 @@ const COURSE_B1: Course = {
   ],
 };
 
+const COURSE_B2: Course = {
+  pct: 8,
+  units: [
+    {
+      n: 1,
+      title: "Contando histórias",
+      objective: "Narrar eventos e experiências recentes com mais precisão.",
+      status: "current",
+      pct: 25,
+      lessons: [
+        { title: "Past perfect x present perfect continuous", meta: "Gramática · 10 min", status: "done" },
+        {
+          title: "Múltipla escolha e completar (B2)",
+          meta: "Prática · 12 min",
+          status: "now",
+          href: "/aluno/praticar",
+        },
+        { title: "Contando uma história real", meta: "Conversa · 8 min", status: "locked" },
+        { title: "Roleplay: contando o que aconteceu", meta: "Voz · 6 min", status: "locked" },
+      ],
+    },
+    {
+      n: 2,
+      title: "Resolvendo problemas",
+      objective: "Pedir serviços e lidar com imprevistos.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Voz passiva e causativo (have something done)", meta: "Gramática · 9 min", status: "locked" },
+        { title: "Especulando com might/could have", meta: "Gramática · 8 min", status: "locked" },
+        { title: "Roleplay: reclamação e solução", meta: "Voz · 6 min", status: "locked" },
+      ],
+    },
+    {
+      n: 3,
+      title: "Conectando ideias com fluência",
+      objective: "Usar conectivos, phrasal verbs e comparações elaboradas com naturalidade.",
+      status: "locked",
+      pct: 0,
+      lessons: [
+        { title: "Conectivos: although, despite, however", meta: "Gramática · 9 min", status: "locked" },
+        { title: "Phrasal verbs do dia a dia", meta: "Vocabulário · 8 min", status: "locked" },
+        { title: "Tradução e ordenar frases (B2)", meta: "Prática · 10 min", status: "locked" },
+      ],
+    },
+  ],
+};
+
 const COURSE_C1: Course = {
   pct: 8,
   units: [
@@ -179,7 +227,7 @@ export const COURSES: Record<CefrLevel, Course> = {
   A1: EMPTY_COURSE,
   A2: COURSE_A2,
   B1: COURSE_B1,
-  B2: EMPTY_COURSE,
+  B2: COURSE_B2,
   C1: COURSE_C1,
   C2: EMPTY_COURSE,
 };

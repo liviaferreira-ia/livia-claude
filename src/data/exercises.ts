@@ -251,6 +251,70 @@ const ORDER_B1: Order[] = [
   { id: "b1-o12", words: ["finished", "you've", "your", "homework", "haven't", "you"], answer: "you've finished your homework haven't you", pt: "Você terminou o dever de casa, não terminou?" },
 ];
 
+// ================= B2 =================
+// Temas: histórias, serviços e imprevistos, conectivos — past perfect,
+// present perfect continuous, voz passiva/causativo, especulação, phrasal verbs.
+
+const MC_B2: MC[] = [
+  { id: "b2-mc1", prompt: "By the time we arrived, the film ___ already started.", options: ["has", "had", "was", "is"], answer: 1, explain: "Past perfect: ação anterior a outra no passado." },
+  { id: "b2-mc2", prompt: "I've been ___ this project for three months.", options: ["work", "working", "worked", "works"], answer: 1, explain: "Present perfect continuous: have been + -ing." },
+  { id: "b2-mc3", prompt: "She asked me where ___.", options: ["do I live", "did I live", "I lived", "I live"], answer: 2, explain: "Discurso indireto (pergunta): ordem afirmativa, verbo no passado, sem auxiliar." },
+  { id: "b2-mc4", prompt: "I ___ my car repaired last week.", options: ["had", "made", "did", "got"], answer: 0, explain: "Voz causativa: have + objeto + particípio." },
+  { id: "b2-mc5", prompt: "He might ___ the bus — that's why he's late.", options: ["miss", "missed", "have missed", "missing"], answer: 2, explain: "Especulação no passado: might have missed." },
+  { id: "b2-mc6", prompt: "The ___ she practices, the ___ she gets.", options: ["more / more", "most / most", "more / most", "most / more"], answer: 0, explain: "'the more... the more' para comparação proporcional." },
+  { id: "b2-mc7", prompt: "___ it was raining, we decided to go for a walk.", options: ["Despite", "Although", "Because of", "Due to"], answer: 1, explain: "Although + oração; Despite pede substantivo/gerúndio." },
+  { id: "b2-mc8", prompt: "I'm not used to ___ up so early.", options: ["get", "getting", "got", "to get"], answer: 1, explain: "be used to + gerúndio: getting." },
+  { id: "b2-mc9", prompt: "They finally ___ the problem after weeks of trying.", options: ["gave up", "looked up", "sorted out", "put off"], answer: 2, explain: "sort out = resolver." },
+  { id: "b2-mc10", prompt: "This is the hotel ___ we stayed last summer.", options: ["which", "where", "that", "who"], answer: 1, explain: "where para lugar (com preposição implícita)." },
+  { id: "b2-mc11", prompt: "The report needs to ___ before Friday.", options: ["finish", "be finished", "finishing", "have finished"], answer: 1, explain: "Voz passiva: needs to be + particípio." },
+  { id: "b2-mc12", prompt: "I can't help ___ about what happened.", options: ["think", "to think", "thinking", "thought"], answer: 2, explain: "can't help + gerúndio: thinking." },
+];
+
+const FILL_B2: Fill[] = [
+  { id: "b2-f1", prompt: "By the time we arrived, the film ___ (already / start).", hint: "past perfect", answers: ["had already started"], explain: "had already started." },
+  { id: "b2-f2", prompt: "I ___ (work) on this project for three months.", hint: "present perfect continuous", answers: ["have been working", "'ve been working"], explain: "have been working." },
+  { id: "b2-f3", prompt: "She asked me where I ___ (live).", hint: "discurso indireto", answers: ["lived"], explain: "lived." },
+  { id: "b2-f4", prompt: "I ___ (have) my car repaired last week.", hint: "voz causativa", answers: ["had"], explain: "had." },
+  { id: "b2-f5", prompt: "He might ___ (miss) the bus.", hint: "especulação no passado", answers: ["have missed"], explain: "have missed." },
+  { id: "b2-f6", prompt: "The more she practices, the ___ (good) she gets.", hint: "comparativo proporcional", answers: ["better"], explain: "better." },
+  { id: "b2-f7", prompt: "___ (Although) it was raining, we went for a walk.", hint: "conjunção", answers: ["Although", "although"], explain: "Although." },
+  { id: "b2-f8", prompt: "I'm not used to ___ (get) up so early.", hint: "be used to + gerúndio", answers: ["getting"], explain: "getting." },
+  { id: "b2-f9", prompt: "They finally ___ (sort) out the problem.", hint: "phrasal verb, passado", answers: ["sorted"], explain: "sorted out." },
+  { id: "b2-f10", prompt: "This is the hotel ___ we stayed last summer.", hint: "pronome relativo de lugar", answers: ["where"], explain: "where." },
+  { id: "b2-f11", prompt: "The report needs to ___ (finish) before Friday.", hint: "voz passiva", answers: ["be finished"], explain: "be finished." },
+  { id: "b2-f12", prompt: "I can't help ___ (think) about what happened.", hint: "can't help + gerúndio", answers: ["thinking"], explain: "thinking." },
+];
+
+const TRANSLATE_B2: Translate[] = [
+  { id: "b2-t1", pt: "Quando chegamos, o filme já tinha começado.", answers: ["by the time we arrived, the film had already started", "when we arrived, the film had already started"], explain: "By the time we arrived, the film had already started." },
+  { id: "b2-t2", pt: "Eu trabalho neste projeto há três meses.", answers: ["i've been working on this project for three months", "i have been working on this project for three months"], explain: "I've been working on this project for three months." },
+  { id: "b2-t3", pt: "Ela me perguntou onde eu morava.", answers: ["she asked me where i lived"], explain: "She asked me where I lived." },
+  { id: "b2-t4", pt: "Eu mandei consertar meu carro semana passada.", answers: ["i had my car repaired last week", "i got my car repaired last week"], explain: "I had my car repaired last week." },
+  { id: "b2-t5", pt: "Ele pode ter perdido o ônibus.", answers: ["he might have missed the bus"], explain: "He might have missed the bus." },
+  { id: "b2-t6", pt: "Quanto mais ela pratica, melhor ela fica.", answers: ["the more she practices, the better she gets", "the more she practices the better she gets"], explain: "The more she practices, the better she gets." },
+  { id: "b2-t7", pt: "Embora estivesse chovendo, nós saímos para caminhar.", answers: ["although it was raining, we went for a walk", "although it was raining we went for a walk"], explain: "Although it was raining, we went for a walk." },
+  { id: "b2-t8", pt: "Eu não estou acostumado a acordar tão cedo.", answers: ["i'm not used to getting up so early", "i am not used to getting up so early"], explain: "I'm not used to getting up so early." },
+  { id: "b2-t9", pt: "Eles finalmente resolveram o problema.", answers: ["they finally sorted out the problem", "they finally sorted the problem out"], explain: "They finally sorted out the problem." },
+  { id: "b2-t10", pt: "Este é o hotel onde nós ficamos no verão passado.", answers: ["this is the hotel where we stayed last summer"], explain: "This is the hotel where we stayed last summer." },
+  { id: "b2-t11", pt: "O relatório precisa ser finalizado até sexta.", answers: ["the report needs to be finished before friday", "the report needs to be finished by friday"], explain: "The report needs to be finished before Friday." },
+  { id: "b2-t12", pt: "Eu não consigo parar de pensar no que aconteceu.", answers: ["i can't help thinking about what happened", "i cannot help thinking about what happened"], explain: "I can't help thinking about what happened." },
+];
+
+const ORDER_B2: Order[] = [
+  { id: "b2-o1", words: ["by", "the", "time", "we", "arrived", "the", "film", "had", "already", "started"], answer: "by the time we arrived the film had already started", pt: "Quando chegamos, o filme já tinha começado." },
+  { id: "b2-o2", words: ["I've", "been", "working", "on", "this", "project", "for", "three", "months"], answer: "i've been working on this project for three months", pt: "Eu trabalho neste projeto há três meses." },
+  { id: "b2-o3", words: ["asked", "she", "me", "where", "I", "lived"], answer: "she asked me where i lived", pt: "Ela me perguntou onde eu morava." },
+  { id: "b2-o4", words: ["had", "I", "my", "car", "repaired", "last", "week"], answer: "i had my car repaired last week", pt: "Eu mandei consertar meu carro semana passada." },
+  { id: "b2-o5", words: ["might", "he", "have", "missed", "the", "bus"], answer: "he might have missed the bus", pt: "Ele pode ter perdido o ônibus." },
+  { id: "b2-o6", words: ["more", "the", "she", "practices", "the", "better", "gets", "she"], answer: "the more she practices the better she gets", pt: "Quanto mais ela pratica, melhor ela fica." },
+  { id: "b2-o7", words: ["although", "it", "was", "raining", "we", "went", "for", "a", "walk"], answer: "although it was raining we went for a walk", pt: "Embora estivesse chovendo, nós saímos para caminhar." },
+  { id: "b2-o8", words: ["not", "I'm", "used", "to", "getting", "up", "so", "early"], answer: "i'm not used to getting up so early", pt: "Eu não estou acostumado a acordar tão cedo." },
+  { id: "b2-o9", words: ["finally", "they", "sorted", "out", "the", "problem"], answer: "they finally sorted out the problem", pt: "Eles finalmente resolveram o problema." },
+  { id: "b2-o10", words: ["is", "this", "the", "hotel", "where", "we", "stayed", "last", "summer"], answer: "this is the hotel where we stayed last summer", pt: "Este é o hotel onde nós ficamos no verão passado." },
+  { id: "b2-o11", words: ["needs", "the", "report", "to", "be", "finished", "before", "Friday"], answer: "the report needs to be finished before friday", pt: "O relatório precisa ser finalizado até sexta." },
+  { id: "b2-o12", words: ["can't", "I", "help", "thinking", "about", "what", "happened"], answer: "i can't help thinking about what happened", pt: "Eu não consigo parar de pensar no que aconteceu." },
+];
+
 // ================= C1 =================
 // Temas: trabalho, opiniões, notícias, negociações — gramática avançada
 // (condicionais mistos, inversão, voz passiva, discurso indireto, coesão).
@@ -321,7 +385,7 @@ export const EXERCISES: Record<CefrLevel, LevelBank> = {
   A1: EMPTY_BANK,
   A2: { mc: MC_A2, fill: FILL_A2, translate: TRANSLATE_A2, order: ORDER_A2 },
   B1: { mc: MC_B1, fill: FILL_B1, translate: TRANSLATE_B1, order: ORDER_B1 },
-  B2: EMPTY_BANK,
+  B2: { mc: MC_B2, fill: FILL_B2, translate: TRANSLATE_B2, order: ORDER_B2 },
   C1: { mc: MC_C1, fill: FILL_C1, translate: TRANSLATE_C1, order: ORDER_C1 },
   C2: EMPTY_BANK,
 };

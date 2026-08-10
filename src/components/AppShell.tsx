@@ -82,6 +82,7 @@ const teacherNav: { section: string; items: NavItem[] }[] = [
   {
     section: "Professor",
     items: [
+      { href: "/professor/alunos", label: "Alunos", icon: I.users },
       { href: "/professor", label: "Recados dos alunos", icon: I.chat },
       { href: "/professor/marina", label: "Exemplo: Marina", icon: I.user },
     ],
@@ -98,6 +99,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/pronuncia": "Pronúncia",
   "/aluno/revisao": "Revisão",
   "/aluno/conta": "Minha conta",
+  "/professor/alunos": "Alunos",
   "/professor": "Recados dos alunos",
   "/professor/marina": "Exemplo: Marina",
 };

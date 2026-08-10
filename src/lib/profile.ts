@@ -4,6 +4,7 @@ import type { User } from "@supabase/supabase-js";
 import { useCallback, useEffect, useState } from "react";
 import type { Kind } from "@/data/exercises";
 import { LEVEL_ORDER, levelBadge, type CefrLevel } from "@/data/placement";
+import { addTimeSeconds, bumpPracticeServer, touchLogin } from "@/lib/activity";
 import { createClient } from "@/lib/supabase/client";
 
 const CEFR_RE = /^[ABC][12]$/;
@@ -143,6 +144,7 @@ export function useProfile() {
           .eq("id", data.user.id)
           .maybeSingle();
         if (mounted) setRole((prof?.role as Role) ?? "student");
+        touchLogin(metaString(data.user, "name"), metaString(data.user, "level")).catch(() => {});
       }
       setReady(true);
     });
@@ -157,6 +159,17 @@ export function useProfile() {
       sub.subscription.unsubscribe();
     };
   }, []);
+
+  // Heartbeat: enquanto o aluno estiver com a aba aberta e visível, soma tempo de uso.
+  useEffect(() => {
+    if (!ready || !user || role !== "student") return;
+    const id = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        addTimeSeconds(60).catch(() => {});
+      }
+    }, 60_000);
+    return () => window.clearInterval(id);
+  }, [ready, user, role]);
 
   const profile: Profile = {
     onboarded: user?.user_metadata?.onboarded === true,
@@ -193,6 +206,7 @@ export function useProfile() {
       saveStats(next);
       return next;
     });
+    bumpPracticeServer(kind, correct).catch(() => {});
   }, []);
 
   /** Zera apenas as estatísticas de prática deste navegador. */

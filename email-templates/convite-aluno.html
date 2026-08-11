@@ -4,21 +4,21 @@
   Assunto sugerido: 🎉 Bem-vindo(a) à Central School — sua jornada em inglês começa agora!
 
   Variáveis do Supabase usadas: {{ .ConfirmationURL }} e {{ .Data.name }} (nome que o
-  professor digitou ao cadastrar o aluno em /professor/alunos).
+  professor digitou ao cadastrar o aluno em /professor/alunos — sempre preenchido,
+  por isso sem lógica condicional aqui: o preview do Supabase não processa {{ if }}/{{ end }}).
 -->
 <div style="background-color:#f5f1e8; padding:40px 20px; font-family: Georgia, 'Times New Roman', serif;">
   <table role="presentation" width="100%" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e6dfce;">
     <tr>
-      <td style="background:#1c3252; background-image:linear-gradient(135deg,#16263f,#223f6b); padding:36px 24px; text-align:center;">
-        <img src="https://centralschool.com.br/crest.png" width="64" height="64" alt="Central School" style="display:block; margin:0 auto 14px; border-radius:8px;" />
-        <div style="color:#ffffff; font-size:23px; font-weight:bold; letter-spacing:0.02em;">Central School</div>
+      <td style="background:#1c3252; background-image:linear-gradient(135deg,#16263f,#223f6b); padding:34px 24px; text-align:center;">
+        <div style="color:#ffffff; font-size:24px; font-weight:bold; letter-spacing:0.03em;">✦ Central School ✦</div>
         <div style="color:#e8c874; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; margin-top:6px;">English as a Lifestyle</div>
       </td>
     </tr>
     <tr>
       <td style="padding:34px 28px 8px; color:#1a2a45;">
         <p style="font-size:21px; font-weight:bold; margin:0 0 14px; line-height:1.35;">
-          Bem-vindo(a){{ if .Data.name }}, {{ .Data.name }}{{ end }}! 🎉
+          Bem-vindo(a), {{ .Data.name }}! 🎉
         </p>
         <p style="font-size:15px; line-height:1.65; color:#57627a; margin:0 0 18px;">
           Você acabou de dar um passo e tanto: começar a falar inglês de verdade, no seu ritmo,

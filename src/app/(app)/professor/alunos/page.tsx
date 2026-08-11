@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  calcAge,
   formatDuration,
   formatLastLogin,
   isInactive,
@@ -176,7 +177,18 @@ export default function ProfessorAlunosPage() {
                     <b style={{ display: "block", fontSize: 14 }}>{name}</b>
                     <span className="muted" style={{ fontSize: 12.5 }}>
                       {r.level ? levelDisplay(r.level) : "Nível não informado"}
+                      {typeof calcAge(r.birthdate) === "number" && ` · ${calcAge(r.birthdate)} anos`}
                     </span>
+                    {r.whatsapp && (
+                      <a
+                        href={`https://wa.me/${r.whatsapp.replace(/\D/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: "block", fontSize: 12.5, color: "var(--good)", fontWeight: 700 }}
+                      >
+                        💬 WhatsApp
+                      </a>
+                    )}
                   </span>
                 </span>
                 <span style={{ fontSize: 13.5 }}>{formatLastLogin(r.last_login_at)}</span>

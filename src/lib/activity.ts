@@ -21,10 +21,36 @@ export async function bumpPracticeServer(kind: Kind, correct: boolean): Promise<
   await supabase.rpc("bump_practice", { p_kind: kind, p_correct: correct });
 }
 
+/** Salva WhatsApp e data de nascimento do aluno logado. */
+export async function updateContactInfo(whatsapp: string, birthdate: string): Promise<{ error: string | null }> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("update_contact_info", {
+    p_whatsapp: whatsapp,
+    p_birthdate: birthdate || null,
+  });
+  return { error: error?.message ?? null };
+}
+
+/** Lê o WhatsApp e a data de nascimento salvos do aluno logado. */
+export async function getMyContactInfo(): Promise<{ whatsapp: string; birthdate: string }> {
+  const supabase = createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const uid = userData.user?.id;
+  if (!uid) return { whatsapp: "", birthdate: "" };
+  const { data } = await supabase
+    .from("student_activity")
+    .select("whatsapp, birthdate")
+    .eq("user_id", uid)
+    .maybeSingle();
+  return { whatsapp: data?.whatsapp ?? "", birthdate: data?.birthdate ?? "" };
+}
+
 export type StudentActivity = {
   user_id: string;
   student_name: string | null;
   level: string | null;
+  whatsapp: string | null;
+  birthdate: string | null;
   last_login_at: string | null;
   session_count: number;
   total_seconds: number;
@@ -74,6 +100,19 @@ export function formatDuration(totalSeconds: number): string {
 export function isInactive(lastLoginIso: string | null): boolean {
   if (!lastLoginIso) return true;
   return Date.now() - new Date(lastLoginIso).getTime() > 7 * 86_400_000;
+}
+
+/** Calcula a idade a partir da data de nascimento (formato YYYY-MM-DD). */
+export function calcAge(birthdate: string | null): number | null {
+  if (!birthdate) return null;
+  const birth = new Date(birthdate);
+  if (Number.isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const beforeBirthdayThisYear =
+    now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate());
+  if (beforeBirthdayThisYear) age -= 1;
+  return age;
 }
 
 /** Formata a data do último login de forma relativa ("Hoje, 14:32", "Ontem", "Há 3 dias"...). */

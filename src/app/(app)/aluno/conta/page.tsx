@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getMyContactInfo, updateContactInfo } from "@/lib/activity";
 import { initials, levelDisplay, useProfile } from "@/lib/profile";
 
 export default function MinhaContaPage() {
@@ -14,6 +15,29 @@ export default function MinhaContaPage() {
   const [savingName, setSavingName] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
+
+  const [whatsapp, setWhatsapp] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+  const [contactLoaded, setContactLoaded] = useState(false);
+  const [savingContact, setSavingContact] = useState(false);
+  const [contactMsg, setContactMsg] = useState("");
+
+  useEffect(() => {
+    if (!ready) return;
+    getMyContactInfo().then(({ whatsapp, birthdate }) => {
+      setWhatsapp(whatsapp);
+      setBirthdate(birthdate);
+      setContactLoaded(true);
+    });
+  }, [ready]);
+
+  async function saveContact() {
+    setSavingContact(true);
+    setContactMsg("");
+    const { error } = await updateContactInfo(whatsapp, birthdate);
+    setSavingContact(false);
+    setContactMsg(error ? "Não consegui salvar agora." : "Dados salvos! ✅");
+  }
 
   // Nome exibido: enquanto não editar, usa o da conta.
   const nameValue = name ?? profile.name;
@@ -124,6 +148,54 @@ export default function MinhaContaPage() {
           >
             {savingName ? "Salvando…" : "Salvar nome"}
           </button>
+        </div>
+
+        {/* Contato */}
+        <div className="card" style={{ marginTop: 18, padding: 22 }}>
+          <div className="eyebrow">WhatsApp e data de nascimento</div>
+          <p className="muted" style={{ fontSize: 13, margin: "6px 0 14px" }}>
+            Usamos isso pra mandar lembretes de aula e recados, e pra indicar o conteúdo certo pra sua idade.
+          </p>
+          {!contactLoaded ? (
+            <p className="muted" style={{ margin: 0 }}>
+              Carregando…
+            </p>
+          ) : (
+            <>
+              <div className="field">
+                <label htmlFor="whatsapp">WhatsApp</label>
+                <input
+                  id="whatsapp"
+                  type="tel"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="(11) 91234-5678"
+                />
+              </div>
+              <div className="field" style={{ marginTop: 10 }}>
+                <label htmlFor="nascimento">Data de nascimento</label>
+                <input
+                  id="nascimento"
+                  type="date"
+                  value={birthdate}
+                  onChange={(e) => setBirthdate(e.target.value)}
+                />
+              </div>
+              {contactMsg && (
+                <p className={`auth-msg ${contactMsg.includes("✅") ? "ok" : "err"}`} style={{ maxWidth: "none" }}>
+                  {contactMsg}
+                </p>
+              )}
+              <button
+                className="btn primary"
+                style={{ marginTop: 12, opacity: savingContact ? 0.6 : 1 }}
+                onClick={saveContact}
+                disabled={savingContact}
+              >
+                {savingContact ? "Salvando…" : "Salvar"}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Objetivo e nível */}

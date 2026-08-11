@@ -35,9 +35,11 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    // Ferramenta só de professor — é seguro mostrar o motivo real do Supabase,
+    // ajuda a diagnosticar sem precisar olhar log de servidor.
     const msg = error.message.toLowerCase().includes("already registered")
       ? "Este e-mail já tem conta."
-      : "Não consegui enviar o convite. Tente de novo.";
+      : `Não consegui enviar o convite: ${error.message}`;
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 

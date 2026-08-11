@@ -18,6 +18,11 @@ export default function ProfessorAlunosPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
+  const [inviteName, setInviteName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteMsg, setInviteMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+
   useEffect(() => {
     if (!ready || !isTeacher) return;
     listStudentActivity().then(({ data, error }) => {
@@ -26,6 +31,31 @@ export default function ProfessorAlunosPage() {
       setLoading(false);
     });
   }, [ready, isTeacher]);
+
+  async function handleInvite(e: React.FormEvent) {
+    e.preventDefault();
+    setInviting(true);
+    setInviteMsg(null);
+    try {
+      const res = await fetch("/api/professor/convidar-aluno", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: inviteName.trim(), email: inviteEmail.trim() }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setInviteMsg({ kind: "err", text: body.error || "Não consegui enviar o convite." });
+        return;
+      }
+      setInviteMsg({ kind: "ok", text: `Convite enviado para ${inviteEmail.trim()}.` });
+      setInviteName("");
+      setInviteEmail("");
+    } catch {
+      setInviteMsg({ kind: "err", text: "Falha de conexão. Tente de novo." });
+    } finally {
+      setInviting(false);
+    }
+  }
 
   if (!ready) {
     return (
@@ -59,6 +89,47 @@ export default function ProfessorAlunosPage() {
       <p className="muted" style={{ margin: "0 0 20px" }}>
         Último login, tempo médio na plataforma e progresso em prática de cada aluno.
       </p>
+
+      <div className="card" style={{ padding: 18, marginBottom: 24, maxWidth: 520 }}>
+        <div className="eyebrow" style={{ marginBottom: 10 }}>
+          Cadastrar aluno
+        </div>
+        <form onSubmit={handleInvite} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="field">
+            <label htmlFor="invite-name">Nome do aluno</label>
+            <input
+              id="invite-name"
+              value={inviteName}
+              onChange={(e) => setInviteName(e.target.value)}
+              placeholder="Nome completo"
+              required
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="invite-email">E-mail do aluno</label>
+            <input
+              id="invite-email"
+              type="email"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              placeholder="aluno@exemplo.com"
+              required
+            />
+          </div>
+          {inviteMsg && <p className={`auth-msg ${inviteMsg.kind === "ok" ? "ok" : "err"}`}>{inviteMsg.text}</p>}
+          <button
+            type="submit"
+            className="btn primary"
+            style={{ alignSelf: "flex-start", opacity: inviting ? 0.6 : 1 }}
+            disabled={inviting}
+          >
+            {inviting ? "Enviando…" : "Enviar convite por e-mail →"}
+          </button>
+          <p className="est-note" style={{ margin: 0 }}>
+            O aluno recebe um e-mail pra criar a senha e já cai na plataforma.
+          </p>
+        </form>
+      </div>
 
       {loading ? (
         <p className="muted">Carregando alunos…</p>

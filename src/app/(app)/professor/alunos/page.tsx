@@ -167,6 +167,11 @@ export default function ProfessorAlunosPage() {
             const avgSeconds = r.session_count > 0 ? r.total_seconds / r.session_count : 0;
             const needsAttention = totals.done === 0 || isInactive(r.last_login_at);
             const name = r.student_name || "Aluno(a)";
+            const paymentFlag = r.blocked
+              ? { text: "Bloqueado (atraso)", cls: "bad" }
+              : r.payment_status === "overdue"
+                ? { text: "Pagamento atrasado", cls: "att" }
+                : null;
             return (
               <div key={r.user_id} className="rosterrow">
                 <span className="std">
@@ -199,8 +204,10 @@ export default function ProfessorAlunosPage() {
                     {totals.done} exercícios · {totals.pct}% de acerto
                   </span>
                 </span>
-                <span className={`flag ${needsAttention ? "att" : "ok"}`}>
-                  {needsAttention ? "Atenção" : "Em dia"}
+                <span>
+                  <span className={`flag ${paymentFlag ? paymentFlag.cls : needsAttention ? "att" : "ok"}`}>
+                    {paymentFlag ? paymentFlag.text : needsAttention ? "Atenção" : "Em dia"}
+                  </span>
                 </span>
               </div>
             );

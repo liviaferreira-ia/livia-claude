@@ -62,6 +62,9 @@ export type StudentActivity = {
   practice_translate_correct: number;
   practice_order_done: number;
   practice_order_correct: number;
+  payment_status: "ok" | "overdue" | null;
+  overdue_since: string | null;
+  blocked: boolean;
   updated_at: string;
 };
 

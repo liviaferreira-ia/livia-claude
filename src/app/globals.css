@@ -604,6 +604,10 @@ h3 {
   background: var(--good-soft);
   color: var(--good);
 }
+.flag.bad {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
 
 /* Login */
 .login-wrap {

@@ -1,4 +1,4 @@
-// Servidor de produção pra hospedagem cPanel (Setup Node.js App / Passenger).
+// Servidor de produção pra hospedagem DirectAdmin (Node.js Selector / Passenger).
 // O Passenger define a porta em process.env.PORT e espera um servidor HTTP
 // comum escutando nela — por isso não usamos "next start" direto, e sim a
 // API programática do Next pra criar esse servidor.

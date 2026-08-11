@@ -28,7 +28,10 @@ export async function POST(request: Request) {
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { name },
-    redirectTo: `${origin}/auth/confirm?next=/definir-senha`,
+    // Vai direto pra /definir-senha (página client-side): o link de convite do
+    // Supabase entrega a sessão via #access_token na URL, que só o navegador lê
+    // — uma rota de servidor nunca chega a ver esse pedaço da URL.
+    redirectTo: `${origin}/definir-senha`,
   });
 
   if (error) {

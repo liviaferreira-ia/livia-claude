@@ -1,16 +1,38 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import { createClient } from "@/lib/supabase/client";
 
 export default function DefinirSenhaPage() {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
+  const [sessionReady, setSessionReady] = useState(false);
+  const [linkError, setLinkError] = useState("");
+
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // O link do convite entrega a sessão via #access_token na URL — só o
+  // navegador consegue ler isso, por isso a checagem acontece aqui.
+  useEffect(() => {
+    const supabase = createClient();
+    const hash = window.location.hash;
+    if (hash.includes("error=")) {
+      const params = new URLSearchParams(hash.slice(1));
+      setLinkError(params.get("error_description")?.replace(/\+/g, " ") || "Link inválido ou expirado.");
+      setChecking(false);
+      return;
+    }
+    supabase.auth.getSession().then(({ data }) => {
+      setSessionReady(!!data.session);
+      setChecking(false);
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +55,39 @@ export default function DefinirSenhaPage() {
     }
     router.push("/onboarding");
     router.refresh();
+  }
+
+  if (checking) {
+    return (
+      <div className="login-wrap">
+        <div className="login-card">
+          <p className="muted">Carregando…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!sessionReady) {
+    return (
+      <div className="login-wrap">
+        <div className="login-card">
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <BrandLockup width={230} />
+          </div>
+          <p className="auth-msg err" style={{ marginTop: 16 }}>
+            {linkError || "Esse link de convite não é válido ou já expirou."}
+          </p>
+          <p className="muted" style={{ fontSize: 13, marginTop: 12, textAlign: "center" }}>
+            Peça pro professor enviar um novo convite.
+          </p>
+          <p className="est-note" style={{ marginTop: 12, textAlign: "center" }}>
+            <Link href="/login" style={{ color: "var(--navy)", fontWeight: 700 }}>
+              ← Ir pro login
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

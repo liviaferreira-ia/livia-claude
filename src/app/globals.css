@@ -1758,8 +1758,8 @@ img.avatar {
 .wc-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 15px 4px;
+  gap: 16px;
+  padding: 18px 4px;
   border-top: 1px solid var(--line);
 }
 .wc-row:first-child {
@@ -1782,6 +1782,8 @@ img.avatar {
   min-width: 0;
 }
 .wc-eyebrow {
+  display: block;
+  margin-bottom: 3px;
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -1789,14 +1791,17 @@ img.avatar {
   color: var(--ink-faint);
 }
 .wc-title {
+  display: block;
   font-size: 15.5px;
   font-weight: 700;
   color: var(--ink);
 }
 .wc-title span {
   display: block;
+  margin-top: 3px;
   font-weight: 400;
   font-size: 13px;
+  line-height: 1.5;
   color: var(--ink-soft);
 }
 

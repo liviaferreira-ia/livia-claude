@@ -240,17 +240,19 @@ export function useProfile() {
     setStats(fresh);
   }, []);
 
-  /** Envia a foto para o Supabase Storage e salva a URL na conta. */
+  /**
+   * Envia a foto para o Supabase Storage e salva a URL na conta.
+   * Recebe a imagem já recortada em quadrado (JPEG), vinda do AvatarCropper.
+   */
   const uploadAvatar = useCallback(
-    async (file: File): Promise<{ error: string | null }> => {
+    async (blob: Blob): Promise<{ error: string | null }> => {
       if (!user) return { error: "Você precisa estar logado." };
       const supabase = createClient();
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-      const path = `${user.id}/avatar.${ext}`;
+      const path = `${user.id}/avatar.jpg`;
 
       const up = await supabase.storage
         .from("avatars")
-        .upload(path, file, { upsert: true, cacheControl: "3600" });
+        .upload(path, blob, { upsert: true, cacheControl: "3600", contentType: "image/jpeg" });
       if (up.error) return { error: up.error.message };
 
       const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);

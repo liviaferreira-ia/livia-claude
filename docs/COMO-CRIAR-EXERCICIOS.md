@@ -177,7 +177,31 @@ Estas regras valem tanto quanto as técnicas.
    - `people are` (não "people is")
    - falsos amigos: `eventually` = "no fim das contas", não "eventualmente";
      `pretend` = "fingir", não "pretender"
-6. **Não repita** o que já existe no arquivo. Leia antes de escrever.
+6. **Não repita** o que já existe. Ver §5.1.
+
+### 5.1 O que já existe (evitar duplicidade)
+
+Hoje são **768 exercícios**: 128 por nível (32 de cada tipo).
+
+Antes de escrever qualquer coisa, consulte:
+
+- **`docs/EXERCICIOS-EXISTENTES.md`** — lista todos os 768, por nível e tipo,
+  com o enunciado de cada um. É o jeito rápido de conferir duplicidade.
+- **`src/data/exercises.ts`** — a fonte da verdade. Se algo divergir do
+  inventário, vale o código.
+
+Depois de adicionar exercícios, regenere o inventário:
+
+```bash
+python3 scripts/inventario-exercicios.py > docs/EXERCICIOS-EXISTENTES.md
+```
+
+Atenção: duplicidade não é só a frase idêntica. Cadastrar
+`"She ___ coffee every morning"` quando já existe
+`"She ___ TV every night"` testando a mesma regra (-s da 3ª pessoa) com o
+mesmo grau de dificuldade **também é repetição** — muda a frase, não o
+aprendizado. Prefira atacar um aspecto ainda não coberto da regra
+(ex.: verbos em -y → -ies, ou o contraste com o plural sem -s).
 
 ### Temas por nível já usados
 
@@ -247,10 +271,13 @@ Saída esperada: `IDs duplicados: nenhum` e `Problemas: nenhum`.
 
 ## 7. Entrega
 
-1. Editar `src/data/exercises.ts`
-2. Rodar o script de validação acima → tem que dar limpo
-3. Rodar `npm run build` → tem que compilar sem erro
-4. Commit com mensagem descrevendo nível e quantidade
+1. Ler `docs/EXERCICIOS-EXISTENTES.md` para não repetir
+2. Editar `src/data/exercises.ts`
+3. Rodar o script de validação acima → tem que dar limpo
+4. Regenerar o inventário:
+   `python3 scripts/inventario-exercicios.py > docs/EXERCICIOS-EXISTENTES.md`
+5. Rodar `npm run build` → tem que compilar sem erro
+6. Commit com mensagem descrevendo nível e quantidade
 
 Não é necessário mexer em banco de dados: os exercícios são estáticos e vão
 junto com o build.

@@ -6,7 +6,7 @@ import { useProfile } from "@/lib/profile";
 
 // Mesmo número placeholder usado na landing page (src/app/page.tsx) — troque os dois juntos.
 const WHATSAPP = "5599999999999";
-const WA_MSG = "Oi! Recebi um aviso de pagamento pendente na Central School e queria regularizar.";
+const WA_MSG = "Oi! Meu acesso à plataforma da Central School está pausado e queria resolver.";
 const waLink = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WA_MSG)}`;
 
 export default function PagamentoPendentePage() {
@@ -26,11 +26,12 @@ export default function PagamentoPendentePage() {
           <BrandLockup width={230} />
         </div>
         <p style={{ fontSize: 18, fontWeight: 800, marginTop: 20, textAlign: "center" }}>
-          Pagamento pendente
+          Acesso pausado
         </p>
         <p className="muted" style={{ fontSize: 14, marginTop: 8, textAlign: "center", lineHeight: 1.6 }}>
-          Identificamos um atraso na sua mensalidade e o acesso à plataforma ficou temporariamente
-          pausado. Assim que o pagamento for confirmado, tudo volta ao normal automaticamente.
+          Seu acesso à plataforma está temporariamente pausado. Se for questão de mensalidade em
+          atraso, ele volta sozinho assim que o pagamento for confirmado. Qualquer outra situação, é
+          só falar com a gente que resolvemos rapidinho.
         </p>
         <a
           href={waLink}

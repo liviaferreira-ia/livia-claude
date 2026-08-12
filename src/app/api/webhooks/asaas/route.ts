@@ -41,15 +41,20 @@ export async function POST(request: Request) {
 async function handlePaid(admin: Admin, customerId: string, origin: string) {
   const { data: existing } = await admin
     .from("student_activity")
-    .select("user_id")
+    .select("user_id, manual_block")
     .eq("asaas_customer_id", customerId)
     .maybeSingle();
 
   // Cliente já vinculado a um aluno (mensalidade recorrente) — só reativa.
   if (existing) {
+    // Quem foi pausado pelo professor continua pausado: só ele reativa.
+    // Do contrário, uma cobrança avulsa reabriria o acesso de quem trancou.
+    const patch = existing.manual_block
+      ? { payment_status: "ok", overdue_since: null }
+      : { payment_status: "ok", overdue_since: null, blocked: false };
     await admin
       .from("student_activity")
-      .update({ payment_status: "ok", overdue_since: null, blocked: false, updated_at: new Date().toISOString() })
+      .update({ ...patch, updated_at: new Date().toISOString() })
       .eq("user_id", existing.user_id);
     return;
   }

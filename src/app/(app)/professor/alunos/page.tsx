@@ -9,6 +9,7 @@ import {
   isInactive,
   listStudentActivity,
   practiceTotals,
+  setStudentAccess,
   type StudentActivity,
 } from "@/lib/activity";
 import { initials, levelDisplay, useProfile } from "@/lib/profile";
@@ -18,6 +19,7 @@ export default function ProfessorAlunosPage() {
   const [rows, setRows] = useState<StudentActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
@@ -32,6 +34,27 @@ export default function ProfessorAlunosPage() {
       setLoading(false);
     });
   }, [ready, isTeacher]);
+
+  async function toggleAccess(row: StudentActivity) {
+    const name = row.student_name || "este aluno";
+    const pausing = !row.blocked;
+    const ok = confirm(
+      pausing
+        ? `Pausar o acesso de ${name}? Ele verá um aviso de pagamento pendente ao entrar.`
+        : `Reativar o acesso de ${name}?`,
+    );
+    if (!ok) return;
+
+    setBusyId(row.user_id);
+    const { error } = await setStudentAccess(row.user_id, pausing ? "pause" : "resume");
+    setBusyId(null);
+    if (error) {
+      setErr(error);
+      return;
+    }
+    const { data } = await listStudentActivity();
+    setRows(data);
+  }
 
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault();
@@ -160,7 +183,7 @@ export default function ProfessorAlunosPage() {
             <span>Aluno</span>
             <span>Último login</span>
             <span>Tempo médio · exercícios</span>
-            <span>Status</span>
+            <span>Status / acesso</span>
           </div>
           {rows.map((r) => {
             const totals = practiceTotals(r);
@@ -168,7 +191,7 @@ export default function ProfessorAlunosPage() {
             const needsAttention = totals.done === 0 || isInactive(r.last_login_at);
             const name = r.student_name || "Aluno(a)";
             const paymentFlag = r.blocked
-              ? { text: "Bloqueado (atraso)", cls: "bad" }
+              ? { text: r.manual_block ? "Acesso pausado" : "Bloqueado (atraso)", cls: "bad" }
               : r.payment_status === "overdue"
                 ? { text: "Pagamento atrasado", cls: "att" }
                 : null;
@@ -204,10 +227,19 @@ export default function ProfessorAlunosPage() {
                     {totals.done} exercícios · {totals.pct}% de acerto
                   </span>
                 </span>
-                <span>
+                <span style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
                   <span className={`flag ${paymentFlag ? paymentFlag.cls : needsAttention ? "att" : "ok"}`}>
                     {paymentFlag ? paymentFlag.text : needsAttention ? "Atenção" : "Em dia"}
                   </span>
+                  <button
+                    type="button"
+                    className="pill-btn"
+                    disabled={busyId === r.user_id}
+                    onClick={() => toggleAccess(r)}
+                    style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
+                  >
+                    {busyId === r.user_id ? "…" : r.blocked ? "Reativar acesso" : "Pausar acesso"}
+                  </button>
                 </span>
               </div>
             );

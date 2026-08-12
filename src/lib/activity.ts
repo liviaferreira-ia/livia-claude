@@ -65,8 +65,29 @@ export type StudentActivity = {
   payment_status: "ok" | "overdue" | null;
   overdue_since: string | null;
   blocked: boolean;
+  /** true quando quem bloqueou foi o professor, não a régua de atraso. */
+  manual_block: boolean;
   updated_at: string;
 };
+
+/** Pausa ou reativa o acesso de um aluno (só funciona logado como professor). */
+export async function setStudentAccess(
+  userId: string,
+  action: "pause" | "resume",
+): Promise<{ error: string | null }> {
+  try {
+    const res = await fetch("/api/professor/acesso", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, action }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { error: body.error || "Não consegui alterar o acesso." };
+    return { error: null };
+  } catch {
+    return { error: "Falha de conexão. Tente de novo." };
+  }
+}
 
 /** Log de todos os alunos (só retorna dados para contas de professor — RLS cuida disso). */
 export async function listStudentActivity(): Promise<{ data: StudentActivity[]; error: string | null }> {

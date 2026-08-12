@@ -1,40 +1,30 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { LESSONS } from "@/data/lesson";
 import { SpeakButton } from "@/components/SpeakButton";
 import { ConcluirEtapa } from "@/components/ConcluirEtapa";
 
-const DIALOGUE = [
-  { who: "Recepção", en: "Good evening! Welcome to Central Hotel.", pt: "Boa noite! Bem-vindo ao Central Hotel." },
-  { who: "Hóspede", en: "Hello. I have a reservation under Souza.", pt: "Olá. Tenho uma reserva no nome Souza." },
-  {
-    who: "Recepção",
-    en: "Let me check... Yes, for two nights. Could I have your ID, please?",
-    pt: "Deixe-me verificar... Sim, para duas noites. Pode me dar seu documento, por favor?",
-  },
-  { who: "Hóspede", en: "Here you are. What time is breakfast?", pt: "Aqui está. Que horas é o café da manhã?" },
-  {
-    who: "Recepção",
-    en: "Breakfast is from 7 to 10 am. Here is your key card.",
-    pt: "O café da manhã é das 7 às 10h. Aqui está seu cartão-chave.",
-  },
-];
+export default async function ListeningPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const lesson = LESSONS[slug];
+  if (!lesson) notFound();
 
-const fullText = DIALOGUE.map((l) => l.en).join(" ");
+  const fullText = lesson.listening.lines.map((l) => l.en).join(" ");
 
-export default function ListeningPage() {
   return (
     <div className="view" style={{ maxWidth: 680 }}>
       <div className="eyebrow" style={{ color: "var(--gold)" }}>
         Listening
       </div>
-      <h2 style={{ fontSize: 24, margin: "6px 0 4px" }}>Ouvir uma conversa</h2>
+      <h2 style={{ fontSize: 24, margin: "6px 0 4px" }}>{lesson.listening.title}</h2>
       <p className="muted" style={{ margin: "0 0 14px" }}>
-        Um check-in no hotel. Ouça cada fala e tente entender antes de ler a tradução.
+        {lesson.listening.hint}
       </p>
       <div style={{ marginBottom: 14 }}>
         <SpeakButton text={fullText} label="▶ Ouvir a conversa toda" />
       </div>
       <div className="card" style={{ padding: "6px 20px" }}>
-        {DIALOGUE.map((line, i) => (
+        {lesson.listening.lines.map((line, i) => (
           <div className="vrow" key={i}>
             <span className="vmain">
               <span className="ven" style={{ display: "block", fontSize: 15.5 }}>
@@ -47,8 +37,8 @@ export default function ListeningPage() {
         ))}
       </div>
       <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-        <ConcluirEtapa id="listening" />
-        <Link href="/aluno/licao" className="btn ghost">
+        <ConcluirEtapa slug={slug} id="listening" />
+        <Link href={`/aluno/licao/${slug}`} className="btn ghost">
           Voltar
         </Link>
       </div>

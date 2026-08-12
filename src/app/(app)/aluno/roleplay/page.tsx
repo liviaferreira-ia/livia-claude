@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ROLEPLAYS, resolveRoleplayLevel } from "@/data/pratica";
+import { ROLEPLAYS, resolveRoleplayLevel, type Roleplay } from "@/data/pratica";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 import {
@@ -17,7 +17,7 @@ type Msg = { who: "ai" | "me"; text: string };
 
 export default function RoleplayPage() {
   const { profile, ready } = useProfile();
-  const [started, setStarted] = useState(false);
+  const [chosenId, setChosenId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState<"idle" | "listening" | "done">("idle");
@@ -27,8 +27,10 @@ export default function RoleplayPage() {
   const chatRef = useRef<HTMLDivElement>(null);
 
   const roleplayLevel = resolveRoleplayLevel(parseCefrLevel(profile.level) ?? "A2");
-  const roleplay = ROLEPLAYS[roleplayLevel];
-  const SCRIPT = roleplay.steps;
+  const scenarios = ROLEPLAYS[roleplayLevel];
+  const roleplay = scenarios.find((r) => r.id === chosenId) ?? null;
+  const SCRIPT = roleplay?.steps ?? [];
+  const started = messages.length > 0;
 
   useEffect(() => {
     setSupported(isSTTSupported());
@@ -39,12 +41,12 @@ export default function RoleplayPage() {
     chatRef.current?.scrollTo(0, chatRef.current.scrollHeight);
   }, [messages]);
 
-  function start() {
-    setStarted(true);
+  function start(r: Roleplay) {
+    setChosenId(r.id);
     setStep(0);
-    setMessages([{ who: "ai", text: SCRIPT[0].ai }]);
+    setMessages([{ who: "ai", text: r.steps[0].ai }]);
     setPhase("idle");
-    speak(SCRIPT[0].ai);
+    speak(r.steps[0].ai);
   }
 
   function handleStudent(said: string) {
@@ -83,8 +85,9 @@ export default function RoleplayPage() {
     }
   }
 
-  function restart() {
-    setStarted(false);
+  /** Volta pra lista de cenários. */
+  function backToList() {
+    setChosenId(null);
     setMessages([]);
     setStep(0);
     setPhase("idle");
@@ -100,22 +103,38 @@ export default function RoleplayPage() {
     );
   }
 
-  if (!started) {
+  // Escolha do cenário
+  if (!started || !roleplay) {
     return (
-      <div className="view" style={{ maxWidth: 640 }}>
+      <div className="view" style={{ maxWidth: 700 }}>
         <div className="eyebrow" style={{ color: "var(--gold)" }}>
           Roleplay por voz · {levelBadge(roleplayLevel)}
         </div>
-        <h2 style={{ fontSize: 24, margin: "6px 0 12px" }}>🎭 {roleplay.title}</h2>
-        <div className="card" style={{ padding: 24 }}>
-          <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6 }}>{roleplay.scenario}</p>
-          <p className="muted" style={{ fontSize: 13.5, marginTop: 12 }}>
-            Seu par de conversa fala primeiro. Toque no microfone e responda em inglês — não precisa ser perfeito!
-          </p>
+        <h2 style={{ fontSize: 24, margin: "6px 0 6px" }}>Escolha uma situação</h2>
+        <p className="muted" style={{ margin: "0 0 20px" }}>
+          Seu par de conversa fala primeiro. Toque no microfone e responda em inglês — não precisa
+          ser perfeito!
+        </p>
+
+        <div className="card" style={{ padding: 8 }}>
+          {scenarios.map((r) => (
+            <button
+              key={r.id}
+              className="m-item"
+              onClick={() => start(r)}
+              style={{ width: "100%", textAlign: "left", background: "none", border: 0, cursor: "pointer", font: "inherit", color: "inherit" }}
+            >
+              <span className="m-ic tint-gold" style={{ fontSize: 18 }}>
+                {r.emoji}
+              </span>
+              <span className="m-body">
+                <b>{r.title}</b>
+                <span>{r.scenario}</span>
+              </span>
+              <span className="m-state todo">{r.steps.length} turnos</span>
+            </button>
+          ))}
         </div>
-        <button className="btn primary" style={{ marginTop: 20 }} onClick={start}>
-          Começar conversa →
-        </button>
       </div>
     );
   }
@@ -130,9 +149,12 @@ export default function RoleplayPage() {
           <p className="muted" style={{ margin: "0 0 20px" }}>
             Ótima conversa. Praticar situações reais é o que faz você falar com confiança.
           </p>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-            <button className="btn primary" onClick={restart}>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="btn primary" onClick={() => start(roleplay)}>
               Fazer de novo
+            </button>
+            <button className="btn ghost" onClick={backToList}>
+              Escolher outra situação
             </button>
             <Link href="/aluno" className="btn ghost">
               Voltar ao início
@@ -148,17 +170,22 @@ export default function RoleplayPage() {
   return (
     <div className="view" style={{ maxWidth: 640 }}>
       <div className="objbar">
-        <span>🎭</span>
+        <span>{roleplay.emoji}</span>
         <div>
           <b>{roleplay.title}</b>{" "}
-          <span className="muted">Fale em inglês quando for sua vez.</span>
+          <span className="muted">
+            Turno {step + 1} de {SCRIPT.length} · fale em inglês quando for sua vez.
+          </span>
         </div>
+        <button className="pill-btn" style={{ marginLeft: "auto" }} onClick={backToList}>
+          Trocar
+        </button>
       </div>
 
       <div className="chat" ref={chatRef}>
         {messages.map((m, i) => (
           <div className={`msg ${m.who}`} key={i}>
-            <span className="who">{m.who === "me" ? "EU" : "AI"}</span>
+            <span className="who">{m.who === "me" ? "EU" : "EN"}</span>
             <div className="bubble">{m.text}</div>
           </div>
         ))}

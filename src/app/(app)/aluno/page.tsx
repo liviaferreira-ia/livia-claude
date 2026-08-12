@@ -7,6 +7,7 @@ import { initials, levelDisplay, parseCefrLevel, totalExercises, useProfile } fr
 import { listMyMessages, sendMessage, type Message } from "@/lib/messages";
 import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
 import { resolveCourseLevel } from "@/data/curso";
+import { DAILY_GOAL } from "@/lib/daily";
 
 export default function AlunoDashboard() {
   const { profile, ready, reset, signOut } = useProfile();
@@ -84,6 +85,9 @@ export default function AlunoDashboard() {
 
   const totals = totalExercises(profile);
   const first = profile.name.split(" ")[0];
+  const dailyDone = profile.stats.dailyDone;
+  const goalPct = Math.min(100, Math.round((dailyDone / DAILY_GOAL) * 100));
+  const goalDone = dailyDone >= DAILY_GOAL;
 
   const badges = [
     { emoji: "🌱", label: "Primeiro passo", got: totals.done >= 1, hint: "Faça 1 exercício" },
@@ -143,6 +147,24 @@ export default function AlunoDashboard() {
           ? `Bem-vindo(a), ${first}! Que tal começar com alguns exercícios?`
           : `Continue assim, ${first}! Você já fez ${totals.done} exercícios.`}
       </p>
+
+      {/* Meta do dia */}
+      <div className="card" style={{ padding: 18, marginBottom: 22 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+          <div className="eyebrow">Meta de hoje</div>
+          <span className="muted" style={{ fontSize: 13, fontWeight: 700 }}>
+            {Math.min(dailyDone, DAILY_GOAL)}/{DAILY_GOAL} exercícios
+          </span>
+        </div>
+        <div className="unit-bar" style={{ marginTop: 12 }}>
+          <i style={{ width: `${goalPct}%` }} />
+        </div>
+        <p className="muted" style={{ fontSize: 13.5, margin: "10px 0 0" }}>
+          {goalDone
+            ? `Meta batida! 🎉 ${profile.stats.streak > 1 ? `${profile.stats.streak} dias seguidos — não perca a chama.` : "Volte amanhã para começar uma ofensiva."}`
+            : `Faltam ${DAILY_GOAL - dailyDone} exercícios para fechar o dia.`}
+        </p>
+      </div>
 
       <div className="grid cols-2">
         <div>

@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import type { Kind } from "@/data/exercises";
 import { LEVEL_ORDER, levelBadge, type CefrLevel } from "@/data/placement";
 import { addTimeSeconds, bumpPracticeServer, touchLogin } from "@/lib/activity";
+import { bumpDaily, readDaily, readStreak, touchStreak } from "@/lib/daily";
+import { countCompletedLessons } from "@/lib/lessonProgress";
 import { createClient } from "@/lib/supabase/client";
 
 const CEFR_RE = /^[ABC][12]$/;
@@ -39,6 +41,8 @@ export type Stats = {
   practice: Record<Kind, PracticeStat>;
   lessonsCompleted: number;
   streak: number;
+  /** Exercícios feitos hoje (para a meta diária). */
+  dailyDone: number;
 };
 
 export type Profile = {
@@ -64,6 +68,7 @@ export function emptyStats(): Stats {
     },
     lessonsCompleted: 0,
     streak: 0,
+    dailyDone: 0,
   };
 }
 
@@ -71,21 +76,30 @@ export function emptyProfile(): Profile {
   return { onboarded: false, name: "", goal: "", level: "", avatarUrl: "", stats: emptyStats() };
 }
 
+/**
+ * `lessonsCompleted` e `streak` não são guardados aqui: são derivados na hora
+ * do progresso das lições e do registro de dias seguidos, senão ficariam
+ * desatualizados (era o motivo de viverem zerados no painel).
+ */
 export function loadStats(): Stats {
   if (typeof window === "undefined") return emptyStats();
+  const base = emptyStats();
+  let practice = base.practice;
   try {
     const raw = window.localStorage.getItem(STATS_KEY);
-    if (!raw) return emptyStats();
-    const parsed = JSON.parse(raw) as Partial<Stats>;
-    const base = emptyStats();
-    return {
-      ...base,
-      ...parsed,
-      practice: { ...base.practice, ...(parsed.practice ?? {}) },
-    };
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<Stats>;
+      practice = { ...base.practice, ...(parsed.practice ?? {}) };
+    }
   } catch {
-    return emptyStats();
+    // storage indisponível — seguimos com os contadores zerados
   }
+  return {
+    practice,
+    lessonsCompleted: countCompletedLessons(),
+    streak: readStreak().streak,
+    dailyDone: readDaily().done,
+  };
 }
 
 export function saveStats(s: Stats) {
@@ -132,6 +146,9 @@ export function useProfile() {
     const supabase = createClient();
     let mounted = true;
 
+    // Registra a presença de hoje antes de ler as estatísticas, senão a
+    // ofensiva só apareceria na próxima vez que o app abrisse.
+    touchStreak();
     setStats(loadStats());
 
     supabase.auth.getUser().then(async ({ data }) => {
@@ -194,6 +211,7 @@ export function useProfile() {
   );
 
   const bumpPractice = useCallback((kind: Kind, correct: boolean) => {
+    const daily = bumpDaily();
     setStats((prev) => {
       const stat = prev.practice[kind];
       const next: Stats = {
@@ -202,11 +220,17 @@ export function useProfile() {
           ...prev.practice,
           [kind]: { done: stat.done + 1, correct: stat.correct + (correct ? 1 : 0) },
         },
+        dailyDone: daily.done,
       };
       saveStats(next);
       return next;
     });
     bumpPracticeServer(kind, correct).catch(() => {});
+  }, []);
+
+  /** Recalcula lições concluídas e ofensiva (ex.: ao voltar de uma lição). */
+  const refreshDerivedStats = useCallback(() => {
+    setStats(loadStats());
   }, []);
 
   /** Zera apenas as estatísticas de prática deste navegador. */
@@ -256,6 +280,7 @@ export function useProfile() {
     ready,
     updateIdentity,
     uploadAvatar,
+    refreshDerivedStats,
     bumpPractice,
     reset,
     signOut,

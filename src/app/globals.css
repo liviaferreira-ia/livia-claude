@@ -1813,7 +1813,12 @@ img.avatar {
   align-items: center;
 }
 .two-col.top {
-  align-items: start;
+  align-items: stretch;
+}
+.two-col.top > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Lista de seções da lição (estilo do print) */

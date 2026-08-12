@@ -17,17 +17,33 @@ export default function DefinirSenhaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // O link do convite entrega a sessão via #access_token na URL — só o
-  // navegador consegue ler isso, por isso a checagem acontece aqui.
+  // O link do convite entrega a sessão via #access_token/#refresh_token na URL
+  // (fluxo antigo, "implicit") — mas o cliente do navegador (@supabase/ssr) é
+  // configurado pro fluxo novo (PKCE, ?code=) e não detecta esse formato
+  // sozinho. Por isso extraímos os tokens do hash na mão e chamamos
+  // setSession() explicitamente, em vez de confiar em detecção automática.
   useEffect(() => {
     const supabase = createClient();
-    const hash = window.location.hash;
-    if (hash.includes("error=")) {
-      const params = new URLSearchParams(hash.slice(1));
+    const params = new URLSearchParams(window.location.hash.slice(1));
+
+    if (params.get("error")) {
       setLinkError(params.get("error_description")?.replace(/\+/g, " ") || "Link inválido ou expirado.");
       setChecking(false);
       return;
     }
+
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+
+    if (access_token && refresh_token) {
+      supabase.auth.setSession({ access_token, refresh_token }).then(({ data, error }) => {
+        setSessionReady(!!data.session && !error);
+        setChecking(false);
+      });
+      return;
+    }
+
+    // Sem token no hash (ex: página recarregada) — checa se já tem sessão salva.
     supabase.auth.getSession().then(({ data }) => {
       setSessionReady(!!data.session);
       setChecking(false);

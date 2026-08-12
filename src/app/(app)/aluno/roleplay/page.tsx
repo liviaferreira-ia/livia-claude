@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { ROLEPLAYS, resolveRoleplayLevel } from "@/data/pratica";
+import { levelBadge } from "@/data/placement";
+import { parseCefrLevel, useProfile } from "@/lib/profile";
 import {
   createRecognition,
   isSTTSupported,
@@ -10,28 +13,10 @@ import {
   type SpeechRecognitionLike,
 } from "@/lib/speech";
 
-const SCRIPT = [
-  {
-    ai: "Good evening! Welcome to Central Hotel. How can I help you?",
-    hint: 'Diga que tem uma reserva: "I have a reservation under Souza."',
-  },
-  {
-    ai: "Let me check... Yes, for two nights, correct? Could I have your ID, please?",
-    hint: 'Entregue o documento — "Here you are." — e pergunte: "What time is breakfast?"',
-  },
-  {
-    ai: "Breakfast is from 7 to 10 am. Would you like a wake-up call?",
-    hint: 'Responda: "Yes, please, at 7." ou "No, thank you."',
-  },
-  {
-    ai: "Perfect. Here is your key card. Your room is 305. Enjoy your stay!",
-    hint: 'Agradeça: "Thank you very much!"',
-  },
-];
-
 type Msg = { who: "ai" | "me"; text: string };
 
 export default function RoleplayPage() {
+  const { profile, ready } = useProfile();
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [step, setStep] = useState(0);
@@ -40,6 +25,10 @@ export default function RoleplayPage() {
   const [supported, setSupported] = useState(true);
   const recRef = useRef<SpeechRecognitionLike | null>(null);
   const chatRef = useRef<HTMLDivElement>(null);
+
+  const roleplayLevel = resolveRoleplayLevel(parseCefrLevel(profile.level) ?? "A2");
+  const roleplay = ROLEPLAYS[roleplayLevel];
+  const SCRIPT = roleplay.steps;
 
   useEffect(() => {
     setSupported(isSTTSupported());
@@ -103,18 +92,23 @@ export default function RoleplayPage() {
   }
 
   // Tela inicial do cenário
+  if (!ready) {
+    return (
+      <div className="view">
+        <p className="muted">Carregando…</p>
+      </div>
+    );
+  }
+
   if (!started) {
     return (
       <div className="view" style={{ maxWidth: 640 }}>
         <div className="eyebrow" style={{ color: "var(--gold)" }}>
-          Roleplay por voz
+          Roleplay por voz · {levelBadge(roleplayLevel)}
         </div>
-        <h2 style={{ fontSize: 24, margin: "6px 0 12px" }}>🏨 Check-in no hotel</h2>
+        <h2 style={{ fontSize: 24, margin: "6px 0 12px" }}>🎭 {roleplay.title}</h2>
         <div className="card" style={{ padding: 24 }}>
-          <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6 }}>
-            Você é o <b>hóspede</b> e a IA é o <b>recepcionista</b>. O objetivo é confirmar sua
-            reserva, pegar a chave e perguntar o horário do café da manhã.
-          </p>
+          <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6 }}>{roleplay.scenario}</p>
           <p className="muted" style={{ fontSize: 13.5, marginTop: 12 }}>
             A IA fala primeiro. Toque no microfone e responda em inglês — não precisa ser perfeito!
           </p>
@@ -132,7 +126,7 @@ export default function RoleplayPage() {
       <div className="view" style={{ maxWidth: 640 }}>
         <div className="card done" style={{ padding: 28 }}>
           <div style={{ fontSize: 46 }}>🎉</div>
-          <h2 style={{ fontSize: 22, margin: "6px 0 6px" }}>Você fez o check-in em inglês!</h2>
+          <h2 style={{ fontSize: 22, margin: "6px 0 6px" }}>Você completou: {roleplay.title}!</h2>
           <p className="muted" style={{ margin: "0 0 20px" }}>
             Ótima conversa. Praticar situações reais é o que faz você falar com confiança.
           </p>
@@ -154,9 +148,9 @@ export default function RoleplayPage() {
   return (
     <div className="view" style={{ maxWidth: 640 }}>
       <div className="objbar">
-        <span>🏨</span>
+        <span>🎭</span>
         <div>
-          <b>Check-in no hotel</b> · você é o hóspede.{" "}
+          <b>{roleplay.title}</b>{" "}
           <span className="muted">Fale em inglês quando for sua vez.</span>
         </div>
       </div>

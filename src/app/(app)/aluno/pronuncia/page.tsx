@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { normalize } from "@/data/exercises";
 import { SpeakButton } from "@/components/SpeakButton";
+import { PRONUNCIATION, resolvePronunciationLevel } from "@/data/pratica";
+import { parseCefrLevel, useProfile } from "@/lib/profile";
 import {
   createRecognition,
   isSTTSupported,
@@ -12,18 +14,10 @@ import {
   type SpeechRecognitionLike,
 } from "@/lib/speech";
 
-const SENTENCES = [
-  "I have a reservation.",
-  "What time is breakfast?",
-  "Could you help me, please?",
-  "I would like a coffee.",
-  "Where is the station?",
-  "Thank you very much.",
-];
-
 type Phase = "idle" | "listening" | "result";
 
 export default function PronunciaPage() {
+  const { profile, ready } = useProfile();
   const [supported, setSupported] = useState(true);
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -33,6 +27,8 @@ export default function PronunciaPage() {
   const [answered, setAnswered] = useState(0);
   const recRef = useRef<SpeechRecognitionLike | null>(null);
 
+  const SENTENCES = PRONUNCIATION[resolvePronunciationLevel(parseCefrLevel(profile.level) ?? "A2")];
+
   useEffect(() => {
     setSupported(isSTTSupported());
     return () => recRef.current?.abort();
@@ -40,8 +36,10 @@ export default function PronunciaPage() {
 
   // Toca a frase de referência automaticamente ao abrir e ao trocar de frase.
   useEffect(() => {
-    if (index < SENTENCES.length) speak(SENTENCES[index]);
-  }, [index]);
+    if (!ready) return;
+    const sentence = SENTENCES[index];
+    if (sentence) speak(sentence);
+  }, [index, ready, SENTENCES]);
 
   const target = SENTENCES[index] ?? "";
   const targetWords = normalize(target).split(" ");
@@ -100,6 +98,14 @@ export default function PronunciaPage() {
     setError("");
     setScoreSum(0);
     setAnswered(0);
+  }
+
+  if (!ready) {
+    return (
+      <div className="view">
+        <p className="muted">Carregando…</p>
+      </div>
+    );
   }
 
   // Tela final

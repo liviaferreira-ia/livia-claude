@@ -3,23 +3,20 @@
 import Link from "next/link";
 import { useState } from "react";
 import { SpeakButton } from "@/components/SpeakButton";
-
-type Card = { front: string; sub: string; back: string; example: string };
-
-const CARDS: Card[] = [
-  { front: "reservation", sub: "substantivo", back: "reserva", example: "I have a reservation under Souza." },
-  { front: "check-in", sub: "substantivo / verbo", back: "registro de entrada", example: "What time is check-in?" },
-  { front: "breakfast", sub: "substantivo", back: "café da manhã", example: "Breakfast is from 7 to 10 am." },
-  { front: "to go → went", sub: "passado simples", back: "ir → foi/fui", example: "I went to Rio last month." },
-  { front: "What time…?", sub: "pergunta", back: "Que horas…?", example: "What time is breakfast?" },
-];
+import { FLASHCARDS, resolveFlashcardLevel } from "@/data/pratica";
+import { levelBadge } from "@/data/placement";
+import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 export default function RevisaoPage() {
+  const { profile, ready } = useProfile();
   const [started, setStarted] = useState(false);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [known, setKnown] = useState(0);
   const [done, setDone] = useState(false);
+
+  const cardLevel = resolveFlashcardLevel(parseCefrLevel(profile.level) ?? "A2");
+  const CARDS = FLASHCARDS[cardLevel];
 
   function grade(ok: boolean) {
     if (ok) setKnown((k) => k + 1);
@@ -39,10 +36,18 @@ export default function RevisaoPage() {
     setDone(false);
   }
 
+  if (!ready) {
+    return (
+      <div className="view">
+        <p className="muted">Carregando…</p>
+      </div>
+    );
+  }
+
   if (!started) {
     return (
       <div className="view" style={{ maxWidth: 620 }}>
-        <div className="eyebrow" style={{ marginBottom: 8 }}>Revisão espaçada</div>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>Revisão espaçada · {levelBadge(cardLevel)}</div>
         <h2 style={{ fontSize: 22, marginBottom: 4 }}>{CARDS.length} itens para revisar hoje</h2>
         <p className="muted" style={{ margin: "0 0 20px" }}>
           A revisão na hora certa fixa o que você aprendeu na memória.

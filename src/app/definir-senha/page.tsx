@@ -14,8 +14,16 @@ export default function DefinirSenhaPage() {
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const reqs = [
+    { label: "Mínimo 6 caracteres", ok: password.length >= 6 },
+    { label: "Uma letra maiúscula", ok: /[A-Z]/.test(password) },
+    { label: "Um caractere especial (ex: ! @ # $ %)", ok: /[^A-Za-z0-9]/.test(password) },
+  ];
+  const passwordValid = reqs.every((r) => r.ok);
 
   // O link do convite entrega a sessão via #access_token/#refresh_token na URL
   // (fluxo antigo, "implicit") — mas o cliente do navegador (@supabase/ssr) é
@@ -53,8 +61,8 @@ export default function DefinirSenhaPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (password.length < 6) {
-      setError("A senha precisa de pelo menos 6 caracteres.");
+    if (!passwordValid) {
+      setError("A senha precisa atender todos os requisitos abaixo.");
       return;
     }
     if (password !== confirm) {
@@ -119,29 +127,66 @@ export default function DefinirSenhaPage() {
         <form onSubmit={handleSubmit} style={{ marginTop: 20 }}>
           <div className="field">
             <label htmlFor="senha">Nova senha</label>
-            <input
-              id="senha"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 6 caracteres"
-              autoComplete="new-password"
-              minLength={6}
-              required
-            />
+            <div className="pw-wrap">
+              <input
+                id="senha"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite sua senha"
+                autoComplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                className="pw-toggle"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                title={showPassword ? "Esconder senha" : "Mostrar senha"}
+              >
+                {showPassword ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.3 20.3 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a20.3 20.3 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <path d="M1 1l22 22" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            <ul className="pw-checklist">
+              {reqs.map((r) => (
+                <li key={r.label} className={r.ok ? "ok" : undefined}>
+                  {r.ok ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="9" />
+                    </svg>
+                  )}
+                  {r.label}
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="field">
             <label htmlFor="confirmar">Confirmar senha</label>
-            <input
-              id="confirmar"
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Digite de novo"
-              autoComplete="new-password"
-              minLength={6}
-              required
-            />
+            <div className="pw-wrap">
+              <input
+                id="confirmar"
+                type={showPassword ? "text" : "password"}
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                placeholder="Digite de novo"
+                autoComplete="new-password"
+                required
+              />
+            </div>
           </div>
 
           {error && <p className="auth-msg err">{error}</p>}

@@ -656,6 +656,7 @@ const MC_A1: MC[] = [
   { id: "a1-mc30", prompt: "How ___ brothers do you have?", options: ["much", "many", "old", "long"], answer: 1, explain: "Brothers é contável: How many." },
   { id: "a1-mc31", prompt: "I ___ speak French.", options: ["don't can", "can't", "doesn't can", "not can"], answer: 1, explain: "Can não usa do/does na negativa: can't." },
   { id: "a1-mc32", prompt: "The children ___ in the garden.", options: ["is", "am", "are", "was"], answer: 2, explain: "Children já é plural (child → children): are." },
+  { id: "a1-mc33", prompt: "Laura is my friend. ___ phone number is 555-0182.", options: ["She", "Her", "Hers", "His"], answer: 1, explain: "Antes de um substantivo usamos o adjetivo possessivo: her phone number. She é sujeito e hers substitui o substantivo." },
 ];
 
 const FILL_A1: Fill[] = [
@@ -691,6 +692,7 @@ const FILL_A1: Fill[] = [
   { id: "a1-f30", prompt: "My parents ___ (have) a dog.", hint: "plural", answers: ["have"], explain: "have (não has)." },
   { id: "a1-f31", prompt: "___ (do) she like music?", hint: "auxiliar, 3ª pessoa", answers: ["does"], explain: "Does she like...?" },
   { id: "a1-f32", prompt: "The book ___ (be) on the table.", hint: "singular", answers: ["is"], explain: "is." },
+  { id: "a1-f33", prompt: "I have two ___ (foot).", hint: "plural irregular", answers: ["feet"], explain: "Foot tem plural irregular: feet, não foots." },
 ];
 
 const TRANSLATE_A1: Translate[] = [
@@ -761,6 +763,7 @@ const ORDER_A1: Order[] = [
   { id: "a1-o30", words: ["dog", "my", "have", "parents", "a"], answer: "my parents have a dog", pt: "Meus pais têm um cachorro." },
   { id: "a1-o31", words: ["music", "she", "like", "does"], answer: "does she like music", pt: "Ela gosta de música?" },
   { id: "a1-o32", words: ["table", "the", "is", "book", "the", "on"], answer: "the book is on the table", pt: "O livro está na mesa." },
+  { id: "a1-o33", words: ["brother", "do", "what", "your", "does"], answer: "what does your brother do", pt: "O que seu irmão faz?" },
 ];
 
 // ================= C2 =================

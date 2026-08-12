@@ -2,18 +2,9 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { initials, useProfile } from "@/lib/profile";
 
 type Msg = { who: "ai" | "me"; text: string; corr?: string };
-
-const OPENING: Msg[] = [
-  { who: "ai", text: "Hi Marina! 👋 Let's talk about travel. Where did you go on your last trip?" },
-  {
-    who: "me",
-    text: "I go to Rio de Janeiro last month.",
-    corr: 'mais natural: "I went to Rio last month."',
-  },
-  { who: "ai", text: "Nice! Rio is beautiful. What did you do there?" },
-];
 
 const REPLIES = [
   "Great! Did you go to the beach?",
@@ -23,18 +14,29 @@ const REPLIES = [
 ];
 
 export default function TutorPage() {
-  const [msgs, setMsgs] = useState<Msg[]>(OPENING);
+  const { profile, ready } = useProfile();
+  const first = profile.name.split(" ")[0] || "there";
+  const opening: Msg[] = [
+    { who: "ai", text: `Hi ${first}! 👋 Let's talk about travel. Where did you go on your last trip?` },
+  ];
+
+  // Só as mensagens trocadas depois da saudação. A saudação é derivada aqui
+  // porque depende do nome, que só chega depois da sessão carregar.
+  const [replies, setReplies] = useState<Msg[]>([]);
   const [text, setText] = useState("");
   const [replyIndex, setReplyIndex] = useState(0);
   const [ended, setEnded] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
+  const msgs: Msg[] = ready ? [...opening, ...replies] : replies;
+  const written = replies.filter((m) => m.who === "me").length;
+
   useEffect(() => {
     chatRef.current?.scrollTo(0, chatRef.current.scrollHeight);
-  }, [msgs]);
+  }, [msgs.length]);
 
   function push(m: Msg) {
-    setMsgs((prev) => [...prev, m]);
+    setReplies((prev) => [...prev, m]);
   }
 
   function send() {
@@ -53,26 +55,21 @@ export default function TutorPage() {
       <div className="view" style={{ maxWidth: 700 }}>
         <div className="eyebrow">Prática concluída</div>
         <h2 style={{ fontSize: 22, margin: "6px 0 4px" }}>
-          Você falou sobre sua viagem ao Rio 🎉
+          Você escreveu {written} {written === 1 ? "frase" : "frases"} em inglês 🎉
         </h2>
         <p className="muted" style={{ margin: "0 0 12px" }}>
-          Boa conversa! Você se comunicou bem e experimentou o passado simples.
+          Escrever sem medo de errar é o que destrava a conversa. Continue praticando!
         </p>
         <div className="card" style={{ padding: 22 }}>
-          <div className="scores">
-            <div className="scorecell"><b>84</b><span>Comunicação</span></div>
-            <div className="scorecell"><b>71</b><span>Gramática</span></div>
-            <div className="scorecell"><b>78</b><span>Vocabulário</span></div>
-            <div className="scorecell"><b>74</b><span>Fluência</span></div>
-          </div>
           <div className="fbrow">
             <span className="ic tint-navy">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 6L9 17l-5-5" /></svg>
             </span>
             <div>
-              <b style={{ fontSize: 14 }}>Ponto forte — pedidos claros</b>
+              <b style={{ fontSize: 14 }}>Quer correção de verdade?</b>
               <div className="muted" style={{ fontSize: 13.5 }}>
-                &quot;Could you help me, please?&quot; — ótimo uso de linguagem educada.
+                Mande suas dúvidas para o seu professor pelos recados, na tela inicial — ele lê e
+                responde pessoalmente.
               </div>
             </div>
           </div>
@@ -81,32 +78,19 @@ export default function TutorPage() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
             </span>
             <div>
-              <b style={{ fontSize: 14 }}>Para melhorar — passado simples</b>
+              <b style={{ fontSize: 14 }}>Treine a mesma estrutura</b>
               <div className="muted" style={{ fontSize: 13.5 }}>
-                Você disse <i>&quot;I go to Rio&quot;</i> → o correto é{" "}
-                <b>&quot;I went to Rio&quot;</b>. Para ações concluídas no passado, use{" "}
-                <i>went</i>.
-              </div>
-            </div>
-          </div>
-          <div className="fbrow">
-            <span className="ic tint-warn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M12 2v20M2 12h20" /></svg>
-            </span>
-            <div>
-              <b style={{ fontSize: 14 }}>Próximo passo</b>
-              <div className="muted" style={{ fontSize: 13.5 }}>
-                Adicionamos <b>passado simples</b> ao seu foco. A missão de amanhã
-                terá 1 atividade sobre isso.
+                Os exercícios do seu nível têm correção automática e explicação em cada questão.
               </div>
             </div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 12, marginTop: 18 }}>
-          <Link href="/aluno" className="btn primary">Voltar ao início</Link>
-          <button className="btn ghost" onClick={() => { setMsgs(OPENING); setEnded(false); setReplyIndex(0); }}>
+        <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
+          <Link href="/aluno/praticar" className="btn primary">Ir para os exercícios →</Link>
+          <button className="btn ghost" onClick={() => { setReplies([]); setEnded(false); setReplyIndex(0); }}>
             Praticar de novo
           </button>
+          <Link href="/aluno" className="btn ghost">Voltar ao início</Link>
         </div>
       </div>
     );
@@ -121,14 +105,19 @@ export default function TutorPage() {
         </svg>
         <div>
           <b>Objetivo:</b> falar sobre uma viagem recente usando o passado simples.{" "}
-          <span className="muted">Nível A2 · ~8 min</span>
+          <span className="muted">~8 min</span>
         </div>
       </div>
+
+      <p className="est-note" style={{ margin: "0 0 12px" }}>
+        Prática guiada com perguntas prontas — ela puxa conversa, mas ainda não lê o que você
+        escreve. Para correção de verdade, use os exercícios ou fale com seu professor.
+      </p>
 
       <div className="chat" ref={chatRef}>
         {msgs.map((m, i) => (
           <div className={`msg ${m.who}`} key={i}>
-            <span className="who">{m.who === "me" ? "MS" : "AI"}</span>
+            <span className="who">{m.who === "me" ? initials(profile.name) : "EN"}</span>
             <div className="bubble">
               {m.text}
               {m.corr && <span className="corr">✎ {m.corr}</span>}

@@ -110,7 +110,7 @@ export default function RoleplayPage() {
         <div className="card" style={{ padding: 24 }}>
           <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6 }}>{roleplay.scenario}</p>
           <p className="muted" style={{ fontSize: 13.5, marginTop: 12 }}>
-            A IA fala primeiro. Toque no microfone e responda em inglês — não precisa ser perfeito!
+            Seu par de conversa fala primeiro. Toque no microfone e responda em inglês — não precisa ser perfeito!
           </p>
         </div>
         <button className="btn primary" style={{ marginTop: 20 }} onClick={start}>

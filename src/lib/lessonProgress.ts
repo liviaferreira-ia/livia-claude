@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { LESSONS, lessonSteps } from "@/data/lesson";
 
 const KEY = "central_lesson_sections_v1";
 
@@ -32,6 +33,21 @@ export function useLessonProgress() {
   );
 
   return { ready, isDone };
+}
+
+/** Quantas lições tiveram TODAS as etapas concluídas (usado nas conquistas do painel). */
+export function countCompletedLessons(): number {
+  if (typeof window === "undefined") return 0;
+  let done: Done = {};
+  try {
+    const raw = window.localStorage.getItem(KEY);
+    done = raw ? (JSON.parse(raw) as Done) : {};
+  } catch {
+    return 0;
+  }
+  return Object.values(LESSONS).filter((lesson) =>
+    lessonSteps(lesson).every((step) => done[keyFor(lesson.slug, step.id)]),
+  ).length;
 }
 
 /** Marca uma etapa como concluída fora de um componente React (ex.: ao finalizar a tarefa). */

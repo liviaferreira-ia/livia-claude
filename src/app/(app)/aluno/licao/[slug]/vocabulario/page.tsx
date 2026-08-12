@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LESSONS } from "@/data/lesson";
 import { SpeakButton } from "@/components/SpeakButton";
+import { SaveWordButton } from "@/components/SaveWordButton";
 import { ConcluirEtapa } from "@/components/ConcluirEtapa";
 
 export default async function VocabularioPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,7 +26,10 @@ export default async function VocabularioPage({ params }: { params: Promise<{ sl
               <span className="ven" style={{ display: "block" }}>{v.en}</span>
               <span className="vpt" style={{ display: "block" }}>{v.pt}</span>
             </span>
-            <SpeakButton text={v.en} />
+            <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <SpeakButton text={v.en} />
+              <SaveWordButton en={v.en} pt={v.pt} source={`Lição · ${lesson.title}`} />
+            </span>
           </div>
         ))}
       </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LESSONS } from "@/data/lesson";
 import { SpeakButton } from "@/components/SpeakButton";
+import { SaveWordButton } from "@/components/SaveWordButton";
 import { ConcluirEtapa } from "@/components/ConcluirEtapa";
 
 export default async function ExpressoesPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,7 +26,10 @@ export default async function ExpressoesPage({ params }: { params: Promise<{ slu
               <span className="ven" style={{ display: "block", fontSize: 16 }}>{e.en}</span>
               <span className="vpt" style={{ display: "block" }}>{e.pt}</span>
             </span>
-            <SpeakButton text={e.en} />
+            <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <SpeakButton text={e.en} />
+              <SaveWordButton en={e.en} pt={e.pt} source={`Lição · ${lesson.title}`} />
+            </span>
           </div>
         ))}
       </div>

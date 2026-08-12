@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { SpeakButton } from "@/components/SpeakButton";
+import { SaveWordButton } from "@/components/SaveWordButton";
 import { FLASHCARDS, resolveFlashcardLevel } from "@/data/pratica";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
@@ -103,8 +104,14 @@ export default function RevisaoPage() {
       <div className="card flashcard">
         <div className="flash-word">{card.front}</div>
         <div className="flash-sub">{card.sub}</div>
-        <div style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 12, display: "flex", gap: 8, justifyContent: "center" }}>
           <SpeakButton text={card.front} />
+          <SaveWordButton
+            en={card.front}
+            pt={card.back}
+            example={card.example}
+            source={`Revisão · ${levelBadge(cardLevel)}`}
+          />
         </div>
         {revealed && (
           <div className="flash-answer">

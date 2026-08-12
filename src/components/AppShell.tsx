@@ -45,6 +45,9 @@ const I = {
   user: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 21v-1a6 6 0 0 1 12 0v1" /></svg>
   ),
+  star: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2.9 5.9 6.5.9-4.7 4.6 1.1 6.4-5.8-3-5.8 3 1.1-6.4L2.6 9.8l6.5-.9L12 3z" /></svg>
+  ),
   help: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>
   ),
@@ -70,7 +73,10 @@ const studentNav: { section: string; items: NavItem[] }[] = [
   },
   {
     section: "Progresso",
-    items: [{ href: "/aluno/revisao", label: "Revisão", icon: I.review, badge: "8" }],
+    items: [
+      { href: "/aluno/revisao", label: "Revisão", icon: I.review },
+      { href: "/aluno/palavras", label: "Minhas palavras", icon: I.star },
+    ],
   },
   {
     section: "Você",
@@ -98,6 +104,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/roleplay": "Roleplay por voz",
   "/aluno/pronuncia": "Pronúncia",
   "/aluno/revisao": "Revisão",
+  "/aluno/palavras": "Minhas palavras",
   "/aluno/conta": "Minha conta",
   "/professor/alunos": "Alunos",
   "/professor": "Recados dos alunos",

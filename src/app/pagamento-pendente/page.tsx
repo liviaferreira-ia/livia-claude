@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { BrandLockup } from "@/components/BrandLockup";
 import { useProfile } from "@/lib/profile";
 
-// Mesmo número placeholder usado na landing page (src/app/page.tsx) — troque os dois juntos.
-const WHATSAPP = "5599999999999";
+// Mesmo número usado na landing page (src/app/page.tsx) — troque os dois juntos.
+// Provisório (número da Livia, 2026-08-12) — trocar pro WhatsApp definitivo da Central School depois.
+const WHATSAPP = "5511933779408";
 const WA_MSG = "Oi! Meu acesso à plataforma da Central School está pausado e queria resolver.";
 const waLink = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WA_MSG)}`;
 

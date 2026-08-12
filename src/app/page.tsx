@@ -3,8 +3,8 @@ import { Crest } from "@/components/Crest";
 import { SceneArt } from "@/components/SceneArt";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-// TODO: trocar pelo número real da escola (formato: DDI + DDD + número, só dígitos)
-const WHATSAPP = "5599999999999";
+// Provisório (número da Livia, 2026-08-12) — trocar pro WhatsApp definitivo da Central School depois.
+const WHATSAPP = "5511933779408";
 const WA_MSG =
   "Olá! Vim pelo site e quero saber mais sobre o curso de inglês da Central School. 😊";
 const waLink = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WA_MSG)}`;

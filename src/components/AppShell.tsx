@@ -64,9 +64,9 @@ const studentNav: { section: string; items: NavItem[] }[] = [
     ],
   },
   {
-    section: "Praticar com IA",
+    section: "Praticar falando",
     items: [
-      { href: "/aluno/tutor", label: "Tutor de conversa", icon: I.chat },
+      { href: "/aluno/tutor", label: "Prática de conversa", icon: I.chat },
       { href: "/aluno/roleplay", label: "Roleplay por voz", icon: I.mic },
       { href: "/aluno/pronuncia", label: "Pronúncia", icon: I.wave },
     ],
@@ -100,7 +100,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/curso": "Meu curso",
   "/aluno/praticar": "Praticar",
   "/aluno/licao": "Minha lição",
-  "/aluno/tutor": "Tutor de conversa",
+  "/aluno/tutor": "Prática de conversa",
   "/aluno/roleplay": "Roleplay por voz",
   "/aluno/pronuncia": "Pronúncia",
   "/aluno/revisao": "Revisão",

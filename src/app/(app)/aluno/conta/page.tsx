@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getMyContactInfo, updateContactInfo } from "@/lib/activity";
 import { initials, levelDisplay, useProfile } from "@/lib/profile";
+import { AvatarCropper } from "@/components/AvatarCropper";
 
 export default function MinhaContaPage() {
   const { profile, email, ready, updateIdentity, uploadAvatar, signOut } = useProfile();
@@ -14,6 +15,7 @@ export default function MinhaContaPage() {
   const [name, setName] = useState<string | null>(null);
   const [savingName, setSavingName] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
   const [msg, setMsg] = useState("");
 
   const [whatsapp, setWhatsapp] = useState("");
@@ -42,23 +44,30 @@ export default function MinhaContaPage() {
   // Nome exibido: enquanto não editar, usa o da conta.
   const nameValue = name ?? profile.name;
 
-  async function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+  /** Escolheu o arquivo: valida e abre o recorte (o envio só acontece depois). */
+  function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    if (fileRef.current) fileRef.current.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
       setMsg("Escolha um arquivo de imagem (JPG ou PNG).");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setMsg("A imagem é muito grande (máximo 5 MB).");
+    if (file.size > 10 * 1024 * 1024) {
+      setMsg("A imagem é muito grande (máximo 10 MB).");
       return;
     }
-    setUploading(true);
     setMsg("");
-    const { error } = await uploadAvatar(file);
+    setPendingPhoto(file);
+  }
+
+  /** Confirmou o enquadramento: envia a versão já recortada. */
+  async function handleCropped(blob: Blob) {
+    setUploading(true);
+    const { error } = await uploadAvatar(blob);
     setUploading(false);
+    setPendingPhoto(null);
     setMsg(error ? `Não consegui enviar a foto: ${error}` : "Foto atualizada! ✅");
-    if (fileRef.current) fileRef.current.value = "";
   }
 
   async function saveName() {
@@ -85,6 +94,14 @@ export default function MinhaContaPage() {
 
   return (
     <div className="view">
+      {pendingPhoto && (
+        <AvatarCropper
+          file={pendingPhoto}
+          saving={uploading}
+          onCancel={() => setPendingPhoto(null)}
+          onConfirm={handleCropped}
+        />
+      )}
       <div style={{ maxWidth: 680 }}>
         <h2 style={{ fontSize: 26, marginBottom: 4 }}>Minha conta</h2>
         <p className="muted" style={{ marginBottom: 22 }}>

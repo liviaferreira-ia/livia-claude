@@ -826,9 +826,11 @@ img.avatar {
   align-items: flex-end;
   gap: 18px;
   padding: 0 24px 16px;
-  margin-top: -44px;
 }
+/* Só a foto sobe para cima do banner. O texto fica inteiro no painel claro,
+   senão o nome cruza a borda do banner e some no meio (metade em cada fundo). */
 .profile-hero-avatar {
+  margin-top: -44px;
   width: 96px;
   height: 96px;
   flex: 0 0 auto;
@@ -856,7 +858,7 @@ img.avatar {
 .profile-hero-info h2 {
   font-size: 23px;
   margin: 0;
-  color: #fff;
+  color: var(--ink);
 }
 .profile-hero-tags {
   display: flex;
@@ -2303,4 +2305,42 @@ img.avatar {
   .sidebar {
     transition: none;
   }
+}
+
+/* ---------- Recorte da foto de perfil ---------- */
+.cropper-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(10, 18, 30, 0.6);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.cropper-box {
+  padding: 22px;
+  max-width: 340px;
+  width: 100%;
+}
+.cropper-view {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--panel-2);
+  margin: 0 auto;
+  cursor: grab;
+  user-select: none;
+}
+.cropper-view:active {
+  cursor: grabbing;
+}
+/* Escurece o que ficará de fora do círculo, mostrando o enquadramento real. */
+.cropper-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 9999px rgba(10, 18, 30, 0.45);
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent 49.5%, #000 50%);
+  mask: radial-gradient(circle at 50% 50%, transparent 49.5%, #000 50%);
 }

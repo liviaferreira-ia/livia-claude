@@ -1,82 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { notFound } from "next/navigation";
+import { use, useState } from "react";
+import { LESSONS } from "@/data/lesson";
 import { markSectionDone } from "@/lib/lessonProgress";
-
-type Multiple = {
-  kind: "mc";
-  type: string;
-  prompt: string;
-  hint: string;
-  options: string[];
-  answer: number;
-  feedbackOk: string;
-  feedbackNo: string;
-};
-
-type Fill = {
-  kind: "fill";
-  type: string;
-  prompt: string;
-  hint: string;
-  answers: string[];
-  feedbackOk: string;
-  feedbackNo: string;
-};
-
-type Question = Multiple | Fill;
-
-const QUESTIONS: Question[] = [
-  {
-    kind: "mc",
-    type: "Escolha a opção correta",
-    prompt: "Good evening. I ___ a reservation under the name Souza.",
-    hint: "Você chega ao hotel e informa que tem uma reserva.",
-    options: ["has", "have", "had", "having"],
-    answer: 1,
-    feedbackOk: "Correto! Com o sujeito “I” usamos have. → “I have a reservation.”",
-    feedbackNo: "Com o sujeito “I” usamos have. → “I have a reservation.”",
-  },
-  {
-    kind: "fill",
-    type: "Complete a frase",
-    prompt: "___ time is breakfast?",
-    hint: "Você quer saber o horário do café da manhã. (uma palavra)",
-    answers: ["what"],
-    feedbackOk: "Perfeito! “What time is breakfast?” = Que horas é o café da manhã?",
-    feedbackNo: "A palavra é What. → “What time is breakfast?”",
-  },
-  {
-    kind: "mc",
-    type: "Escolha a opção correta",
-    prompt: "Could I ___ in now, please?",
-    hint: "Você quer fazer o registro de entrada no hotel.",
-    options: ["check", "checking", "checked", "to check"],
-    answer: 0,
-    feedbackOk: "Isso! Depois de “Could I” usamos o verbo na forma base: check in.",
-    feedbackNo: "Depois de “Could I” o verbo fica na forma base: “Could I check in?”",
-  },
-  {
-    kind: "fill",
-    type: "Tradução PT → EN",
-    prompt: "Eu tenho uma reserva. → I ___ a reservation.",
-    hint: "Lembre da regra do sujeito “I”.",
-    answers: ["have"],
-    feedbackOk: "Muito bem! “I have a reservation.”",
-    feedbackNo: "A forma é have. → “I have a reservation.”",
-  },
-  {
-    kind: "mc",
-    type: "Escolha a opção correta",
-    prompt: "Breakfast is served ___ 7 to 10 am.",
-    hint: "Indicando o intervalo de horário.",
-    options: ["in", "from", "at", "since"],
-    answer: 1,
-    feedbackOk: "Exato! Usamos from ... to para intervalos: “from 7 to 10 am.”",
-    feedbackNo: "Para um intervalo usamos from ... to: “from 7 to 10 am.”",
-  },
-];
 
 function normalize(s: string) {
   return (s ?? "")
@@ -86,7 +14,10 @@ function normalize(s: string) {
     .replace(/\s+/g, " ");
 }
 
-export default function TarefaFinalPage() {
+export default function TarefaFinalPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  const lesson = LESSONS[slug];
+
   const [index, setIndex] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [wasRight, setWasRight] = useState(false);
@@ -95,8 +26,11 @@ export default function TarefaFinalPage() {
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
 
-  const q = QUESTIONS[index];
-  const isLast = index === QUESTIONS.length - 1;
+  if (!lesson) notFound();
+
+  const questions = lesson.exercises.questions;
+  const q = questions[index];
+  const isLast = index === questions.length - 1;
 
   function check() {
     if (answered) {
@@ -118,7 +52,7 @@ export default function TarefaFinalPage() {
 
   function next() {
     if (isLast) {
-      markSectionDone("exercicios");
+      markSectionDone(slug, "exercicios");
       setDone(true);
       return;
     }
@@ -140,10 +74,10 @@ export default function TarefaFinalPage() {
   }
 
   if (done) {
-    const pct = Math.round((correct / QUESTIONS.length) * 100);
+    const pct = Math.round((correct / questions.length) * 100);
     const msg =
       pct >= 80
-        ? "Excelente! Você domina o vocabulário do hotel. 🎉"
+        ? lesson.exercises.praise
         : pct >= 50
           ? "Bom trabalho — revise os pontos que errou e tente de novo."
           : "Vamos praticar mais um pouco. Você consegue! 💪";
@@ -151,7 +85,7 @@ export default function TarefaFinalPage() {
       <div className="view" style={{ maxWidth: 680 }}>
         <div className="card done" style={{ padding: 28 }}>
           <div className="big">
-            {correct}/{QUESTIONS.length}
+            {correct}/{questions.length}
           </div>
           <p className="muted" style={{ margin: "6px 0 20px" }}>
             {pct}% de acerto · {msg}
@@ -160,7 +94,7 @@ export default function TarefaFinalPage() {
             <button className="btn primary" onClick={restart}>
               Praticar de novo
             </button>
-            <Link href="/aluno/licao" className="btn ghost">
+            <Link href={`/aluno/licao/${slug}`} className="btn ghost">
               Voltar à lição
             </Link>
           </div>
@@ -176,12 +110,12 @@ export default function TarefaFinalPage() {
       <div className="lesson-head">
         <div>
           <div className="eyebrow" style={{ color: "var(--gold)" }}>
-            Tarefa final · Reservas e check-in
+            Tarefa final · {lesson.title}
           </div>
-          <h2 style={{ fontSize: 22, marginTop: 4 }}>Pratique tudo</h2>
+          <h2 style={{ fontSize: 22, marginTop: 4 }}>{lesson.exercises.title}</h2>
         </div>
-        <div className="dots" aria-label={`Questão ${index + 1} de ${QUESTIONS.length}`}>
-          {QUESTIONS.map((_, k) => (
+        <div className="dots" aria-label={`Questão ${index + 1} de ${questions.length}`}>
+          {questions.map((_, k) => (
             <i key={k} className={k < index ? "on" : k === index ? "cur" : ""} />
           ))}
         </div>
@@ -243,7 +177,7 @@ export default function TarefaFinalPage() {
           <button className="btn primary" style={{ flex: 1 }} onClick={check}>
             {answered ? (isLast ? "Concluir tarefa" : "Próxima →") : "Verificar"}
           </button>
-          <Link href="/aluno/licao" className="btn ghost">
+          <Link href={`/aluno/licao/${slug}`} className="btn ghost">
             Sair
           </Link>
         </div>

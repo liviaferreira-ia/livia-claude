@@ -6,7 +6,12 @@ const KEY = "central_lesson_sections_v1";
 
 type Done = Record<string, boolean>;
 
-/** Guarda quais seções da lição já foram concluídas (no localStorage). */
+/** A chave é por lição, senão concluir "intro" numa lição marcaria todas as outras. */
+function keyFor(slug: string, sectionId: string) {
+  return `${slug}:${sectionId}`;
+}
+
+/** Guarda quais etapas de cada lição já foram concluídas (no localStorage). */
 export function useLessonProgress() {
   const [done, setDone] = useState<Done>({});
   const [ready, setReady] = useState(false);
@@ -21,25 +26,20 @@ export function useLessonProgress() {
     setReady(true);
   }, []);
 
-  const mark = useCallback((id: string) => {
-    setDone((prev) => {
-      const next = { ...prev, [id]: true };
-      try {
-        window.localStorage.setItem(KEY, JSON.stringify(next));
-      } catch {}
-      return next;
-    });
-  }, []);
+  const isDone = useCallback(
+    (slug: string, sectionId: string) => done[keyFor(slug, sectionId)] === true,
+    [done],
+  );
 
-  return { done, ready, mark };
+  return { ready, isDone };
 }
 
-/** Marca uma seção como concluída fora de um componente React (ex.: ao finalizar a tarefa). */
-export function markSectionDone(id: string) {
+/** Marca uma etapa como concluída fora de um componente React (ex.: ao finalizar a tarefa). */
+export function markSectionDone(slug: string, sectionId: string) {
   try {
     const raw = window.localStorage.getItem(KEY);
     const done = raw ? (JSON.parse(raw) as Done) : {};
-    done[id] = true;
+    done[keyFor(slug, sectionId)] = true;
     window.localStorage.setItem(KEY, JSON.stringify(done));
   } catch {}
 }

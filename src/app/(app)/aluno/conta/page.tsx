@@ -15,7 +15,8 @@ export default function MinhaContaPage() {
   const [name, setName] = useState<string | null>(null);
   const [savingName, setSavingName] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
+  const [pendingPhoto, setPendingPhoto] = useState<Blob | null>(null);
+  const [loadingCurrent, setLoadingCurrent] = useState(false);
   const [msg, setMsg] = useState("");
 
   const [whatsapp, setWhatsapp] = useState("");
@@ -59,6 +60,22 @@ export default function MinhaContaPage() {
     }
     setMsg("");
     setPendingPhoto(file);
+  }
+
+  /** Reabre o recorte na foto que já está salva, pra só reposicionar/dar zoom sem escolher outro arquivo. */
+  async function handleReposition() {
+    if (!profile.avatarUrl) return;
+    setMsg("");
+    setLoadingCurrent(true);
+    try {
+      const res = await fetch(profile.avatarUrl);
+      if (!res.ok) throw new Error();
+      setPendingPhoto(await res.blob());
+    } catch {
+      setMsg("Não consegui carregar a foto atual pra ajustar. Tente trocar a foto de novo.");
+    } finally {
+      setLoadingCurrent(false);
+    }
   }
 
   /** Confirmou o enquadramento: envia a versão já recortada. */
@@ -134,13 +151,24 @@ export default function MinhaContaPage() {
               onChange={handlePhoto}
               style={{ display: "none" }}
             />
-            <button
-              className="btn ghost profile-hero-btn"
-              onClick={() => fileRef.current?.click()}
-              disabled={uploading}
-            >
-              {uploading ? "Enviando…" : profile.avatarUrl ? "Trocar foto" : "Adicionar foto"}
-            </button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {profile.avatarUrl && (
+                <button
+                  className="btn ghost profile-hero-btn"
+                  onClick={handleReposition}
+                  disabled={uploading || loadingCurrent}
+                >
+                  {loadingCurrent ? "Carregando…" : "Reposicionar"}
+                </button>
+              )}
+              <button
+                className="btn ghost profile-hero-btn"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading || loadingCurrent}
+              >
+                {uploading ? "Enviando…" : profile.avatarUrl ? "Trocar foto" : "Adicionar foto"}
+              </button>
+            </div>
           </div>
         </div>
 

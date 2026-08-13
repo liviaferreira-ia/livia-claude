@@ -8,7 +8,8 @@ const OUTPUT = 512;
 const VIEW = 280;
 
 type Props = {
-  file: File;
+  /** Aceita tanto um arquivo recém-escolhido quanto a foto atual (pra reposicionar sem reenviar). */
+  file: Blob;
   onCancel: () => void;
   onConfirm: (blob: Blob) => void;
   saving?: boolean;

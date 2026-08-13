@@ -143,7 +143,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           style={{ textDecoration: "none", color: "inherit" }}
           onClick={() => setMenuOpen(false)}
         >
-          <Crest size={40} />
+          <Crest size={54} />
           <div>
             <b>Central School</b>
             <span>ENGLISH AS A LIFESTYLE</span>

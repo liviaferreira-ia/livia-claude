@@ -123,22 +123,22 @@ h3 {
 .brand {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 6px 8px 16px;
+  gap: 13px;
+  padding: 8px 8px 20px;
 }
 .brand b {
-  font-size: 15.5px;
+  font-size: 18px;
   font-family: Georgia, "Times New Roman", serif;
   line-height: 1.05;
   display: block;
 }
 .brand span {
   display: block;
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: var(--gold);
   font-weight: 700;
   letter-spacing: 0.14em;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 .navlabel {
   font-size: 10.5px;

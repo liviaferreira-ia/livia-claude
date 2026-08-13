@@ -6,7 +6,7 @@ import { loadOperational, updateIncident, type AuditLog, type Incident } from "@
 import { useProfile } from "@/lib/profile";
 
 const statusText = { new: "Novo", investigating: "Investigando", resolved: "Resolvido" };
-const actionText: Record<string, string> = { student_invited: "Aluno convidado", student_updated: "Cadastro atualizado", access_paused: "Acesso pausado", access_resumed: "Acesso reativado", password_reset_sent: "Redefinição de senha enviada", note_added: "Anotação criada", note_deleted: "Anotação excluída", assignment_added: "Atividade atribuída", assignment_status_changed: "Status de atividade alterado", incident_status_changed: "Incidente atualizado" };
+const actionText: Record<string, string> = { student_invited: "Aluno convidado", student_updated: "Cadastro atualizado", access_paused: "Acesso pausado", access_resumed: "Acesso reativado", password_reset_sent: "Redefinição de senha enviada", note_added: "Anotação criada", note_deleted: "Anotação excluída", assignment_added: "Atividade atribuída", assignment_status_changed: "Status de atividade alterado", incident_status_changed: "Incidente atualizado", content_validation_changed: "Validação de conteúdo atualizada" };
 
 function when(value: string) { return new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); }
 

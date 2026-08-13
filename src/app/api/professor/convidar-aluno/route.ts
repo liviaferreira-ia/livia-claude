@@ -38,10 +38,11 @@ export async function POST(request: Request) {
   if (error) {
     // Ferramenta só de professor — é seguro mostrar o motivo real do Supabase,
     // ajuda a diagnosticar sem precisar olhar log de servidor.
-    const msg = error.message.toLowerCase().includes("already registered")
-      ? "Este e-mail já tem conta."
+    const duplicate = /already registered|already exists|email.*exists|email_exists|user.*registered/.test(error.message.toLowerCase());
+    const msg = duplicate
+      ? "Este e-mail já está em uso. Procure o aluno na lista ou envie uma redefinição de senha pela página dele."
       : `Não consegui enviar o convite: ${error.message}`;
-    return NextResponse.json({ error: msg }, { status: 400 });
+    return NextResponse.json({ error: msg }, { status: duplicate ? 409 : 400 });
   }
 
   // Sem isso o aluno convidado fica invisível no painel até o primeiro login.

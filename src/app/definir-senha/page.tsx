@@ -19,10 +19,20 @@ export default function DefinirSenhaPage() {
   const [error, setError] = useState("");
 
   const reqs = [
-    { label: "Mínimo 6 caracteres", ok: password.length >= 6 },
+    { label: "Mínimo 8 caracteres", ok: password.length >= 8 },
+    { label: "Uma letra minúscula", ok: /[a-z]/.test(password) },
     { label: "Uma letra maiúscula", ok: /[A-Z]/.test(password) },
+    { label: "Um número", ok: /[0-9]/.test(password) },
     { label: "Um caractere especial (ex: ! @ # $ %)", ok: /[^A-Za-z0-9]/.test(password) },
   ];
+  const strengthScore = reqs.filter((requirement) => requirement.ok).length;
+  const strength = password.length === 0
+    ? { label: "Digite uma senha", className: "empty" }
+    : strengthScore <= 2
+      ? { label: "Senha fraca", className: "weak" }
+      : strengthScore <= 4
+        ? { label: "Senha média", className: "medium" }
+        : { label: "Senha forte", className: "strong" };
   const passwordValid = reqs.every((r) => r.ok);
 
   // O link do convite entrega a sessão via #access_token/#refresh_token na URL
@@ -142,6 +152,7 @@ export default function DefinirSenhaPage() {
                 className="pw-toggle"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                aria-pressed={showPassword}
                 title={showPassword ? "Esconder senha" : "Mostrar senha"}
               >
                 {showPassword ? (
@@ -156,6 +167,12 @@ export default function DefinirSenhaPage() {
                   </svg>
                 )}
               </button>
+            </div>
+            <div className="pw-strength" aria-live="polite">
+              <div className={`pw-strength-bar ${strength.className}`}>
+                <span style={{ width: `${password.length === 0 ? 0 : Math.max(20, strengthScore * 20)}%` }} />
+              </div>
+              <span>{strength.label}</span>
             </div>
             <ul className="pw-checklist">
               {reqs.map((r) => (

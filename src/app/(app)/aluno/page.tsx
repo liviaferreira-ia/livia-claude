@@ -8,7 +8,14 @@ import { listMyMessages, sendMessage, type Message } from "@/lib/messages";
 import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
 import { resolveCourseLevel } from "@/data/curso";
 import { DAILY_GOAL } from "@/lib/daily";
-import { completeMyAssignment, listMyAssignments, type StudentAssignment } from "@/lib/student-admin";
+import {
+  completeMyAssignment,
+  countMyActiveDaysThisWeek,
+  getMySettings,
+  listMyAssignments,
+  type StudentAssignment,
+  type StudentSettings,
+} from "@/lib/student-admin";
 
 export default function AlunoDashboard() {
   const { profile, ready, reset, signOut } = useProfile();
@@ -23,11 +30,15 @@ export default function AlunoDashboard() {
   const [sending, setSending] = useState(false);
   const [msgErr, setMsgErr] = useState("");
   const [assignments, setAssignments] = useState<StudentAssignment[]>([]);
+  const [settings, setSettings] = useState<StudentSettings | null>(null);
+  const [activeDays, setActiveDays] = useState(0);
 
   useEffect(() => {
     if (!ready || !profile.onboarded) return;
     listMyMessages().then(({ data }) => setMessages(data));
     listMyAssignments().then(setAssignments);
+    getMySettings().then(setSettings);
+    countMyActiveDaysThisWeek().then(setActiveDays);
   }, [ready, profile.onboarded]);
 
   async function handleSend() {
@@ -174,6 +185,30 @@ export default function AlunoDashboard() {
             : `Faltam ${DAILY_GOAL - dailyDone} exercícios para fechar o dia.`}
         </p>
       </div>
+
+      {settings && (
+        <div className="card" style={{ padding: 18, marginBottom: 22 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+            <div className="eyebrow">Meta da semana</div>
+            <span className="muted" style={{ fontSize: 13, fontWeight: 700 }}>
+              {Math.min(activeDays, settings.weekly_goal)}/{settings.weekly_goal} dias
+            </span>
+          </div>
+          <div className="unit-bar" style={{ marginTop: 12 }}>
+            <i style={{ width: `${Math.min(100, Math.round((activeDays / settings.weekly_goal) * 100))}%` }} />
+          </div>
+          <p className="muted" style={{ fontSize: 13.5, margin: "10px 0 0" }}>
+            {activeDays >= settings.weekly_goal
+              ? "Meta da semana batida! 🎉"
+              : `Pratique em mais ${settings.weekly_goal - activeDays} dia${settings.weekly_goal - activeDays === 1 ? "" : "s"} essa semana pra bater a meta.`}
+          </p>
+          {settings.focus && (
+            <p className="muted" style={{ fontSize: 13.5, margin: "10px 0 0", paddingTop: 10, borderTop: "1px solid var(--line)" }}>
+              🎯 <b>Foco combinado com seu professor:</b> {settings.focus}
+            </p>
+          )}
+        </div>
+      )}
 
       {assignments.length > 0 && (
         <div className="card" style={{ padding: 18, marginBottom: 22 }}>

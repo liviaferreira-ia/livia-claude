@@ -79,6 +79,24 @@ export async function studentAdminAction(id: string, values: Record<string, unkn
   return res.ok ? null : body.error || "Não consegui concluir a ação.";
 }
 
+/** Meta semanal e foco definidos pelo professor (RLS: aluno só lê o próprio). */
+export async function getMySettings(): Promise<StudentSettings | null> {
+  const supabase = createClient();
+  const { data } = await supabase.from("student_settings").select("*").maybeSingle();
+  return (data as StudentSettings) ?? null;
+}
+
+/** Quantos dias distintos o aluno teve atividade (login ou exercício) desde a segunda-feira. */
+export async function countMyActiveDaysThisWeek(): Promise<number> {
+  const supabase = createClient();
+  const monday = new Date();
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+  const { data } = await supabase.from("student_events").select("created_at").gte("created_at", monday.toISOString());
+  const days = new Set((data ?? []).map((e) => new Date(e.created_at as string).toDateString()));
+  return days.size;
+}
+
 export async function listMyAssignments(): Promise<StudentAssignment[]> {
   const supabase = createClient();
   const { data } = await supabase

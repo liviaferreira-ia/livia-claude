@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getAsaasCustomer } from "@/lib/asaas";
+import { getAsaasCustomer, type AsaasPayment } from "@/lib/asaas";
+import { linkCustomerPayments, refreshStudentPaymentStatus, upsertAsaasPayment } from "@/lib/payments-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
 const PAID_EVENTS = new Set(["PAYMENT_RECEIVED", "PAYMENT_CONFIRMED"]);
-const OVERDUE_EVENTS = new Set(["PAYMENT_OVERDUE"]);
 
 /** Recebe eventos de pagamento do Asaas: libera acesso quando paga, marca atraso quando vence. */
 export async function POST(request: Request) {
@@ -16,8 +16,9 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   const event = body?.event as string | undefined;
-  const customerId = body?.payment?.customer as string | undefined;
-  if (!event || !customerId) {
+  const payment = body?.payment as AsaasPayment | undefined;
+  const customerId = payment?.customer;
+  if (!event || !payment?.id || !customerId) {
     return NextResponse.json({ ok: true });
   }
 
@@ -25,10 +26,13 @@ export async function POST(request: Request) {
   const { origin } = new URL(request.url);
 
   try {
-    if (PAID_EVENTS.has(event)) {
-      await handlePaid(admin, customerId, origin);
-    } else if (OVERDUE_EVENTS.has(event)) {
-      await handleOverdue(admin, customerId);
+    let userId = await upsertAsaasPayment(admin, payment, event);
+    if (PAID_EVENTS.has(event) && !userId) {
+      userId = await ensureStudentForPaidCustomer(admin, customerId, origin);
+    }
+    if (userId) {
+      await linkCustomerPayments(admin, customerId, userId);
+      await refreshStudentPaymentStatus(admin, userId);
     }
   } catch (err) {
     console.error("Erro processando webhook do Asaas:", err);
@@ -38,30 +42,25 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true });
 }
 
-async function handlePaid(admin: Admin, customerId: string, origin: string) {
+async function ensureStudentForPaidCustomer(
+  admin: Admin,
+  customerId: string,
+  origin: string,
+): Promise<string | undefined> {
   const { data: existing } = await admin
     .from("student_activity")
-    .select("user_id, manual_block")
+    .select("user_id")
     .eq("asaas_customer_id", customerId)
     .maybeSingle();
 
   // Cliente já vinculado a um aluno (mensalidade recorrente) — só reativa.
   if (existing) {
-    // Quem foi pausado pelo professor continua pausado: só ele reativa.
-    // Do contrário, uma cobrança avulsa reabriria o acesso de quem trancou.
-    const patch = existing.manual_block
-      ? { payment_status: "ok", overdue_since: null }
-      : { payment_status: "ok", overdue_since: null, blocked: false };
-    await admin
-      .from("student_activity")
-      .update({ ...patch, updated_at: new Date().toISOString() })
-      .eq("user_id", existing.user_id);
-    return;
+    return existing.user_id;
   }
 
   // Primeiro pagamento desse cliente Asaas: precisa achar (ou criar) a conta do aluno.
   const customer = await getAsaasCustomer(customerId);
-  if (!customer.email) return;
+  if (!customer.email) return undefined;
   const email = customer.email.trim().toLowerCase();
 
   const { data: invited, error } = await admin.auth.admin.inviteUserByEmail(email, {
@@ -71,11 +70,11 @@ async function handlePaid(admin: Admin, customerId: string, origin: string) {
 
   let userId = invited?.user?.id;
   if (error) {
-    if (!error.message.toLowerCase().includes("already registered")) return;
+    if (!error.message.toLowerCase().includes("already registered")) return undefined;
     // E-mail já tinha conta (ex.: professor cadastrou manualmente antes) — só falta linkar o cliente Asaas.
     const { data: usersPage } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
     userId = usersPage.users.find((u) => u.email?.toLowerCase() === email)?.id;
-    if (!userId) return;
+    if (!userId) return undefined;
   }
 
   await admin.from("student_activity").upsert(
@@ -90,23 +89,5 @@ async function handlePaid(admin: Admin, customerId: string, origin: string) {
     },
     { onConflict: "user_id" },
   );
-}
-
-async function handleOverdue(admin: Admin, customerId: string) {
-  const { data: existing } = await admin
-    .from("student_activity")
-    .select("user_id, payment_status")
-    .eq("asaas_customer_id", customerId)
-    .maybeSingle();
-  // Sem aluno vinculado ainda, ou já contando o atraso — não reseta o prazo dos 5 dias.
-  if (!existing || existing.payment_status === "overdue") return;
-
-  await admin
-    .from("student_activity")
-    .update({
-      payment_status: "overdue",
-      overdue_since: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", existing.user_id);
+  return userId;
 }

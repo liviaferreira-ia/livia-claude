@@ -20,6 +20,8 @@ export default function ProfessorAlunosPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
 
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
@@ -104,6 +106,15 @@ export default function ProfessorAlunosPage() {
     );
   }
 
+  const activeCount = rows.filter((r) => !r.blocked).length;
+  const overdueCount = rows.filter((r) => r.payment_status === "overdue").length;
+  const attentionCount = rows.filter((r) => practiceTotals(r).done === 0 || isInactive(r.last_login_at)).length;
+  const visibleRows = rows.filter((r) => {
+    const matchesName = (r.student_name ?? "").toLowerCase().includes(query.trim().toLowerCase());
+    const matchesFilter = filter === "all" || (filter === "active" && !r.blocked) || (filter === "blocked" && r.blocked) || (filter === "overdue" && r.payment_status === "overdue") || (filter === "inactive" && isInactive(r.last_login_at));
+    return matchesName && matchesFilter;
+  });
+
   return (
     <div className="view">
       <div className="eyebrow" style={{ marginBottom: 8 }}>
@@ -111,13 +122,15 @@ export default function ProfessorAlunosPage() {
       </div>
       <h2 style={{ fontSize: 22, marginBottom: 4 }}>Alunos</h2>
       <p className="muted" style={{ margin: "0 0 20px" }}>
-        Último login, tempo médio na plataforma e progresso em prática de cada aluno.
+        Acompanhe progresso, atividade, financeiro, recados e acesso de cada aluno.
       </p>
 
-      <div className="card" style={{ padding: 18, marginBottom: 24, maxWidth: 520 }}>
-        <div className="eyebrow" style={{ marginBottom: 10 }}>
-          Cadastrar aluno
-        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 20 }}>
+        {[[rows.length, "Alunos"], [activeCount, "Acessos ativos"], [overdueCount, "Em atraso"], [attentionCount, "Precisam de atenção"]].map(([value, label]) => <div className="card stat" key={String(label)}><b style={{ display: "block", fontSize: 22 }}>{value}</b><span className="muted" style={{ fontSize: 12.5 }}>{label}</span></div>)}
+      </div>
+
+      <details className="card" style={{ padding: 18, marginBottom: 20, maxWidth: 560 }}>
+        <summary style={{ cursor: "pointer", fontWeight: 800, color: "var(--navy)" }}>＋ Adicionar aluno</summary>
         <form onSubmit={handleInvite} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div className="field">
             <label htmlFor="invite-name">Nome do aluno</label>
@@ -153,6 +166,13 @@ export default function ProfessorAlunosPage() {
             O aluno recebe um e-mail pra criar a senha e já cai na plataforma.
           </p>
         </form>
+      </details>
+
+      <div className="card" style={{ padding: 14, marginBottom: 16, display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <input aria-label="Buscar aluno" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nome…" style={{ flex: "1 1 240px" }} />
+        <select aria-label="Filtrar alunos" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ minWidth: 180 }}>
+          <option value="all">Todos os alunos</option><option value="active">Acesso ativo</option><option value="blocked">Acesso bloqueado</option><option value="overdue">Pagamento atrasado</option><option value="inactive">Inativos há 7 dias</option>
+        </select>
       </div>
 
       {loading ? (
@@ -185,7 +205,7 @@ export default function ProfessorAlunosPage() {
             <span>Tempo médio · exercícios</span>
             <span>Status / acesso</span>
           </div>
-          {rows.map((r) => {
+          {visibleRows.map((r) => {
             const totals = practiceTotals(r);
             const avgSeconds = r.session_count > 0 ? r.total_seconds / r.session_count : 0;
             const needsAttention = totals.done === 0 || isInactive(r.last_login_at);
@@ -197,7 +217,7 @@ export default function ProfessorAlunosPage() {
                 : null;
             return (
               <div key={r.user_id} className="rosterrow">
-                <span className="std">
+                <Link href={`/professor/alunos/${r.user_id}`} className="std" style={{ textDecoration: "none", color: "inherit" }}>
                   <span className="mini-av" style={{ background: "linear-gradient(135deg,#274a7d,#16263f)" }}>
                     {initials(name)}
                   </span>
@@ -218,7 +238,7 @@ export default function ProfessorAlunosPage() {
                       </a>
                     )}
                   </span>
-                </span>
+                </Link>
                 <span style={{ fontSize: 13.5 }}>{formatLastLogin(r.last_login_at)}</span>
                 <span style={{ fontSize: 13.5 }}>
                   {formatDuration(avgSeconds)} / sessão

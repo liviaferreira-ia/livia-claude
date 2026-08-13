@@ -62,6 +62,7 @@ export type StudentActivity = {
   practice_translate_correct: number;
   practice_order_done: number;
   practice_order_correct: number;
+  asaas_customer_id: string | null;
   payment_status: "ok" | "overdue" | null;
   overdue_since: string | null;
   blocked: boolean;

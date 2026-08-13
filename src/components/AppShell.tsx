@@ -51,6 +51,9 @@ const I = {
   help: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></svg>
   ),
+  wallet: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h15a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h13" /><path d="M16 11h5v4h-5a2 2 0 0 1 0-4z" /></svg>
+  ),
 };
 
 const studentNav: { section: string; items: NavItem[] }[] = [
@@ -89,6 +92,7 @@ const teacherNav: { section: string; items: NavItem[] }[] = [
     section: "Professor",
     items: [
       { href: "/professor/alunos", label: "Alunos", icon: I.users },
+      { href: "/professor/financeiro", label: "Financeiro", icon: I.wallet },
       { href: "/professor", label: "Recados dos alunos", icon: I.chat },
       { href: "/professor/marina", label: "Exemplo: Marina", icon: I.user },
     ],
@@ -107,6 +111,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/palavras": "Minhas palavras",
   "/aluno/conta": "Minha conta",
   "/professor/alunos": "Alunos",
+  "/professor/financeiro": "Financeiro",
   "/professor": "Recados dos alunos",
   "/professor/marina": "Exemplo: Marina",
 };

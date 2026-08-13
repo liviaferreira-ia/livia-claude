@@ -5,57 +5,33 @@
    Azul-marinho + dourado + marfim, tipografia serifada clássica
    ============================================================ */
 
+/* Azul-marinho é a cor primária (fundo padrão); marfim/branco é secundária, reservada aos cards. */
 :root {
-  --bg: #f5f1e8;
-  --panel: #ffffff;
-  --panel-2: #f3efe4;
-  --ink: #1a2a45;
-  --ink-soft: #57627a;
-  --ink-faint: #8b93a4;
-  --line: #e6dfce;
-  --navy: #223f6b;
-  --navy-deep: #16263f;
-  --navy-soft: #e0e6f0;
-  --gold: #b8912f;
-  --gold-soft: #f1e7ca;
-  --good: #17916a;
-  --good-soft: #d8ecdf;
-  --warn: #c58326;
-  --warn-soft: #f5e6cc;
-  --bad: #c8474d;
-  --bad-soft: #f6dcdd;
-  --shadow-sm: 0 1px 2px rgba(20, 32, 43, 0.06);
-  --shadow: 0 2px 4px rgba(20, 32, 43, 0.05), 0 12px 32px rgba(20, 32, 43, 0.08);
+  --bg: #0e1a2b;
+  --panel: #152538;
+  --panel-2: #1c2e44;
+  --ink: #eef2f8;
+  --ink-soft: #a7b4c6;
+  --ink-faint: #6f7f93;
+  --line: #26384f;
+  --navy: #6d97d1;
+  --navy-deep: #a9c4e6;
+  --navy-soft: #1a3050;
+  --gold: #d8b866;
+  --gold-soft: #38300f;
+  --good: #45c191;
+  --good-soft: #123326;
+  --warn: #e0af52;
+  --warn-soft: #33280f;
+  --bad: #ef6f78;
+  --bad-soft: #3a1c20;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.45);
   --r: 16px;
   --r-sm: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1a2b;
-    --panel: #152538;
-    --panel-2: #1c2e44;
-    --ink: #eef2f8;
-    --ink-soft: #a7b4c6;
-    --ink-faint: #6f7f93;
-    --line: #26384f;
-    --navy: #6d97d1;
-    --navy-deep: #a9c4e6;
-    --navy-soft: #1a3050;
-    --gold: #d8b866;
-    --gold-soft: #38300f;
-    --good: #45c191;
-    --good-soft: #123326;
-    --warn: #e0af52;
-    --warn-soft: #33280f;
-    --bad: #ef6f78;
-    --bad-soft: #3a1c20;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.45);
-  }
-}
-
-/* Escolha manual do tema (vence a preferência do sistema, nos dois sentidos) */
+/* Escolha manual do tema (vence o padrão, nos dois sentidos) */
 :root[data-theme="light"] {
   --bg: #f5f1e8; --panel: #ffffff; --panel-2: #f3efe4; --ink: #1a2a45;
   --ink-soft: #57627a; --ink-faint: #8b93a4; --line: #e6dfce; --navy: #223f6b;

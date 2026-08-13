@@ -4,17 +4,14 @@ import { useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
+/** Azul-marinho é a cor primária da marca: tema escuro é o padrão pra quem nunca escolheu, independente do sistema. */
 function getInitial(): Theme {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   try {
     const stored = window.localStorage.getItem("central_theme");
     if (stored === "light" || stored === "dark") return stored;
   } catch {}
-  try {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  } catch {
-    return "light";
-  }
+  return "dark";
 }
 
 /** Aplica o tema salvo assim que o app monta (sem alterar o HTML do servidor). */

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   EXERCISES,
   categoriesFor,
@@ -14,6 +14,7 @@ import {
   type Order,
   type Translate,
 } from "@/data/exercises";
+import { LEVEL_ORDER, type CefrLevel } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 const TINTS: Record<Kind, string> = {
@@ -33,21 +34,52 @@ function shuffle<T>(arr: readonly T[]): T[] {
 }
 
 export default function PraticarPage() {
-  const { profile, ready, bumpPractice } = useProfile();
+  const { profile, ready, isTeacher, bumpPractice } = useProfile();
   const [kind, setKind] = useState<Kind | null>(null);
+  const [reviewLevel, setReviewLevel] = useState<CefrLevel | null>(null);
+  const [queryReady, setQueryReady] = useState(false);
 
-  const studentLevel = parseCefrLevel(profile.level) ?? "A2";
-  const contentLevel = resolveExerciseLevel(studentLevel);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const requested = new URLSearchParams(window.location.search).get("revisao");
+      setReviewLevel(
+        requested && (LEVEL_ORDER as string[]).includes(requested)
+          ? requested as CefrLevel
+          : null,
+      );
+      setQueryReady(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const reviewMode = ready && isTeacher && reviewLevel !== null;
+  const studentLevel = reviewMode ? reviewLevel : parseCefrLevel(profile.level) ?? "A2";
+  const contentLevel = reviewMode ? reviewLevel : resolveExerciseLevel(studentLevel);
   const categories = categoriesFor(contentLevel);
   const bank = EXERCISES[contentLevel];
+
+  if (!queryReady || !ready) {
+    return <div className="view"><p className="muted">Carregando…</p></div>;
+  }
 
   if (!kind) {
     return (
       <div className="view">
+        {reviewMode && (
+          <div className="objbar" style={{ marginBottom: 20 }}>
+            <div style={{ flex: 1 }}>
+              <b>Modo de revisão pedagógica · {contentLevel}</b>
+              <div className="muted" style={{ fontSize: 13, marginTop: 3 }}>
+                Suas respostas servem apenas para conferir o conteúdo e não entram no progresso dos alunos.
+              </div>
+            </div>
+            <Link className="pill-btn" href="/professor/validacao-conteudo">Voltar à validação</Link>
+          </div>
+        )}
         <div className="eyebrow" style={{ marginBottom: 8 }}>
-          Praticar
+          {reviewMode ? "Revisão pedagógica" : "Praticar"}
         </div>
-        <h2 style={{ fontSize: 24, marginBottom: 4 }}>Escolha um tipo de exercício</h2>
+        <h2 style={{ fontSize: 24, marginBottom: 4 }}>{reviewMode ? `Exercícios do nível ${contentLevel}` : "Escolha um tipo de exercício"}</h2>
         <p className="muted" style={{ margin: "0 0 22px" }}>
           Exercícios do nível {contentLevel}, embaralhados a cada rodada.
         </p>
@@ -59,7 +91,7 @@ export default function PraticarPage() {
         )}
         <div className="cat-grid">
           {categories.map((cat) => {
-            const stat = ready ? profile.stats.practice[cat.kind] : { done: 0, correct: 0 };
+            const stat = !reviewMode ? profile.stats.practice[cat.kind] : { done: 0, correct: 0 };
             return (
               <button key={cat.kind} className="cat-card" onClick={() => setKind(cat.kind)}>
                 <div className={`cat-ic ${TINTS[cat.kind]}`} style={{ fontWeight: 800 }}>
@@ -69,7 +101,7 @@ export default function PraticarPage() {
                 <p>{cat.desc}</p>
                 <div className="cat-meta">
                   {cat.count} exercícios
-                  {stat.done > 0 && ` · você fez ${stat.done} (${Math.round((stat.correct / stat.done) * 100)}% ✓)`}
+                  {!reviewMode && stat.done > 0 && ` · você fez ${stat.done} (${Math.round((stat.correct / stat.done) * 100)}% ✓)`}
                 </div>
               </button>
             );
@@ -85,7 +117,8 @@ export default function PraticarPage() {
       bank={bank}
       categories={categories}
       onExit={() => setKind(null)}
-      bump={bumpPractice}
+      bump={reviewMode ? () => {} : bumpPractice}
+      reviewMode={reviewMode}
     />
   );
 }
@@ -96,12 +129,14 @@ function Runner({
   categories,
   onExit,
   bump,
+  reviewMode,
 }: {
   kind: Kind;
   bank: LevelBank;
   categories: { kind: Kind; title: string; desc: string; count: number }[];
   onExit: () => void;
   bump: (k: Kind, correct: boolean) => void;
+  reviewMode: boolean;
 }) {
   const queue = useMemo(
     () => shuffle(bank[kind] as readonly (MC | Fill | Translate | Order)[]),
@@ -177,14 +212,14 @@ function Runner({
             {correct}/{queue.length}
           </div>
           <p className="muted" style={{ margin: "6px 0 20px" }}>
-            {pct}% de acerto em {title}. Seu progresso foi salvo. 💾
+            {pct}% de acerto em {title}. {reviewMode ? "Revisão concluída sem alterar o progresso dos alunos." : "Seu progresso foi salvo. 💾"}
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
             <button className="btn primary" onClick={onExit}>
               Escolher outro tipo
             </button>
-            <Link href="/aluno" className="btn ghost">
-              Voltar ao início
+            <Link href={reviewMode ? "/professor/validacao-conteudo" : "/aluno"} className="btn ghost">
+              {reviewMode ? "Voltar à validação" : "Voltar ao início"}
             </Link>
           </div>
         </div>

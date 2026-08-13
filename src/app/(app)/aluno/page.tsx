@@ -8,6 +8,7 @@ import { listMyMessages, sendMessage, type Message } from "@/lib/messages";
 import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
 import { resolveCourseLevel } from "@/data/curso";
 import { DAILY_GOAL } from "@/lib/daily";
+import { completeMyAssignment, listMyAssignments, type StudentAssignment } from "@/lib/student-admin";
 
 export default function AlunoDashboard() {
   const { profile, ready, reset, signOut } = useProfile();
@@ -21,10 +22,12 @@ export default function AlunoDashboard() {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [msgErr, setMsgErr] = useState("");
+  const [assignments, setAssignments] = useState<StudentAssignment[]>([]);
 
   useEffect(() => {
     if (!ready || !profile.onboarded) return;
     listMyMessages().then(({ data }) => setMessages(data));
+    listMyAssignments().then(setAssignments);
   }, [ready, profile.onboarded]);
 
   async function handleSend() {
@@ -41,6 +44,12 @@ export default function AlunoDashboard() {
     setDraft("");
     const { data } = await listMyMessages();
     setMessages(data);
+  }
+
+  async function finishAssignment(id: string) {
+    const error = await completeMyAssignment(id);
+    if (error) { setMsgErr("Não consegui concluir a atividade agora."); return; }
+    setAssignments(await listMyAssignments());
   }
 
   async function handleSignOut() {
@@ -165,6 +174,18 @@ export default function AlunoDashboard() {
             : `Faltam ${DAILY_GOAL - dailyDone} exercícios para fechar o dia.`}
         </p>
       </div>
+
+      {assignments.length > 0 && (
+        <div className="card" style={{ padding: 18, marginBottom: 22 }}>
+          <div className="eyebrow">Atividades do professor</div>
+          {assignments.map((item) => (
+            <div key={item.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: "1px solid var(--line)", flexWrap: "wrap" }}>
+              <div><b>{item.title}</b>{item.details && <p className="muted" style={{ margin: "4px 0", fontSize: 13 }}>{item.details}</p>}<span className="muted" style={{ fontSize: 12 }}>{item.due_date ? `Prazo: ${new Date(`${item.due_date}T12:00:00`).toLocaleDateString("pt-BR")}` : "Sem prazo"}</span></div>
+              <button className="btn light" onClick={() => void finishAssignment(item.id)}>Marcar como concluída ✓</button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid cols-2">
         <div>

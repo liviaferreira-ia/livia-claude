@@ -15,17 +15,6 @@ export type AsaasCustomer = {
   mobilePhone: string | null;
 };
 
-/** Busca os dados do cliente no Asaas (nome, e-mail) a partir do id recebido no webhook. */
-export async function getAsaasCustomer(customerId: string): Promise<AsaasCustomer> {
-  const res = await fetch(`${BASE_URL}/customers/${customerId}`, {
-    headers: { access_token: apiKey() },
-  });
-  if (!res.ok) {
-    throw new Error(`Asaas: não consegui buscar o cliente ${customerId} (HTTP ${res.status})`);
-  }
-  return res.json();
-}
-
 export type AsaasPayment = {
   id: string;
   customer: string;
@@ -41,6 +30,17 @@ export type AsaasPayment = {
   bankSlipUrl?: string | null;
   description?: string | null;
 };
+
+/** Busca os dados do cliente no Asaas (nome, e-mail) a partir do id recebido no webhook. */
+export async function getAsaasCustomer(customerId: string): Promise<AsaasCustomer> {
+  const res = await fetch(`${BASE_URL}/customers/${customerId}`, {
+    headers: { access_token: apiKey() },
+  });
+  if (!res.ok) {
+    throw new Error(`Asaas: não consegui buscar o cliente ${customerId} (HTTP ${res.status})`);
+  }
+  return res.json();
+}
 
 /** Lista todas as cobranças de um cliente, percorrendo a paginação do Asaas. */
 export async function listAsaasPayments(customerId: string): Promise<AsaasPayment[]> {

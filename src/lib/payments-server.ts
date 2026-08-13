@@ -99,13 +99,9 @@ export async function refreshStudentPaymentStatus(admin: Admin, userId: string):
     return;
   }
 
-  const patch = activity?.manual_block
-    ? { payment_status: "ok" as const, overdue_since: null }
-    : { payment_status: "ok" as const, overdue_since: null, blocked: false };
-
   const { error } = await admin
     .from("student_activity")
-    .update({ ...patch, updated_at: now })
+    .update({ payment_status: "ok", overdue_since: null, blocked: Boolean(activity?.manual_block), updated_at: now })
     .eq("user_id", userId);
   if (error) throw new Error(`Não foi possível liberar o acesso: ${error.message}`);
 }

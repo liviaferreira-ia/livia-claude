@@ -94,7 +94,6 @@ const teacherNav: { section: string; items: NavItem[] }[] = [
       { href: "/professor/alunos", label: "Alunos", icon: I.users },
       { href: "/professor/financeiro", label: "Financeiro", icon: I.wallet },
       { href: "/professor", label: "Recados dos alunos", icon: I.chat },
-      { href: "/professor/marina", label: "Exemplo: Marina", icon: I.user },
     ],
   },
 ];
@@ -113,7 +112,6 @@ const CRUMBS: Record<string, string> = {
   "/professor/alunos": "Alunos",
   "/professor/financeiro": "Financeiro",
   "/professor": "Recados dos alunos",
-  "/professor/marina": "Exemplo: Marina",
 };
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -128,7 +126,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     router.refresh();
   }
   const nav = isTeacher ? teacherNav : studentNav;
-  const crumb = CRUMBS[pathname] ?? "";
+  const crumb = pathname.startsWith("/professor/alunos/") ? "Detalhes do aluno" : CRUMBS[pathname] ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Fecha o menu-gaveta ao trocar de página.

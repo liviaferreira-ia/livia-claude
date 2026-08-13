@@ -28,5 +28,25 @@ export async function GET(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ blocked: data?.length ?? 0 });
+
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: expired } = await admin
+    .from("student_settings")
+    .select("student_id")
+    .not("access_expires_on", "is", null)
+    .lt("access_expires_on", today);
+  const expiredIds = (expired ?? []).map((x) => x.student_id);
+  let expiredBlocked = 0;
+  if (expiredIds.length > 0) {
+    const { data: blockedExpired, error: expiredError } = await admin
+      .from("student_activity")
+      .update({ blocked: true, manual_block: true, updated_at: new Date().toISOString() })
+      .in("user_id", expiredIds)
+      .eq("blocked", false)
+      .select("user_id");
+    if (expiredError) return NextResponse.json({ error: expiredError.message }, { status: 500 });
+    expiredBlocked = blockedExpired?.length ?? 0;
+  }
+
+  return NextResponse.json({ blocked: data?.length ?? 0, expiredBlocked });
 }

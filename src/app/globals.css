@@ -539,7 +539,7 @@ h3 {
 /* Teacher roster */
 .rosterrow {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.4fr auto;
+  grid-template-columns: 2fr 0.6fr 1fr 1.3fr 1fr 1.3fr auto;
   align-items: center;
   gap: 14px;
   padding: 14px 18px;

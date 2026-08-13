@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Crest } from "./Crest";
 import { ThemeToggle } from "./ThemeToggle";
 import { initials, useProfile } from "@/lib/profile";
+import { OperationalMonitor } from "@/components/OperationalMonitor";
 
 type NavItem = {
   href: string;
@@ -54,6 +55,9 @@ const I = {
   wallet: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h15a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h13" /><path d="M16 11h5v4h-5a2 2 0 0 1 0-4z" /></svg>
   ),
+  pulse: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6" /></svg>
+  ),
 };
 
 const studentNav: { section: string; items: NavItem[] }[] = [
@@ -93,6 +97,7 @@ const teacherNav: { section: string; items: NavItem[] }[] = [
     items: [
       { href: "/professor/alunos", label: "Alunos", icon: I.users },
       { href: "/professor/financeiro", label: "Financeiro", icon: I.wallet },
+      { href: "/professor/operacional", label: "Operacional", icon: I.pulse },
       { href: "/professor", label: "Recados dos alunos", icon: I.chat },
     ],
   },
@@ -111,6 +116,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/conta": "Minha conta",
   "/professor/alunos": "Alunos",
   "/professor/financeiro": "Financeiro",
+  "/professor/operacional": "Operacional",
   "/professor": "Recados dos alunos",
 };
 
@@ -131,11 +137,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   // Fecha o menu-gaveta ao trocar de página.
   useEffect(() => {
-    setMenuOpen(false);
+    const timer = window.setTimeout(() => setMenuOpen(false), 0);
+    return () => window.clearTimeout(timer);
   }, [pathname]);
 
   return (
     <div className="app-shell">
+      <OperationalMonitor />
       <aside className={`sidebar${menuOpen ? " open" : ""}`}>
         <Link
           href="/"

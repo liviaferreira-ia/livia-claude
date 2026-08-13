@@ -3,6 +3,7 @@
 import type { StudentActivity } from "@/lib/activity";
 import type { StudentPayment } from "@/lib/finance";
 import type { Message } from "@/lib/messages";
+import type { AuditLog, Incident } from "@/lib/operational";
 import { createClient } from "@/lib/supabase/client";
 
 export type StudentSettings = {
@@ -50,6 +51,8 @@ export type StudentDetail = {
   events: StudentEvent[];
   payments: StudentPayment[];
   messages: Message[];
+  incidents: Incident[];
+  audits: AuditLog[];
 };
 
 export async function getStudentDetail(id: string): Promise<{ data: StudentDetail | null; error: string | null }> {

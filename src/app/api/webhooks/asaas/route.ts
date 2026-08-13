@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAsaasCustomer, type AsaasPayment } from "@/lib/asaas";
 import { linkCustomerPayments, refreshStudentPaymentStatus, upsertAsaasPayment } from "@/lib/payments-server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { recordIncident } from "@/lib/operational-server";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -31,9 +32,10 @@ export async function POST(request: Request) {
 
   const admin = createAdminClient();
   const { origin } = new URL(request.url);
+  let userId: string | undefined;
 
   try {
-    let userId = await upsertAsaasPayment(admin, payment, event);
+    userId = await upsertAsaasPayment(admin, payment, event);
     if (PAID_EVENTS.has(event) && !userId) {
       userId = await ensureStudentForPaidCustomer(admin, customerId, origin);
     }
@@ -42,7 +44,15 @@ export async function POST(request: Request) {
       await refreshStudentPaymentStatus(admin, userId);
     }
   } catch (err) {
-    console.error("Erro processando webhook do Asaas:", err);
+    await recordIncident({
+      userId,
+      source: "webhook",
+      area: "financeiro/asaas",
+      action: event,
+      severity: "critical",
+      message: err instanceof Error ? err.message : "Erro processando webhook do Asaas",
+      metadata: { payment_id: payment.id, customer_id: customerId },
+    });
     // Sempre 200 pro Asaas não ficar re-tentando um evento que já sabemos que vai falhar de novo.
   }
 

@@ -12,7 +12,24 @@ import {
   setStudentAccess,
   type StudentActivity,
 } from "@/lib/activity";
-import { initials, levelDisplay, useProfile } from "@/lib/profile";
+import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
+import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
+
+/** % do banco de exercícios do nível já feito (0 se nunca praticou, sem nível fixo assume A2). */
+function progressPct(r: StudentActivity): number {
+  const level = resolveExerciseLevel(parseCefrLevel(r.level ?? "") ?? "A2");
+  const total = categoriesFor(level).reduce((sum, c) => sum + c.count, 0);
+  return total ? Math.min(100, Math.round((practiceTotals(r).done / total) * 100)) : 0;
+}
+
+/** Texto curto explicando por que o aluno está em alerta (ou null se está tudo bem). */
+function attentionReason(r: StudentActivity): string | null {
+  if (!r.last_login_at) return "Convite pendente";
+  const days = Math.floor((Date.now() - new Date(r.last_login_at).getTime()) / 86_400_000);
+  if (days >= 7) return `Sem estudar há ${days}d`;
+  if (practiceTotals(r).done === 0) return "Ainda não praticou";
+  return null;
+}
 
 export default function ProfessorAlunosPage() {
   const { ready, isTeacher } = useProfile();
@@ -22,6 +39,7 @@ export default function ProfessorAlunosPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
+  const [level, setLevel] = useState("all");
 
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
@@ -106,13 +124,24 @@ export default function ProfessorAlunosPage() {
     );
   }
 
-  const activeCount = rows.filter((r) => !r.blocked).length;
-  const overdueCount = rows.filter((r) => r.payment_status === "overdue").length;
-  const attentionCount = rows.filter((r) => practiceTotals(r).done === 0 || isInactive(r.last_login_at)).length;
+  const activeCount = rows.filter((r) => !r.blocked && r.last_login_at).length;
+  const pendingInviteCount = rows.filter((r) => !r.last_login_at).length;
+  const staleCount = rows.filter((r) => r.last_login_at && isInactive(r.last_login_at)).length;
+  const lowPerfCount = rows.filter((r) => {
+    const t = practiceTotals(r);
+    return t.done >= 5 && t.pct < 60;
+  }).length;
   const visibleRows = rows.filter((r) => {
     const matchesName = (r.student_name ?? "").toLowerCase().includes(query.trim().toLowerCase());
-    const matchesFilter = filter === "all" || (filter === "active" && !r.blocked) || (filter === "blocked" && r.blocked) || (filter === "overdue" && r.payment_status === "overdue") || (filter === "inactive" && isInactive(r.last_login_at));
-    return matchesName && matchesFilter;
+    const matchesLevel = level === "all" || r.level === level;
+    const matchesFilter =
+      filter === "all" ||
+      (filter === "pending" && !r.last_login_at) ||
+      (filter === "active" && !r.blocked && !!r.last_login_at) ||
+      (filter === "blocked" && r.blocked) ||
+      (filter === "overdue" && r.payment_status === "overdue") ||
+      (filter === "inactive" && !!r.last_login_at && isInactive(r.last_login_at));
+    return matchesName && matchesLevel && matchesFilter;
   });
 
   return (
@@ -126,7 +155,7 @@ export default function ProfessorAlunosPage() {
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 20 }}>
-        {[[rows.length, "Alunos"], [activeCount, "Acessos ativos"], [overdueCount, "Em atraso"], [attentionCount, "Precisam de atenção"]].map(([value, label]) => <div className="card stat" key={String(label)}><b style={{ display: "block", fontSize: 22 }}>{value}</b><span className="muted" style={{ fontSize: 12.5 }}>{label}</span></div>)}
+        {[[activeCount, "Alunos ativos"], [pendingInviteCount, "Convites pendentes"], [staleCount, "Sem entrar há 7 dias"], [lowPerfCount, "Baixo desempenho"]].map(([value, label]) => <div className="card stat" key={String(label)}><b style={{ display: "block", fontSize: 22 }}>{value}</b><span className="muted" style={{ fontSize: 12.5 }}>{label}</span></div>)}
       </div>
 
       <details className="card" style={{ padding: 18, marginBottom: 20, maxWidth: 560 }}>
@@ -170,8 +199,12 @@ export default function ProfessorAlunosPage() {
 
       <div className="card" style={{ padding: 14, marginBottom: 16, display: "flex", gap: 12, flexWrap: "wrap" }}>
         <input aria-label="Buscar aluno" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar por nome…" style={{ flex: "1 1 240px" }} />
+        <select aria-label="Filtrar por nível" value={level} onChange={(e) => setLevel(e.target.value)} style={{ minWidth: 140 }}>
+          <option value="all">Todos os níveis</option>
+          {["A1", "A2", "B1", "B2", "C1", "C2"].map((l) => <option key={l} value={l}>{l}</option>)}
+        </select>
         <select aria-label="Filtrar alunos" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ minWidth: 180 }}>
-          <option value="all">Todos os alunos</option><option value="active">Acesso ativo</option><option value="blocked">Acesso bloqueado</option><option value="overdue">Pagamento atrasado</option><option value="inactive">Inativos há 7 dias</option>
+          <option value="all">Todos os alunos</option><option value="pending">Convite pendente</option><option value="active">Acesso ativo</option><option value="blocked">Acesso bloqueado</option><option value="overdue">Pagamento atrasado</option><option value="inactive">Inativos há 7 dias</option>
         </select>
       </div>
 
@@ -201,20 +234,23 @@ export default function ProfessorAlunosPage() {
             }}
           >
             <span>Aluno</span>
-            <span>Último login</span>
-            <span>Tempo médio · exercícios</span>
-            <span>Status / acesso</span>
+            <span>Nível</span>
+            <span>Último acesso</span>
+            <span>Progresso / acertos</span>
+            <span>Tempo de estudo</span>
+            <span>Situação</span>
+            <span>Ações</span>
           </div>
           {visibleRows.map((r) => {
             const totals = practiceTotals(r);
-            const avgSeconds = r.session_count > 0 ? r.total_seconds / r.session_count : 0;
-            const needsAttention = totals.done === 0 || isInactive(r.last_login_at);
             const name = r.student_name || "Aluno(a)";
+            const reason = attentionReason(r);
             const paymentFlag = r.blocked
               ? { text: r.manual_block ? "Acesso pausado" : "Bloqueado (atraso)", cls: "bad" }
               : r.payment_status === "overdue"
                 ? { text: "Pagamento atrasado", cls: "att" }
                 : null;
+            const situation = paymentFlag ?? (reason ? { text: reason, cls: "att" as const } : { text: "Em dia", cls: "ok" as const });
             return (
               <div key={r.user_id} className="rosterrow">
                 <Link href={`/professor/alunos/${r.user_id}`} className="std" style={{ textDecoration: "none", color: "inherit" }}>
@@ -223,10 +259,9 @@ export default function ProfessorAlunosPage() {
                   </span>
                   <span>
                     <b style={{ display: "block", fontSize: 14 }}>{name}</b>
-                    <span className="muted" style={{ fontSize: 12.5 }}>
-                      {r.level ? levelDisplay(r.level) : "Nível não informado"}
-                      {typeof calcAge(r.birthdate) === "number" && ` · ${calcAge(r.birthdate)} anos`}
-                    </span>
+                    {typeof calcAge(r.birthdate) === "number" && (
+                      <span className="muted" style={{ fontSize: 12.5 }}>{calcAge(r.birthdate)} anos</span>
+                    )}
                     {r.whatsapp && (
                       <a
                         href={`https://wa.me/${r.whatsapp.replace(/\D/g, "")}`}
@@ -239,28 +274,28 @@ export default function ProfessorAlunosPage() {
                     )}
                   </span>
                 </Link>
+                <span style={{ fontSize: 13.5 }}>{r.level ? levelDisplay(r.level) : "—"}</span>
                 <span style={{ fontSize: 13.5 }}>{formatLastLogin(r.last_login_at)}</span>
                 <span style={{ fontSize: 13.5 }}>
-                  {formatDuration(avgSeconds)} / sessão
+                  {progressPct(r)}% do nível
                   <br />
                   <span className="muted" style={{ fontSize: 12.5 }}>
                     {totals.done} exercícios · {totals.pct}% de acerto
                   </span>
                 </span>
-                <span style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
-                  <span className={`flag ${paymentFlag ? paymentFlag.cls : needsAttention ? "att" : "ok"}`}>
-                    {paymentFlag ? paymentFlag.text : needsAttention ? "Atenção" : "Em dia"}
-                  </span>
-                  <button
-                    type="button"
-                    className="pill-btn"
-                    disabled={busyId === r.user_id}
-                    onClick={() => toggleAccess(r)}
-                    style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
-                  >
-                    {busyId === r.user_id ? "…" : r.blocked ? "Reativar acesso" : "Pausar acesso"}
-                  </button>
+                <span style={{ fontSize: 13.5 }}>{formatDuration(r.total_seconds)}</span>
+                <span>
+                  <span className={`flag ${situation.cls}`}>{situation.text}</span>
                 </span>
+                <button
+                  type="button"
+                  className="pill-btn"
+                  disabled={busyId === r.user_id}
+                  onClick={() => toggleAccess(r)}
+                  style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
+                >
+                  {busyId === r.user_id ? "…" : r.blocked ? "Reativar" : "Pausar"}
+                </button>
               </div>
             );
           })}

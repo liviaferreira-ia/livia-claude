@@ -13,13 +13,14 @@ import {
 } from "@/lib/student-admin";
 import { initials, levelDisplay, useProfile } from "@/lib/profile";
 
-type Tab = "overview" | "progress" | "activity" | "finance" | "notes" | "access";
+type Tab = "overview" | "progress" | "activity" | "finance" | "notes" | "logs" | "access";
 const tabs: { id: Tab; label: string }[] = [
   { id: "overview", label: "Visão geral" },
   { id: "progress", label: "Progresso" },
   { id: "activity", label: "Atividades" },
   { id: "finance", label: "Financeiro" },
   { id: "notes", label: "Recados e anotações" },
+  { id: "logs", label: "Logs e suporte" },
   { id: "access", label: "Acesso e cadastro" },
 ];
 const kindLabels = { mc: "Múltipla escolha", fill: "Completar", translate: "Tradução", order: "Ordenar" };
@@ -162,6 +163,11 @@ export default function ProfessorStudentPage() {
       {tab === "notes" && <div className="grid cols-2">
         <div className="card stat"><div className="eyebrow">Conversa com o aluno</div><div style={{ maxHeight: 360, overflowY: "auto", margin: "12px 0" }}>{detail.messages.length === 0 ? <p className="muted">Nenhum recado ainda.</p> : detail.messages.map((m) => <div key={m.id} className={`tutor-msg ${m.sender}`}><p>{m.body}</p><time>{dateLabel(m.created_at, true)}</time></div>)}</div><textarea className="tutor-input" rows={3} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Escreva uma resposta…" /><button className="btn primary" style={{ marginTop: 10 }} disabled={busy || !reply.trim()} onClick={async () => { const ok = await run(async () => (await replyToStudent(id, name, reply)).error, "Recado enviado."); if (ok) setReply(""); }}>Enviar recado</button></div>
         <div className="card stat"><div className="eyebrow">Anotações privadas</div><textarea className="tutor-input" rows={4} style={{ marginTop: 12 }} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Observações pedagógicas que o aluno não verá…" /><button className="btn primary" style={{ marginTop: 10 }} disabled={busy || !note.trim()} onClick={async () => { const ok = await run(() => studentAdminAction(id, { action: "add_note", body: note }), "Anotação salva."); if (ok) setNote(""); }}>Salvar anotação</button><div style={{ marginTop: 14 }}>{detail.notes.map((n) => <div key={n.id} style={{ padding: "12px 0", borderTop: "1px solid var(--line)" }}><p style={{ margin: "0 0 5px", whiteSpace: "pre-wrap" }}>{n.body}</p><span className="muted" style={{ fontSize: 12 }}>{dateLabel(n.created_at, true)}</span><button className="pill-btn" style={{ marginLeft: 8 }} onClick={() => void run(() => studentAdminAction(id, { action: "delete_note", note_id: n.id }), "Anotação removida.")}>Excluir</button></div>)}</div></div>
+      </div>}
+
+      {tab === "logs" && <div className="grid cols-2">
+        <div className="card stat"><div className="eyebrow">Incidentes deste aluno</div>{detail.incidents.length === 0 ? <p className="muted">Nenhum erro registrado para este aluno.</p> : detail.incidents.map((item) => <div key={item.id} style={{ padding: "12px 0", borderBottom: "1px solid var(--line)" }}><div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}><b>{item.trace_code}</b><span className={`flag ${item.status === "resolved" ? "ok" : item.severity === "critical" ? "bad" : "att"}`}>{item.status === "resolved" ? "Resolvido" : item.status === "investigating" ? "Investigando" : "Novo"}</span></div><p style={{ margin: "7px 0" }}>{item.message}</p><span className="muted" style={{ fontSize: 12 }}>{item.area} · {item.occurrences} ocorrência(s) · {dateLabel(item.last_seen_at, true)}</span>{item.resolution_note && <p style={{ fontSize: 13 }}><b>Solução:</b> {item.resolution_note}</p>}</div>)}<Link className="btn light" style={{ marginTop: 12 }} href="/professor/operacional">Abrir painel operacional →</Link></div>
+        <div className="card stat"><div className="eyebrow">Histórico administrativo</div>{detail.audits.length === 0 ? <p className="muted">As próximas alterações feitas pela escola aparecerão aqui.</p> : detail.audits.map((item) => <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: 10, padding: "10px 0", borderBottom: "1px solid var(--line)" }}><span>{({ student_invited: "Aluno convidado", student_updated: "Cadastro atualizado", access_paused: "Acesso pausado", access_resumed: "Acesso reativado", password_reset_sent: "Redefinição de senha enviada", note_added: "Anotação criada", note_deleted: "Anotação excluída", assignment_added: "Atividade atribuída", assignment_status_changed: "Atividade atualizada" } as Record<string, string>)[item.action] ?? item.action}</span><span className="muted" style={{ fontSize: 12 }}>{dateLabel(item.created_at, true)}</span></div>)}</div>
       </div>}
 
       {tab === "access" && <div className="grid cols-2">

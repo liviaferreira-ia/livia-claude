@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { recordAudit, recordIncident } from "@/lib/operational-server";
 
 /**
  * Pausa ou reativa o acesso de um aluno na mão. Só professor(a) pode chamar.
@@ -44,7 +45,9 @@ export async function POST(request: Request) {
     .eq("user_id", userId);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const trace = await recordIncident({ userId, source: "server", area: "professor/acesso", action, message: error.message });
+    return NextResponse.json({ error: `Não foi possível alterar o acesso. Código: ${trace}` }, { status: 500 });
   }
+  await recordAudit(user.id, userId, action === "pause" ? "access_paused" : "access_resumed");
   return NextResponse.json({ ok: true, blocked: action === "pause" });
 }

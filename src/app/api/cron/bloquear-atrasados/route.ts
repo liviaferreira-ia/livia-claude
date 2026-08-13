@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { recordIncident } from "@/lib/operational-server";
 
 const DIAS_DE_TOLERANCIA = 5;
 
@@ -26,7 +27,8 @@ export async function GET(request: Request) {
     .select("user_id");
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const trace = await recordIncident({ source: "cron", area: "cron/acessos", action: "block_overdue", message: error.message, severity: "critical" });
+    return NextResponse.json({ error: "internal_error", trace }, { status: 500 });
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -44,9 +46,14 @@ export async function GET(request: Request) {
       .in("user_id", expiredIds)
       .eq("blocked", false)
       .select("user_id");
-    if (expiredError) return NextResponse.json({ error: expiredError.message }, { status: 500 });
+    if (expiredError) {
+      const trace = await recordIncident({ source: "cron", area: "cron/acessos", action: "block_expired", message: expiredError.message, severity: "critical" });
+      return NextResponse.json({ error: "internal_error", trace }, { status: 500 });
+    }
     expiredBlocked = blockedExpired?.length ?? 0;
   }
 
-  return NextResponse.json({ blocked: data?.length ?? 0, expiredBlocked });
+  const { data: cleanup, error: cleanupError } = await admin.rpc("cleanup_operational_logs");
+  if (cleanupError) await recordIncident({ source: "cron", area: "cron/manutencao", action: "cleanup_logs", message: cleanupError.message, severity: "warning" });
+  return NextResponse.json({ blocked: data?.length ?? 0, expiredBlocked, cleanup: cleanup ?? null });
 }

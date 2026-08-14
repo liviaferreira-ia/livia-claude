@@ -31,6 +31,13 @@ export type AsaasPayment = {
   description?: string | null;
 };
 
+export const PAID_ASAAS_STATUSES = new Set([
+  "RECEIVED",
+  "CONFIRMED",
+  "RECEIVED_IN_CASH",
+  "DUNNING_RECEIVED",
+]);
+
 /** Busca os dados do cliente no Asaas (nome, e-mail) a partir do id recebido no webhook. */
 export async function getAsaasCustomer(customerId: string): Promise<AsaasCustomer> {
   const res = await fetch(`${BASE_URL}/customers/${customerId}`, {
@@ -60,6 +67,36 @@ export async function listAsaasPayments(customerId: string): Promise<AsaasPaymen
     }
     const page = (await res.json()) as { data?: AsaasPayment[]; hasMore?: boolean };
     payments.push(...(page.data ?? []));
+    hasMore = Boolean(page.hasMore);
+    offset += limit;
+  }
+
+  return payments;
+}
+
+/** Lista cobranças efetivamente pagas em um intervalo, para a carga inicial de alunos. */
+export async function listPaidAsaasPayments(from: string, to: string): Promise<AsaasPayment[]> {
+  const payments: AsaasPayment[] = [];
+  const limit = 100;
+  let offset = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const params = new URLSearchParams({
+      limit: String(limit),
+      offset: String(offset),
+      "paymentDate[ge]": from,
+      "paymentDate[le]": to,
+    });
+    const res = await fetch(`${BASE_URL}/payments?${params}`, {
+      headers: { access_token: apiKey() },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      throw new Error(`Asaas: não consegui listar os pagamentos recentes (HTTP ${res.status})`);
+    }
+    const page = (await res.json()) as { data?: AsaasPayment[]; hasMore?: boolean };
+    payments.push(...(page.data ?? []).filter((payment) => PAID_ASAAS_STATUSES.has(payment.status)));
     hasMore = Boolean(page.hasMore);
     offset += limit;
   }

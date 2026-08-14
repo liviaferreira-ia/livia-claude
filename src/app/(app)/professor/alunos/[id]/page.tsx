@@ -25,6 +25,17 @@ const tabs: { id: Tab; label: string }[] = [
 ];
 const kindLabels = { mc: "Múltipla escolha", fill: "Completar", translate: "Tradução", order: "Ordenar" };
 
+function eventLabel(e: { event_type: string; kind: string | null; correct: boolean | null }): string {
+  if (e.event_type === "login") return "Entrou na plataforma";
+  if (e.event_type === "tutor") return "Praticou no tutor de conversa (IA)";
+  if (e.event_type === "roleplay") return "Completou um roleplay por voz";
+  if (e.event_type === "pronunciation") {
+    return e.correct === null ? "Praticou pronúncia" : `Praticou pronúncia · ${e.correct ? "clara" : "precisa treinar mais"}`;
+  }
+  const kind = e.kind && e.kind in kindLabels ? kindLabels[e.kind as keyof typeof kindLabels] : "prática";
+  return `${e.correct ? "✓" : "✕"} Exercício de ${kind.toLowerCase()}`;
+}
+
 function dateLabel(value: string | null, withTime = false) {
   if (!value) return "—";
   const date = new Date(value.length === 10 ? `${value}T12:00:00` : value);
@@ -155,7 +166,7 @@ export default function ProfessorStudentPage() {
       {tab === "activity" && <div className="grid cols-2">
         <div className="card stat"><div className="eyebrow">Atribuir atividade</div><div className="field" style={{ marginTop: 12 }}><label>Título</label><input value={assignment.title} onChange={(e) => setAssignment({ ...assignment, title: e.target.value })} placeholder="Ex.: Revisar present simple" /></div><div className="field"><label>Orientações</label><textarea value={assignment.details} onChange={(e) => setAssignment({ ...assignment, details: e.target.value })} rows={3} /></div><div className="field"><label>Prazo</label><input type="date" value={assignment.due_date} onChange={(e) => setAssignment({ ...assignment, due_date: e.target.value })} /></div><button className="btn primary" disabled={busy || !assignment.title.trim()} onClick={async () => { const ok = await run(() => studentAdminAction(id, { action: "add_assignment", ...assignment }), "Atividade atribuída."); if (ok) setAssignment({ title: "", details: "", due_date: "" }); }}>Atribuir ao aluno</button></div>
         <div><div className="card stat"><div className="eyebrow">Tarefas</div>{detail.assignments.length === 0 ? <p className="muted">Nenhuma atividade atribuída.</p> : detail.assignments.map((x) => <div key={x.id} style={{ padding: "12px 0", borderBottom: "1px solid var(--line)" }}><b>{x.title}</b><div className="muted" style={{ fontSize: 12.5 }}>{x.due_date ? `Prazo: ${dateLabel(x.due_date)}` : "Sem prazo"} · {x.status === "done" ? "Concluída" : x.status === "cancelled" ? "Cancelada" : "Pendente"}</div>{x.status === "assigned" && <button className="pill-btn" style={{ marginTop: 6 }} onClick={() => void run(() => studentAdminAction(id, { action: "assignment_status", assignment_id: x.id, status: "cancelled" }), "Atividade cancelada.")}>Cancelar</button>}</div>)}</div></div>
-        <div className="card stat" style={{ gridColumn: "1 / -1" }}><div className="eyebrow">Linha do tempo recente</div>{detail.events.length === 0 ? <p className="muted">O histórico começará a ser registrado após a migração desta entrega.</p> : detail.events.map((e) => <div key={e.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid var(--line)", fontSize: 13.5 }}><span>{e.event_type === "login" ? "Entrou na plataforma" : `${e.correct ? "✓" : "✕"} Exercício de ${e.kind ? kindLabels[e.kind].toLowerCase() : "prática"}`}</span><span className="muted">{dateLabel(e.created_at, true)}</span></div>)}</div>
+        <div className="card stat" style={{ gridColumn: "1 / -1" }}><div className="eyebrow">Linha do tempo recente</div>{detail.events.length === 0 ? <p className="muted">O histórico começará a ser registrado após a migração desta entrega.</p> : detail.events.map((e) => <div key={e.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid var(--line)", fontSize: 13.5 }}><span>{eventLabel(e)}</span><span className="muted">{dateLabel(e.created_at, true)}</span></div>)}</div>
       </div>}
 
       {tab === "finance" && <div className="card" style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}><thead><tr>{["Vencimento", "Pagamento", "Valor", "Forma", "Status", "Cobrança"].map((x) => <th key={x} style={{ padding: 12, textAlign: "left", borderBottom: "1px solid var(--line)" }}>{x}</th>)}</tr></thead><tbody>{detail.payments.map((p) => { const flag = paymentLabel(p.status); return <tr key={p.id} style={{ borderBottom: "1px solid var(--line)" }}><td style={{ padding: 12 }}>{dateLabel(p.due_date)}</td><td style={{ padding: 12 }}>{dateLabel(p.payment_date ?? p.confirmed_date)}</td><td style={{ padding: 12 }}>{money(Number(p.value))}</td><td style={{ padding: 12 }}>{p.billing_type?.replaceAll("_", " ") ?? "—"}</td><td style={{ padding: 12 }}><span className={`flag ${flag.cls}`}>{flag.text}</span></td><td style={{ padding: 12 }}>{p.invoice_url ? <a href={p.invoice_url} target="_blank" rel="noopener noreferrer">Abrir ↗</a> : "—"}</td></tr>; })}</tbody></table>{detail.payments.length === 0 && <p className="muted" style={{ padding: 18 }}>Nenhuma cobrança sincronizada.</p>}</div>}

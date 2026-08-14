@@ -6,6 +6,7 @@ import { normalize } from "@/data/exercises";
 import { SpeakButton } from "@/components/SpeakButton";
 import { PRONUNCIATION, resolvePronunciationLevel } from "@/data/pratica";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
+import { logModuleEvent } from "@/lib/module-events";
 import {
   createRecognition,
   isSTTSupported,
@@ -83,6 +84,8 @@ export default function PronunciaPage() {
   function next() {
     if (index === SENTENCES.length - 1) {
       setIndex(SENTENCES.length); // marca fim
+      const finalAvg = answered ? Math.round(scoreSum / answered) : 0;
+      void logModuleEvent("pronunciation", String(SENTENCES.length), finalAvg >= 70);
       return;
     }
     setIndex((i) => i + 1);

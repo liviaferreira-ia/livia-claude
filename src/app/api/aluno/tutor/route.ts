@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getTutorReply, type TutorTurn } from "@/lib/ai/tutor-provider";
 import { recordIncident } from "@/lib/operational-server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 const OBJECTIVE = "Falar sobre uma viagem recente usando o passado simples.";
@@ -68,6 +69,8 @@ export async function POST(request: Request) {
       latency_ms: Date.now() - startedAt,
       usage: tokenUsage,
     }));
+    // Só o evento (pra "Atividades" do professor saber que o aluno usou o tutor) -- nunca o texto trocado.
+    await createAdminClient().from("student_events").insert({ student_id: user.id, event_type: "tutor" });
     return NextResponse.json({ reply: text });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Falha ao gerar resposta do tutor.";

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ROLEPLAYS, resolveRoleplayLevel, type Roleplay } from "@/data/pratica";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
+import { logModuleEvent } from "@/lib/module-events";
 import {
   createRecognition,
   isSTTSupported,
@@ -60,6 +61,7 @@ export default function RoleplayPage() {
       speak(line);
     } else {
       setPhase("done");
+      if (roleplay) void logModuleEvent("roleplay", roleplay.id);
     }
   }
 

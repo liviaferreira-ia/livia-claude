@@ -36,8 +36,8 @@ export type StudentAssignment = {
 export type StudentEvent = {
   id: number;
   student_id: string;
-  event_type: "login" | "exercise";
-  kind: "mc" | "fill" | "translate" | "order" | null;
+  event_type: "login" | "exercise" | "tutor" | "roleplay" | "pronunciation";
+  kind: "mc" | "fill" | "translate" | "order" | string | null;
   correct: boolean | null;
   created_at: string;
 };

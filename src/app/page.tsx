@@ -8,6 +8,7 @@ const WHATSAPP = "5511933779408";
 const WA_MSG =
   "Olá! Vim pelo site e quero saber mais sobre o curso de inglês da Central School. 😊";
 const waLink = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WA_MSG)}`;
+const waPlanLink = (plan: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Olá! Vim pelo site e quero saber mais sobre o plano ${plan} da Central School.`)}`;
 
 const WaIcon = (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -105,7 +106,7 @@ const features = [
   {
     tint: "tint-navy",
     title: "Roleplay por voz",
-    desc: "Situações reais: hotel, restaurante, viagem.",
+    desc: "Pratique situações reais por voz, com falas e dicas guiadas.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /></svg>
     ),
@@ -136,24 +137,6 @@ const faq = [
   {
     q: "Como eu começo?",
     a: "É só falar com a gente no WhatsApp. Tiramos suas dúvidas e te ajudamos a começar hoje mesmo.",
-  },
-];
-
-const quotes = [
-  {
-    text: "Em poucos meses saí do “travado” pra conversar numa viagem. O app com a professora fez toda a diferença.",
-    who: "Marina S.",
-    role: "aluna · nível A2 (exemplo)",
-  },
-  {
-    text: "Consigo praticar de manhã antes do trabalho. É a primeira vez que mantenho a rotina de estudar inglês.",
-    who: "Lucas R.",
-    role: "aluno · nível B1 (exemplo)",
-  },
-  {
-    text: "Como professora, adoro ver o progresso de cada aluno e preparar a aula com o que eles realmente precisam.",
-    who: "Prof. Fernanda",
-    role: "professora (exemplo)",
   },
 ];
 
@@ -286,7 +269,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <a
-                href={waLink}
+                href={waPlanLink(p.name)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-wa"
@@ -327,25 +310,6 @@ export default function LandingPage() {
             <Crest size={168} />
           </div>
         </div>
-      </section>
-
-      {/* Depoimentos */}
-      <section className="lp-section" id="depoimentos" style={{ paddingTop: 20 }}>
-        <h2 className="lp-h2">Quem estuda, recomenda</h2>
-        <div className="lp-quotes">
-          {quotes.map((q) => (
-            <div className="lp-quote" key={q.who}>
-              <p>“{q.text}”</p>
-              <div className="who">
-                {q.who}
-                <span>{q.role}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="muted" style={{ textAlign: "center", fontSize: 12.5, marginTop: 18 }}>
-          Depoimentos ilustrativos — serão substituídos por relatos reais de alunos.
-        </p>
       </section>
 
       {/* FAQ */}

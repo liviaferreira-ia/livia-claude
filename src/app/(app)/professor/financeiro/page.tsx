@@ -119,10 +119,7 @@ export default function ProfessorFinanceiroPage() {
       const res = await fetch("/api/professor/financeiro/sincronizar", { method: "POST" });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || "Não foi possível sincronizar.");
-      setSyncMessage(
-        `${body.created} novos alunos pré-cadastrados, ${body.linked} já existentes vinculados e ${body.payments} cobranças sincronizadas. Nenhum convite foi enviado.` +
-        (body.skipped ? ` ${body.skipped} clientes precisam de revisão por falta de e-mail ou conflito de cadastro.` : ""),
-      );
+      setSyncMessage(`${body.payments} cobranças de ${body.students} alunos sincronizadas.`);
       await load();
     } catch (err) {
       setSyncMessage(err instanceof Error ? err.message : "Falha de conexão.");
@@ -153,7 +150,7 @@ export default function ProfessorFinanceiroPage() {
           <p className="muted" style={{ margin: 0 }}>Mensalidades, vencimentos e histórico de pagamentos dos alunos.</p>
         </div>
         <button className="btn primary" onClick={synchronize} disabled={syncing} style={{ opacity: syncing ? 0.6 : 1 }}>
-          {syncing ? "Importando…" : "↻ Importar pagantes do Asaas"}
+          {syncing ? "Sincronizando…" : "↻ Sincronizar Asaas"}
         </button>
       </div>
 

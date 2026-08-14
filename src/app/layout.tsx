@@ -3,9 +3,9 @@ import "./globals.css";
 import { ThemeInit } from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
-  title: "Central School — Inglês com IA",
+  title: "Central School — Inglês como estilo de vida",
   description:
-    "Plataforma de inglês da Central School: aprenda a falar inglês com prática guiada por IA e acompanhamento de professores.",
+    "Aprenda inglês com prática digital guiada, situações reais e acompanhamento de professores.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

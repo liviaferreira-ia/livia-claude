@@ -15,6 +15,8 @@ function LoginInner() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -40,6 +42,22 @@ function LoginInner() {
     router.refresh();
   }
 
+  async function handleReset(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/definir-senha`,
+    });
+    setLoading(false);
+    if (error) {
+      setError("Não foi possível enviar o link agora. Aguarde um instante e tente novamente.");
+      return;
+    }
+    setResetSent(true);
+  }
+
   return (
     <div className="login-wrap">
       <div style={{ position: "fixed", top: 16, right: 16, zIndex: 20 }}>
@@ -50,10 +68,10 @@ function LoginInner() {
           <BrandLockup width={230} />
         </div>
         <p className="muted" style={{ fontSize: 14, marginTop: 16 }}>
-          Entre para continuar seus estudos.
+          {resetMode ? "Informe seu e-mail para criar uma nova senha." : "Entre para continuar seus estudos."}
         </p>
 
-        <form onSubmit={handleSubmit} style={{ marginTop: 20 }}>
+        <form onSubmit={resetMode ? handleReset : handleSubmit} style={{ marginTop: 20 }}>
           <div className="field">
             <label htmlFor="email">E-mail</label>
             <input
@@ -66,7 +84,7 @@ function LoginInner() {
               required
             />
           </div>
-          <div className="field">
+          {!resetMode && <div className="field">
             <label htmlFor="senha">Senha</label>
             <div className="pw-wrap">
               <input
@@ -100,19 +118,29 @@ function LoginInner() {
                 )}
               </button>
             </div>
-          </div>
+          </div>}
 
           {error && <p className="auth-msg err">{error}</p>}
+          {resetSent && <p className="auth-msg ok">Se este e-mail estiver cadastrado, você receberá um link para criar uma nova senha. Verifique também a caixa de spam.</p>}
 
           <button
             type="submit"
             className="btn primary"
             style={{ width: "100%", marginTop: 8, opacity: loading ? 0.6 : 1 }}
-            disabled={loading}
+            disabled={loading || resetSent}
           >
-            {loading ? "Aguarde…" : "Entrar →"}
+            {loading ? "Aguarde…" : resetMode ? "Enviar link de recuperação" : "Entrar →"}
           </button>
         </form>
+
+        <button
+          type="button"
+          className="link-btn"
+          style={{ marginTop: 14 }}
+          onClick={() => { setResetMode((current) => !current); setResetSent(false); setError(""); }}
+        >
+          {resetMode ? "Voltar para o login" : "Esqueci minha senha"}
+        </button>
 
         <p className="muted" style={{ fontSize: 13, marginTop: 16, textAlign: "center" }}>
           Ainda não tem conta? Fale com a Central School pra receber seu acesso.

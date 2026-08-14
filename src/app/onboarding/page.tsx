@@ -97,7 +97,7 @@ export default function OnboardingPage() {
         {step === 1 && (
           <StepOptions
             title={`Qual é o seu objetivo, ${name.split(" ")[0]}?`}
-            subtitle="Isso ajuda a IA a escolher os temas e as práticas certas para você."
+            subtitle="Isso ajuda a plataforma e seus professores a escolher os temas e as práticas certas para você."
             options={GOALS}
             selected={goal}
             onSelect={setGoal}

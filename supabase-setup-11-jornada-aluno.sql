@@ -1,0 +1,2 @@
+-- Cópia de apoio. A fonte de trabalho está em C:\Users\Livia\central-school.
+-- Ver o arquivo homônimo no repositório principal para a migração completa.

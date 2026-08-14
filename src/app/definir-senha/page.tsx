@@ -45,9 +45,11 @@ export default function DefinirSenhaPage() {
     const params = new URLSearchParams(window.location.hash.slice(1));
 
     if (params.get("error")) {
-      setLinkError(params.get("error_description")?.replace(/\+/g, " ") || "Link inválido ou expirado.");
-      setChecking(false);
-      return;
+      const timer = window.setTimeout(() => {
+        setLinkError(params.get("error_description")?.replace(/\+/g, " ") || "Link inválido ou expirado.");
+        setChecking(false);
+      }, 0);
+      return () => window.clearTimeout(timer);
     }
 
     const access_token = params.get("access_token");
@@ -81,13 +83,13 @@ export default function DefinirSenhaPage() {
     }
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({ password });
+    const { data, error } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (error) {
       setError("Não consegui salvar a senha. Peça um novo convite ao professor.");
       return;
     }
-    router.push("/onboarding");
+    router.push(data.user?.user_metadata?.onboarded === true ? "/aluno" : "/onboarding");
     router.refresh();
   }
 

@@ -97,7 +97,7 @@ const features = [
   {
     tint: "tint-warn",
     title: "Pronúncia",
-    desc: "Fale e veja onde melhorar, palavra por palavra.",
+    desc: "Ouça a referência, repita em voz alta e compare sua fala.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h3l3 8 4-16 3 8h5" /></svg>
     ),

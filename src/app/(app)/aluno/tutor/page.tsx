@@ -6,13 +6,6 @@ import { initials, useProfile } from "@/lib/profile";
 
 type Msg = { who: "ai" | "me"; text: string; corr?: string };
 
-const REPLIES = [
-  "Great! Did you go to the beach?",
-  "Sounds fun! Who did you travel with?",
-  "Nice. What food did you try there?",
-  "Awesome. Would you like to go back someday?",
-];
-
 export default function TutorPage() {
   const { profile, ready } = useProfile();
   const first = profile.name.split(" ")[0] || "there";
@@ -24,7 +17,8 @@ export default function TutorPage() {
   // porque depende do nome, que só chega depois da sessão carregar.
   const [replies, setReplies] = useState<Msg[]>([]);
   const [text, setText] = useState("");
-  const [replyIndex, setReplyIndex] = useState(0);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
   const [ended, setEnded] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
@@ -33,21 +27,39 @@ export default function TutorPage() {
 
   useEffect(() => {
     chatRef.current?.scrollTo(0, chatRef.current.scrollHeight);
-  }, [msgs.length]);
+  }, [msgs.length, sending]);
 
   function push(m: Msg) {
     setReplies((prev) => [...prev, m]);
   }
 
-  function send() {
+  async function send() {
     const v = text.trim();
-    if (!v) return;
+    if (!v || sending) return;
+    const history = [...opening, ...replies, { who: "me" as const, text: v }];
     push({ who: "me", text: v });
     setText("");
-    setTimeout(() => {
-      push({ who: "ai", text: REPLIES[replyIndex % REPLIES.length] });
-      setReplyIndex((i) => i + 1);
-    }, 600);
+    setError("");
+    setSending(true);
+    try {
+      const res = await fetch("/api/aluno/tutor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          history: history.map((m) => ({ role: m.who === "me" ? "user" : "assistant", content: m.text })),
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(body.error || "Não consegui responder agora. Tente de novo.");
+        return;
+      }
+      push({ who: "ai", text: body.reply });
+    } catch {
+      setError("Falha de conexão. Tente de novo.");
+    } finally {
+      setSending(false);
+    }
   }
 
   if (ended) {
@@ -66,10 +78,10 @@ export default function TutorPage() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 6L9 17l-5-5" /></svg>
             </span>
             <div>
-              <b style={{ fontSize: 14 }}>Quer correção de verdade?</b>
+              <b style={{ fontSize: 14 }}>Quer aprofundar com seu professor?</b>
               <div className="muted" style={{ fontSize: 13.5 }}>
-                Mande suas dúvidas para o seu professor pelos recados, na tela inicial — ele lê e
-                responde pessoalmente.
+                Mande suas dúvidas pelos recados, na tela inicial — ele lê e responde
+                pessoalmente, além da correção que você já recebeu do tutor de IA agora.
               </div>
             </div>
           </div>
@@ -87,7 +99,7 @@ export default function TutorPage() {
         </div>
         <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
           <Link href="/aluno/praticar" className="btn primary">Ir para os exercícios →</Link>
-          <button className="btn ghost" onClick={() => { setReplies([]); setEnded(false); setReplyIndex(0); }}>
+          <button className="btn ghost" onClick={() => { setReplies([]); setEnded(false); }}>
             Praticar de novo
           </button>
           <Link href="/aluno" className="btn ghost">Voltar ao início</Link>
@@ -110,8 +122,8 @@ export default function TutorPage() {
       </div>
 
       <p className="est-note" style={{ margin: "0 0 12px" }}>
-        Prática guiada com perguntas prontas — ela puxa conversa, mas ainda não lê o que você
-        escreve. Para correção de verdade, use os exercícios ou fale com seu professor.
+        Converse em inglês — o tutor de IA lê o que você escreve e responde de verdade, no seu
+        nível. Ele corrige com cuidado, um ponto de cada vez.
       </p>
 
       <div className="chat" ref={chatRef}>
@@ -124,17 +136,28 @@ export default function TutorPage() {
             </div>
           </div>
         ))}
+        {sending && (
+          <div className="msg ai">
+            <span className="who">EN</span>
+            <div className="bubble">
+              <span className="muted">digitando…</span>
+            </div>
+          </div>
+        )}
       </div>
+
+      {error && <p className="auth-msg err" style={{ maxWidth: "none" }}>{error}</p>}
 
       <div className="composer">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
+          onKeyDown={(e) => e.key === "Enter" && !sending && send()}
           placeholder="Escreva sua resposta em inglês…"
           autoComplete="off"
+          disabled={sending}
         />
-        <button className="btn primary" onClick={send} aria-label="Enviar">
+        <button className="btn primary" onClick={send} aria-label="Enviar" disabled={sending || !text.trim()}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} style={{ width: 18, height: 18 }}>
             <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
           </svg>
@@ -142,13 +165,13 @@ export default function TutorPage() {
       </div>
 
       <div className="tutor-tools">
-        <button className="pill-btn" onClick={() => push({ who: "ai", text: "Em português: estou te perguntando o que você fez na viagem. Tente responder no passado — por exemplo: \"I visited...\", \"I ate...\"." })}>
+        <button className="pill-btn" disabled={sending} onClick={() => push({ who: "ai", text: "Em português: estou te perguntando o que você fez na viagem. Tente responder no passado — por exemplo: \"I visited...\", \"I ate...\"." })}>
           🇧🇷 Explicar em português
         </button>
-        <button className="pill-btn" onClick={() => push({ who: "ai", text: '💡 Dica: comece com "I went to..." ou "I visited...".' })}>
+        <button className="pill-btn" disabled={sending} onClick={() => push({ who: "ai", text: '💡 Dica: comece com "I went to..." ou "I visited...".' })}>
           💡 Dica
         </button>
-        <button className="pill-btn" onClick={() => setEnded(true)}>
+        <button className="pill-btn" disabled={sending} onClick={() => setEnded(true)}>
           ✓ Encerrar e ver feedback
         </button>
       </div>

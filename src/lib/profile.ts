@@ -4,7 +4,7 @@ import type { User } from "@supabase/supabase-js";
 import { useCallback, useEffect, useState } from "react";
 import type { Kind } from "@/data/exercises";
 import { LEVEL_ORDER, levelBadge, type CefrLevel } from "@/data/placement";
-import { addTimeSeconds, bumpPracticeServer, touchLogin } from "@/lib/activity";
+import { addTimeSeconds, getMyLearningSnapshot, recordExerciseAttempt, touchLogin } from "@/lib/activity";
 import { bumpDaily, readDaily, readStreak, touchStreak } from "@/lib/daily";
 import { countCompletedLessons } from "@/lib/lessonProgress";
 import { createClient } from "@/lib/supabase/client";
@@ -43,6 +43,10 @@ export type Stats = {
   streak: number;
   /** Exercícios feitos hoje (para a meta diária). */
   dailyDone: number;
+  bestStreak: number;
+  lastPath: string;
+  lastTitle: string;
+  lastActivityType: string;
 };
 
 export type Profile = {
@@ -69,6 +73,10 @@ export function emptyStats(): Stats {
     lessonsCompleted: 0,
     streak: 0,
     dailyDone: 0,
+    bestStreak: 0,
+    lastPath: "",
+    lastTitle: "",
+    lastActivityType: "",
   };
 }
 
@@ -99,6 +107,10 @@ export function loadStats(): Stats {
     lessonsCompleted: countCompletedLessons(),
     streak: readStreak().streak,
     dailyDone: readDaily().done,
+    bestStreak: readStreak().best,
+    lastPath: "",
+    lastTitle: "",
+    lastActivityType: "",
   };
 }
 
@@ -148,8 +160,10 @@ export function useProfile() {
 
     // Registra a presença de hoje antes de ler as estatísticas, senão a
     // ofensiva só apareceria na próxima vez que o app abrisse.
-    touchStreak();
-    setStats(loadStats());
+    const localTimer = window.setTimeout(() => {
+      touchStreak();
+      if (mounted) setStats(loadStats());
+    }, 0);
 
     supabase.auth.getUser().then(async ({ data }) => {
       if (!mounted) return;
@@ -162,6 +176,10 @@ export function useProfile() {
           .maybeSingle();
         if (mounted) setRole((prof?.role as Role) ?? "student");
         touchLogin(metaString(data.user, "name"), metaString(data.user, "level")).catch(() => {});
+        const snapshot = await getMyLearningSnapshot();
+        if (mounted && snapshot) {
+          setStats((current) => ({ ...current, ...snapshot }));
+        }
       }
       setReady(true);
     });
@@ -173,6 +191,7 @@ export function useProfile() {
 
     return () => {
       mounted = false;
+      window.clearTimeout(localTimer);
       sub.subscription.unsubscribe();
     };
   }, []);
@@ -210,7 +229,7 @@ export function useProfile() {
     [],
   );
 
-  const bumpPractice = useCallback((kind: Kind, correct: boolean) => {
+  const bumpPractice = useCallback((kind: Kind, correct: boolean, exerciseId = "unknown", level: CefrLevel = "A2", title = "Prática") => {
     const daily = bumpDaily();
     setStats((prev) => {
       const stat = prev.practice[kind];
@@ -225,7 +244,7 @@ export function useProfile() {
       saveStats(next);
       return next;
     });
-    bumpPracticeServer(kind, correct).catch(() => {});
+    recordExerciseAttempt({ exerciseId, level, kind, correct, title }).catch(() => {});
   }, []);
 
   /** Recalcula lições concluídas e ofensiva (ex.: ao voltar de uma lição). */

@@ -15,6 +15,7 @@ import {
   type Translate,
 } from "@/data/exercises";
 import { LEVEL_ORDER, type CefrLevel } from "@/data/placement";
+import { markContentValidated } from "@/lib/content-validation";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 const TINTS: Record<Kind, string> = {
@@ -37,24 +38,33 @@ export default function PraticarPage() {
   const { profile, ready, isTeacher, bumpPractice } = useProfile();
   const [kind, setKind] = useState<Kind | null>(null);
   const [reviewLevel, setReviewLevel] = useState<CefrLevel | null>(null);
+  const [smartReviewLevel, setSmartReviewLevel] = useState<CefrLevel | null>(null);
+  const [reviewIds, setReviewIds] = useState<string[]>([]);
   const [queryReady, setQueryReady] = useState(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       const requested = new URLSearchParams(window.location.search).get("revisao");
+      const params = new URLSearchParams(window.location.search);
+      const requestedLevel = params.get("nivel");
+      const requestedKind = params.get("tipo");
       setReviewLevel(
         requested && (LEVEL_ORDER as string[]).includes(requested)
           ? requested as CefrLevel
           : null,
       );
+      setSmartReviewLevel(requestedLevel && (LEVEL_ORDER as string[]).includes(requestedLevel) ? requestedLevel as CefrLevel : null);
+      setReviewIds((params.get("erros") ?? "").split(",").filter(Boolean).slice(0, 20));
+      if (requestedKind && (["mc", "fill", "translate", "order"] as string[]).includes(requestedKind)) setKind(requestedKind as Kind);
       setQueryReady(true);
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
 
   const reviewMode = ready && isTeacher && reviewLevel !== null;
-  const studentLevel = reviewMode ? reviewLevel : parseCefrLevel(profile.level) ?? "A2";
-  const contentLevel = reviewMode ? reviewLevel : resolveExerciseLevel(studentLevel);
+  const smartReviewMode = !reviewMode && smartReviewLevel !== null && reviewIds.length > 0;
+  const studentLevel = reviewMode ? reviewLevel : smartReviewLevel ?? parseCefrLevel(profile.level) ?? "A2";
+  const contentLevel = reviewMode ? reviewLevel : smartReviewMode ? smartReviewLevel : resolveExerciseLevel(studentLevel);
   const categories = categoriesFor(contentLevel);
   const bank = EXERCISES[contentLevel];
 
@@ -119,6 +129,9 @@ export default function PraticarPage() {
       onExit={() => setKind(null)}
       bump={reviewMode ? () => {} : bumpPractice}
       reviewMode={reviewMode}
+      level={contentLevel}
+      filterIds={smartReviewMode ? reviewIds : []}
+      returnHref={smartReviewMode ? "/aluno/revisao" : reviewMode ? "/professor/validacao-conteudo" : "/aluno"}
     />
   );
 }
@@ -130,23 +143,34 @@ function Runner({
   onExit,
   bump,
   reviewMode,
+  level,
+  filterIds,
+  returnHref,
 }: {
   kind: Kind;
   bank: LevelBank;
   categories: { kind: Kind; title: string; desc: string; count: number }[];
   onExit: () => void;
-  bump: (k: Kind, correct: boolean) => void;
+  bump: (k: Kind, correct: boolean, exerciseId?: string, level?: CefrLevel, title?: string) => void;
   reviewMode: boolean;
+  level: CefrLevel;
+  filterIds: string[];
+  returnHref: string;
 }) {
   const queue = useMemo(
-    () => shuffle(bank[kind] as readonly (MC | Fill | Translate | Order)[]),
-    [bank, kind],
+    () => {
+      const source = bank[kind] as readonly (MC | Fill | Translate | Order)[];
+      const selected = filterIds.length ? source.filter((item) => filterIds.includes(item.id)) : source;
+      return shuffle(selected);
+    },
+    [bank, kind, filterIds],
   );
   const [i, setI] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [wasRight, setWasRight] = useState(false);
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
+  const [validationState, setValidationState] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   // per-question inputs
   const [selected, setSelected] = useState<number | null>(null);
@@ -200,7 +224,13 @@ function Runner({
     setWasRight(ok);
     setAnswered(true);
     if (ok) setCorrect((c) => c + 1);
-    bump(kind, ok);
+    bump(kind, ok, item.id, level, title);
+  }
+
+  async function validateLevel() {
+    setValidationState("saving");
+    const failure = await markContentValidated(level);
+    setValidationState(failure ? "error" : "saved");
   }
 
   if (done) {
@@ -214,12 +244,27 @@ function Runner({
           <p className="muted" style={{ margin: "6px 0 20px" }}>
             {pct}% de acerto em {title}. {reviewMode ? "Revisão concluída sem alterar o progresso dos alunos." : "Seu progresso foi salvo. 💾"}
           </p>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+          {reviewMode && validationState === "error" && (
+            <p className="auth-msg err" role="alert">Não foi possível validar o nível. Tente novamente.</p>
+          )}
+          {reviewMode && validationState === "saved" && (
+            <p className="auth-msg ok" role="status">Nível {level} validado com sucesso.</p>
+          )}
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            {reviewMode && (
+              <button
+                className="btn primary"
+                disabled={validationState === "saving" || validationState === "saved"}
+                onClick={() => void validateLevel()}
+              >
+                {validationState === "saving" ? "Validando…" : validationState === "saved" ? `${level} validado` : `Validar nível ${level}`}
+              </button>
+            )}
             <button className="btn primary" onClick={onExit}>
               Escolher outro tipo
             </button>
-            <Link href={reviewMode ? "/professor/validacao-conteudo" : "/aluno"} className="btn ghost">
-              {reviewMode ? "Voltar à validação" : "Voltar ao início"}
+            <Link href={returnHref} className="btn ghost">
+              {reviewMode ? "Voltar à validação" : filterIds.length ? "Voltar à revisão" : "Voltar ao início"}
             </Link>
           </div>
         </div>

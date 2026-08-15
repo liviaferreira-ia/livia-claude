@@ -8,6 +8,7 @@ import { listMyMessages, sendMessage, type Message } from "@/lib/messages";
 import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
 import { resolveCourseLevel } from "@/data/curso";
 import { DAILY_GOAL } from "@/lib/daily";
+import { listMyReviewTargets, type ReviewTarget } from "@/lib/activity";
 import {
   completeMyAssignment,
   countMyActiveDaysThisWeek,
@@ -18,7 +19,7 @@ import {
 } from "@/lib/student-admin";
 
 export default function AlunoDashboard() {
-  const { profile, ready, reset, signOut } = useProfile();
+  const { profile, ready, signOut } = useProfile();
   const router = useRouter();
   const studentLevel = parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = resolveExerciseLevel(studentLevel);
@@ -32,6 +33,7 @@ export default function AlunoDashboard() {
   const [assignments, setAssignments] = useState<StudentAssignment[]>([]);
   const [settings, setSettings] = useState<StudentSettings | null>(null);
   const [activeDays, setActiveDays] = useState(0);
+  const [reviewTargets, setReviewTargets] = useState<ReviewTarget[]>([]);
 
   useEffect(() => {
     if (!ready || !profile.onboarded) return;
@@ -39,6 +41,7 @@ export default function AlunoDashboard() {
     listMyAssignments().then(setAssignments);
     getMySettings().then(setSettings);
     countMyActiveDaysThisWeek().then(setActiveDays);
+    listMyReviewTargets().then(setReviewTargets);
   }, [ready, profile.onboarded]);
 
   async function handleSend() {
@@ -67,16 +70,6 @@ export default function AlunoDashboard() {
     await signOut();
     router.push("/login");
     router.refresh();
-  }
-
-  function clearProgress() {
-    if (!confirm("Zerar o progresso deste navegador? Sua conta e seu perfil continuam salvos.")) {
-      return;
-    }
-    try {
-      window.localStorage.removeItem("central_lesson_sections_v1");
-    } catch {}
-    reset();
   }
 
   if (!ready) {
@@ -108,6 +101,17 @@ export default function AlunoDashboard() {
   const dailyDone = profile.stats.dailyDone;
   const goalPct = Math.min(100, Math.round((dailyDone / DAILY_GOAL) * 100));
   const goalDone = dailyDone >= DAILY_GOAL;
+  const firstReview = reviewTargets[0];
+  const reviewHref = firstReview
+    ? `/aluno/praticar?tipo=${firstReview.kind}&nivel=${firstReview.level}&erros=${reviewTargets.filter((item) => item.kind === firstReview.kind && item.level === firstReview.level).map((item) => item.exerciseId).join(",")}`
+    : "/aluno/revisao";
+  const mission = assignments.length > 0
+    ? { eyebrow: "Prioridade do professor", title: assignments[0].title, text: assignments[0].details || "Você tem uma atividade indicada pelo seu professor.", href: "#atividades", action: "Ver atividade" }
+    : reviewTargets.length > 0
+      ? { eyebrow: "Missão de hoje", title: `Revisar ${reviewTargets.length} ${reviewTargets.length === 1 ? "ponto" : "pontos"} que precisam de atenção`, text: "Comece pelo que você errou recentemente para fixar melhor o conteúdo.", href: reviewHref, action: "Começar revisão" }
+      : profile.stats.lastPath
+        ? { eyebrow: "Continue de onde parou", title: profile.stats.lastTitle || "Retomar seus estudos", text: "Sua última atividade está pronta para continuar.", href: profile.stats.lastPath, action: "Continuar" }
+        : { eyebrow: "Sua primeira missão", title: "Começar a trilha do seu nível", text: `Uma atividade curta do nível ${contentLevel} para iniciar seu aprendizado.`, href: "/aluno/licao", action: "Começar agora" };
 
   const badges = [
     { emoji: "🌱", label: "Primeiro passo", got: totals.done >= 1, hint: "Faça 1 exercício" },
@@ -168,6 +172,13 @@ export default function AlunoDashboard() {
           : `Continue assim, ${first}! Você já fez ${totals.done} exercícios.`}
       </p>
 
+      <div className="hero" style={{ marginBottom: 22 }}>
+        <div className="eyebrow">{mission.eyebrow}</div>
+        <h2>{mission.title}</h2>
+        <p>{mission.text}</p>
+        <Link href={mission.href} className="btn light">{mission.action} →</Link>
+      </div>
+
       {/* Meta do dia */}
       <div className="card" style={{ padding: 18, marginBottom: 22 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
@@ -187,7 +198,7 @@ export default function AlunoDashboard() {
       </div>
 
       {settings && (
-        <div className="card" style={{ padding: 18, marginBottom: 22 }}>
+        <div id="atividades" className="card" style={{ padding: 18, marginBottom: 22 }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
             <div className="eyebrow">Meta da semana</div>
             <span className="muted" style={{ fontSize: 13, fontWeight: 700 }}>
@@ -360,13 +371,9 @@ export default function AlunoDashboard() {
             <button className="btn primary" style={{ width: "100%" }} onClick={handleSignOut}>
               ↩ Sair da conta
             </button>
-            <button
-              className="btn ghost"
-              style={{ width: "100%", marginTop: 8 }}
-              onClick={clearProgress}
-            >
-              Zerar progresso deste navegador
-            </button>
+            <Link className="btn ghost" style={{ width: "100%", marginTop: 8 }} href="/aluno/progresso">
+              Ver meu progresso
+            </Link>
           </div>
         </div>
       </div>

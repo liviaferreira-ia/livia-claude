@@ -143,7 +143,7 @@ function LoginInner() {
         </button>
 
         <p className="muted" style={{ fontSize: 13, marginTop: 16, textAlign: "center" }}>
-          Ainda não tem conta? Fale com a Central School pra receber seu acesso.
+          Ainda não tem conta? <Link href="/experimente">Experimente grátis por 7 dias</Link>.
         </p>
 
         <p className="est-note" style={{ marginTop: 12, textAlign: "center" }}>

@@ -29,7 +29,60 @@ export type AsaasPayment = {
   invoiceUrl?: string | null;
   bankSlipUrl?: string | null;
   description?: string | null;
+  externalReference?: string | null;
 };
+
+export type AsaasCheckout = {
+  id: string;
+  link?: string | null;
+  status: string;
+  externalReference?: string | null;
+};
+
+type CreateCheckoutInput = {
+  externalReference: string;
+  itemName: string;
+  itemDescription: string;
+  value: number;
+  successUrl: string;
+  cancelUrl: string;
+  expiredUrl: string;
+};
+
+/** Cria uma página hospedada do Asaas para uma assinatura mensal. */
+export async function createRecurringCheckout(input: CreateCheckoutInput): Promise<AsaasCheckout> {
+  const res = await fetch(`${BASE_URL}/checkouts`, {
+    method: "POST",
+    headers: { access_token: apiKey(), "Content-Type": "application/json", accept: "application/json" },
+    body: JSON.stringify({
+      billingTypes: ["CREDIT_CARD", "PIX"],
+      chargeTypes: ["RECURRENT"],
+      minutesToExpire: 1440,
+      externalReference: input.externalReference,
+      callback: {
+        successUrl: input.successUrl,
+        cancelUrl: input.cancelUrl,
+        expiredUrl: input.expiredUrl,
+      },
+      items: [{
+        externalReference: "central-school-plataforma",
+        name: input.itemName,
+        description: input.itemDescription,
+        quantity: 1,
+        value: input.value,
+      }],
+      subscription: { cycle: "MONTHLY", nextDueDate: new Date().toISOString().slice(0, 10) },
+    }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok || typeof body?.id !== "string") {
+    const description = Array.isArray(body?.errors) && typeof body.errors[0]?.description === "string"
+      ? body.errors[0].description
+      : `HTTP ${res.status}`;
+    throw new Error(`Asaas: não consegui criar o checkout (${description}).`);
+  }
+  return body as AsaasCheckout;
+}
 
 /** Busca os dados do cliente no Asaas (nome, e-mail) a partir do id recebido no webhook. */
 export async function getAsaasCustomer(customerId: string): Promise<AsaasCustomer> {

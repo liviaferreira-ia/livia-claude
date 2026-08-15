@@ -53,7 +53,17 @@ export async function GET(request: Request) {
     expiredBlocked = blockedExpired?.length ?? 0;
   }
 
+  const { data: expiredTrials, error: trialsError } = await admin
+    .from("student_trials")
+    .update({ status: "expired", updated_at: new Date().toISOString() })
+    .eq("status", "active")
+    .lt("ends_at", new Date().toISOString())
+    .select("student_id");
+  if (trialsError && trialsError.code !== "42P01") {
+    await recordIncident({ source: "cron", area: "cron/trials", action: "expire_trials", message: trialsError.message, severity: "warning" });
+  }
+
   const { data: cleanup, error: cleanupError } = await admin.rpc("cleanup_operational_logs");
   if (cleanupError) await recordIncident({ source: "cron", area: "cron/manutencao", action: "cleanup_logs", message: cleanupError.message, severity: "warning" });
-  return NextResponse.json({ blocked: data?.length ?? 0, expiredBlocked, cleanup: cleanup ?? null });
+  return NextResponse.json({ blocked: data?.length ?? 0, expiredBlocked, trialsExpired: expiredTrials?.length ?? 0, cleanup: cleanup ?? null });
 }

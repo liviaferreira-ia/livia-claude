@@ -10,10 +10,11 @@ const MAX_MESSAGE_LENGTH = 600;
 
 /** Limite simples por processo: no máximo 30 mensagens por aluno por hora. Suficiente pro piloto atual. */
 const RATE_LIMIT = 30;
+const TRIAL_RATE_LIMIT = 10;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 const usage = new Map<string, { count: number; windowStart: number }>();
 
-function rateLimited(userId: string): boolean {
+function rateLimited(userId: string, limit: number): boolean {
   const now = Date.now();
   const entry = usage.get(userId);
   if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
@@ -21,7 +22,7 @@ function rateLimited(userId: string): boolean {
     return false;
   }
   entry.count += 1;
-  return entry.count > RATE_LIMIT;
+  return entry.count > limit;
 }
 
 export async function POST(request: Request) {
@@ -29,7 +30,18 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 });
 
-  if (rateLimited(user.id)) {
+  const { data: trial } = await supabase
+    .from("student_trials")
+    .select("status,ends_at")
+    .eq("student_id", user.id)
+    .maybeSingle();
+  const trialEnded = trial?.ends_at ? new Date(trial.ends_at).getTime() <= Date.now() : false;
+  if (trial && trial.status !== "converted" && (trialEnded || trial.status === "expired" || trial.status === "cancelled")) {
+    return NextResponse.json({ error: "Seu período gratuito terminou. Escolha um plano para continuar." }, { status: 403 });
+  }
+
+  const rateLimit = trial && trial.status !== "converted" ? TRIAL_RATE_LIMIT : RATE_LIMIT;
+  if (rateLimited(user.id, rateLimit)) {
     return NextResponse.json({ error: "Muitas mensagens em pouco tempo. Tente de novo daqui a pouco." }, { status: 429 });
   }
 

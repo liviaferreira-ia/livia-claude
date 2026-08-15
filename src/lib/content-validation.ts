@@ -23,3 +23,13 @@ export async function updateContentValidation(level: CefrLevel, validated: boole
   const body = await response.json().catch(() => ({}));
   return response.ok ? null : body.error || "Não consegui salvar a validação.";
 }
+
+export async function markContentValidated(level: CefrLevel) {
+  const response = await fetch("/api/professor/validacao-conteudo", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ level, validated: true }),
+  });
+  const body = await response.json().catch(() => ({}));
+  return response.ok ? null : body.error || "Não consegui validar este nível.";
+}

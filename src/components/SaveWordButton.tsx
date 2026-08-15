@@ -29,7 +29,7 @@ export function SaveWordButton({
       title="Salvar em Minhas palavras"
       style={saved ? { borderColor: "var(--good)", color: "var(--good)" } : undefined}
       onClick={() => {
-        saveWord({ en, pt, example, source });
+        void saveWord({ en, pt, example, source });
         setSaved(true);
       }}
     >

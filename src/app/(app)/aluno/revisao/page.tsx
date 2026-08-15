@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SpeakButton } from "@/components/SpeakButton";
 import { SaveWordButton } from "@/components/SaveWordButton";
 import { FLASHCARDS, resolveFlashcardLevel } from "@/data/pratica";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
+import { listMyReviewTargets, type ReviewTarget } from "@/lib/activity";
 
 export default function RevisaoPage() {
   const { profile, ready } = useProfile();
@@ -15,9 +16,15 @@ export default function RevisaoPage() {
   const [revealed, setRevealed] = useState(false);
   const [known, setKnown] = useState(0);
   const [done, setDone] = useState(false);
+  const [targets, setTargets] = useState<ReviewTarget[]>([]);
 
   const cardLevel = resolveFlashcardLevel(parseCefrLevel(profile.level) ?? "A2");
   const CARDS = FLASHCARDS[cardLevel];
+
+  useEffect(() => {
+    if (!ready) return;
+    void listMyReviewTargets().then(setTargets);
+  }, [ready]);
 
   function grade(ok: boolean) {
     if (ok) setKnown((k) => k + 1);
@@ -53,6 +60,16 @@ export default function RevisaoPage() {
         <p className="muted" style={{ margin: "0 0 20px" }}>
           A revisão na hora certa fixa o que você aprendeu na memória.
         </p>
+        {targets.length > 0 && (() => {
+          const first = targets[0];
+          const ids = targets.filter((item) => item.level === first.level && item.kind === first.kind).map((item) => item.exerciseId).join(",");
+          return <div className="hero" style={{ marginBottom: 18 }}>
+            <div className="eyebrow">Revisão personalizada</div>
+            <h3>{targets.length} {targets.length === 1 ? "questão precisa" : "questões precisam"} de uma nova tentativa</h3>
+            <p>Selecionamos os erros mais recentes. Quando você acertar, eles saem automaticamente desta fila.</p>
+            <Link className="btn light" href={`/aluno/praticar?tipo=${first.kind}&nivel=${first.level}&erros=${ids}`}>Corrigir meus erros →</Link>
+          </div>;
+        })()}
         <div className="card" style={{ padding: 8 }}>
           {CARDS.map((c, i) => (
             <div className="m-item" key={i} style={{ cursor: "default" }}>

@@ -21,14 +21,13 @@ export default function MinhasPalavrasPage() {
   useEffect(() => {
     // Em callback, não no corpo do efeito — evita renderização em cascata.
     Promise.resolve().then(() => {
-      setWords(listWords());
-      setLoaded(true);
+      void listWords().then((data) => { setWords(data); setLoaded(true); });
     });
   }, []);
 
-  function handleRemove(en: string) {
-    removeWord(en);
-    setWords(listWords());
+  async function handleRemove(en: string) {
+    await removeWord(en);
+    setWords(await listWords());
   }
 
   function startQuiz() {
@@ -193,7 +192,7 @@ export default function MinhasPalavrasPage() {
                 type="button"
                 className="pill-btn"
                 title="Remover da lista"
-                onClick={() => handleRemove(w.en)}
+                onClick={() => void handleRemove(w.en)}
               >
                 Remover
               </button>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { LESSONS, lessonSteps } from "@/data/lesson";
+import { createClient } from "@/lib/supabase/client";
 
 const KEY = "central_lesson_sections_v1";
 
@@ -18,13 +19,31 @@ export function useLessonProgress() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(KEY);
-      setDone(raw ? (JSON.parse(raw) as Done) : {});
-    } catch {
-      setDone({});
-    }
-    setReady(true);
+    const timer = window.setTimeout(async () => {
+      let local: Done = {};
+      try {
+        const raw = window.localStorage.getItem(KEY);
+        local = raw ? (JSON.parse(raw) as Done) : {};
+      } catch {}
+      const supabase = createClient();
+      const { data } = await supabase.from("student_lesson_progress").select("lesson_slug,section_id");
+      const server: Done = {};
+      for (const row of data ?? []) server[keyFor(row.lesson_slug, row.section_id)] = true;
+      const merged = { ...local, ...server };
+      setDone(merged);
+      setReady(true);
+      // Importação silenciosa das etapas antigas que existiam apenas neste navegador.
+      for (const key of Object.keys(local).filter((item) => local[item] && !server[item])) {
+        const separator = key.lastIndexOf(":");
+        const slug = key.slice(0, separator);
+        const section = key.slice(separator + 1);
+        if (slug && section) {
+          const title = LESSONS[slug]?.title ?? "Lição";
+          void supabase.rpc("mark_lesson_section", { p_slug: slug, p_section: section, p_title: title });
+        }
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const isDone = useCallback(
@@ -58,4 +77,10 @@ export function markSectionDone(slug: string, sectionId: string) {
     done[keyFor(slug, sectionId)] = true;
     window.localStorage.setItem(KEY, JSON.stringify(done));
   } catch {}
+  const supabase = createClient();
+  void supabase.rpc("mark_lesson_section", {
+    p_slug: slug,
+    p_section: sectionId,
+    p_title: LESSONS[slug]?.title ?? "Lição",
+  });
 }

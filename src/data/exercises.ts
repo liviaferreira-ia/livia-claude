@@ -4,6 +4,7 @@
 // que cai pro nível populado mais próximo enquanto o resto é construído.
 
 import { nearestLevelWithContent, type CefrLevel } from "@/data/placement";
+import { EXPANSION_EXERCISES } from "@/data/exercise-expansion";
 
 export type Kind = "mc" | "fill" | "translate" | "order";
 
@@ -911,12 +912,12 @@ const ORDER_C2: Order[] = [
 ];
 
 export const EXERCISES: Record<CefrLevel, LevelBank> = {
-  A1: { mc: MC_A1, fill: FILL_A1, translate: TRANSLATE_A1, order: ORDER_A1 },
-  A2: { mc: MC_A2, fill: FILL_A2, translate: TRANSLATE_A2, order: ORDER_A2 },
-  B1: { mc: MC_B1, fill: FILL_B1, translate: TRANSLATE_B1, order: ORDER_B1 },
-  B2: { mc: MC_B2, fill: FILL_B2, translate: TRANSLATE_B2, order: ORDER_B2 },
-  C1: { mc: MC_C1, fill: FILL_C1, translate: TRANSLATE_C1, order: ORDER_C1 },
-  C2: { mc: MC_C2, fill: FILL_C2, translate: TRANSLATE_C2, order: ORDER_C2 },
+  A1: { mc: [...MC_A1, ...EXPANSION_EXERCISES.A1.mc], fill: [...FILL_A1, ...EXPANSION_EXERCISES.A1.fill], translate: [...TRANSLATE_A1, ...EXPANSION_EXERCISES.A1.translate], order: [...ORDER_A1, ...EXPANSION_EXERCISES.A1.order] },
+  A2: { mc: [...MC_A2, ...EXPANSION_EXERCISES.A2.mc], fill: [...FILL_A2, ...EXPANSION_EXERCISES.A2.fill], translate: [...TRANSLATE_A2, ...EXPANSION_EXERCISES.A2.translate], order: [...ORDER_A2, ...EXPANSION_EXERCISES.A2.order] },
+  B1: { mc: [...MC_B1, ...EXPANSION_EXERCISES.B1.mc], fill: [...FILL_B1, ...EXPANSION_EXERCISES.B1.fill], translate: [...TRANSLATE_B1, ...EXPANSION_EXERCISES.B1.translate], order: [...ORDER_B1, ...EXPANSION_EXERCISES.B1.order] },
+  B2: { mc: [...MC_B2, ...EXPANSION_EXERCISES.B2.mc], fill: [...FILL_B2, ...EXPANSION_EXERCISES.B2.fill], translate: [...TRANSLATE_B2, ...EXPANSION_EXERCISES.B2.translate], order: [...ORDER_B2, ...EXPANSION_EXERCISES.B2.order] },
+  C1: { mc: [...MC_C1, ...EXPANSION_EXERCISES.C1.mc], fill: [...FILL_C1, ...EXPANSION_EXERCISES.C1.fill], translate: [...TRANSLATE_C1, ...EXPANSION_EXERCISES.C1.translate], order: [...ORDER_C1, ...EXPANSION_EXERCISES.C1.order] },
+  C2: { mc: [...MC_C2, ...EXPANSION_EXERCISES.C2.mc], fill: [...FILL_C2, ...EXPANSION_EXERCISES.C2.fill], translate: [...TRANSLATE_C2, ...EXPANSION_EXERCISES.C2.translate], order: [...ORDER_C2, ...EXPANSION_EXERCISES.C2.order] },
 };
 
 export const CATEGORY_META: Record<Kind, { title: string; desc: string }> = {

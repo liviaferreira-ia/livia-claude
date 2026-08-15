@@ -81,6 +81,7 @@ const studentNav: { section: string; items: NavItem[] }[] = [
   {
     section: "Progresso",
     items: [
+      { href: "/aluno/progresso", label: "Meu progresso", icon: I.path },
       { href: "/aluno/revisao", label: "Revisão", icon: I.review },
       { href: "/aluno/palavras", label: "Minhas palavras", icon: I.star },
     ],
@@ -113,6 +114,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/roleplay": "Roleplay por voz",
   "/aluno/pronuncia": "Pronúncia",
   "/aluno/revisao": "Revisão",
+  "/aluno/progresso": "Meu progresso",
   "/aluno/palavras": "Minhas palavras",
   "/aluno/conta": "Minha conta",
   "/professor/alunos": "Alunos",

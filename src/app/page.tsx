@@ -136,7 +136,7 @@ const faq = [
   },
   {
     q: "Como eu começo?",
-    a: "É só falar com a gente no WhatsApp. Tiramos suas dúvidas e te ajudamos a começar hoje mesmo.",
+    a: "Você pode experimentar a plataforma grátis por 7 dias, sem cartão. O período começa no primeiro acesso e não há cobrança automática ao final.",
   },
 ];
 
@@ -165,6 +165,9 @@ export default function LandingPage() {
           <Link href="/login" className="btn ghost" style={{ padding: "10px 16px" }}>
             Área do aluno
           </Link>
+          <Link href="/experimente" className="btn primary" style={{ padding: "10px 16px" }}>
+            Teste grátis
+          </Link>
           <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-wa">
             {WaIcon}
             WhatsApp
@@ -186,13 +189,13 @@ export default function LandingPage() {
               professores. English as a lifestyle.
             </p>
             <div className="lp-cta-row">
+              <Link href="/experimente" className="btn primary" style={{ padding: "14px 22px", fontSize: 16 }}>
+                Experimentar 7 dias grátis →
+              </Link>
               <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-wa" style={{ padding: "14px 22px", fontSize: 16 }}>
                 {WaIcon}
                 Falar no WhatsApp
               </a>
-              <Link href="/login" className="btn primary" style={{ padding: "14px 22px", fontSize: 16 }}>
-                Área do aluno →
-              </Link>
             </div>
           </div>
           <div>

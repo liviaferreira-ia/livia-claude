@@ -1,6 +1,7 @@
 "use client";
 
 import type { Kind } from "@/data/exercises";
+import type { CefrLevel } from "@/data/placement";
 import { createClient } from "@/lib/supabase/client";
 
 /** Registra um login/carregamento de sessão do usuário logado. */
@@ -19,6 +20,90 @@ export async function addTimeSeconds(seconds: number): Promise<void> {
 export async function bumpPracticeServer(kind: Kind, correct: boolean): Promise<void> {
   const supabase = createClient();
   await supabase.rpc("bump_practice", { p_kind: kind, p_correct: correct });
+}
+
+export type LearningSnapshot = {
+  practice: Record<Kind, { done: number; correct: number }>;
+  dailyDone: number;
+  streak: number;
+  bestStreak: number;
+  lessonsCompleted: number;
+  lastPath: string;
+  lastTitle: string;
+  lastActivityType: string;
+};
+
+/** Lê do servidor o estado que deve acompanhar o aluno em qualquer aparelho. */
+export async function getMyLearningSnapshot(): Promise<LearningSnapshot | null> {
+  const supabase = createClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return null;
+  const [{ data: activity }, { data: sections }] = await Promise.all([
+    supabase.from("student_activity").select("practice_mc_done,practice_mc_correct,practice_fill_done,practice_fill_correct,practice_translate_done,practice_translate_correct,practice_order_done,practice_order_correct,daily_activity_date,daily_exercise_done,streak_count,best_streak,last_path,last_title,last_activity_type").eq("user_id", auth.user.id).maybeSingle(),
+    supabase.from("student_lesson_progress").select("lesson_slug,section_id").eq("student_id", auth.user.id),
+  ]);
+  if (!activity) return null;
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+  const byLesson = new Map<string, Set<string>>();
+  for (const row of sections ?? []) {
+    const set = byLesson.get(row.lesson_slug) ?? new Set<string>();
+    set.add(row.section_id);
+    byLesson.set(row.lesson_slug, set);
+  }
+  return {
+    practice: {
+      mc: { done: activity.practice_mc_done, correct: activity.practice_mc_correct },
+      fill: { done: activity.practice_fill_done, correct: activity.practice_fill_correct },
+      translate: { done: activity.practice_translate_done, correct: activity.practice_translate_correct },
+      order: { done: activity.practice_order_done, correct: activity.practice_order_correct },
+    },
+    dailyDone: activity.daily_activity_date === today ? activity.daily_exercise_done : 0,
+    streak: activity.streak_count,
+    bestStreak: activity.best_streak,
+    lessonsCompleted: byLesson.size,
+    lastPath: activity.last_path ?? "",
+    lastTitle: activity.last_title ?? "",
+    lastActivityType: activity.last_activity_type ?? "",
+  };
+}
+
+export async function recordExerciseAttempt(input: {
+  exerciseId: string; level: CefrLevel; kind: Kind; correct: boolean; path?: string; title?: string;
+}): Promise<void> {
+  const supabase = createClient();
+  await supabase.rpc("record_exercise_attempt", {
+    p_exercise_id: input.exerciseId,
+    p_level: input.level,
+    p_kind: input.kind,
+    p_correct: input.correct,
+    p_path: input.path ?? "/aluno/praticar",
+    p_title: input.title ?? "Prática",
+  });
+}
+
+export async function recordLearningPosition(path: string, title: string, activityType: string): Promise<void> {
+  const supabase = createClient();
+  await supabase.rpc("record_learning_position", { p_path: path, p_title: title, p_activity_type: activityType });
+}
+
+export type ReviewTarget = { exerciseId: string; level: CefrLevel; kind: Kind };
+
+/** Última resposta de cada questão: só retorna as que continuam erradas. */
+export async function listMyReviewTargets(): Promise<ReviewTarget[]> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("student_exercise_attempts")
+    .select("exercise_id,level,kind,correct,answered_at")
+    .order("answered_at", { ascending: false })
+    .limit(400);
+  const seen = new Set<string>();
+  const due: ReviewTarget[] = [];
+  for (const row of data ?? []) {
+    if (seen.has(row.exercise_id)) continue;
+    seen.add(row.exercise_id);
+    if (!row.correct) due.push({ exerciseId: row.exercise_id, level: row.level as CefrLevel, kind: row.kind as Kind });
+  }
+  return due;
 }
 
 /** Salva WhatsApp e data de nascimento do aluno logado. */

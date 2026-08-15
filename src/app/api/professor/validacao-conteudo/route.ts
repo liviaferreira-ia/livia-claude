@@ -39,18 +39,32 @@ export async function PATCH(request: Request) {
   const body = await request.json().catch(() => null);
   const level = typeof body?.level === "string" && (LEVEL_ORDER as string[]).includes(body.level) ? body.level as CefrLevel : null;
   const validated = typeof body?.validated === "boolean" ? body.validated : null;
-  const note = typeof body?.note === "string" ? body.note.trim().slice(0, 2000) : "";
+  const hasNote = typeof body?.note === "string";
+  const note = hasNote ? body.note.trim().slice(0, 2000) : null;
   if (!level || validated === null) return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
 
   const admin = createAdminClient();
-  const { error } = await admin.from("content_validations").update({
+  const changes: {
+    validated: boolean;
+    validated_by: string | null;
+    validated_at: string | null;
+    updated_at: string;
+    note?: string | null;
+  } = {
     validated,
     validated_by: validated ? session.user!.id : null,
     validated_at: validated ? new Date().toISOString() : null,
-    note: note || null,
     updated_at: new Date().toISOString(),
-  }).eq("level", level);
+  };
+  if (hasNote) changes.note = note || null;
+
+  const { data, error } = await admin.from("content_validations")
+    .update(changes)
+    .eq("level", level)
+    .select("level, validated, validated_at, note, updated_at")
+    .maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data) return NextResponse.json({ error: "Nível não encontrado." }, { status: 404 });
   await recordAudit(session.user!.id, null, "content_validation_changed", { level, validated });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, validation: data });
 }

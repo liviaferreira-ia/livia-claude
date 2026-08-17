@@ -7,6 +7,7 @@ import { Crest } from "./Crest";
 import { ThemeToggle } from "./ThemeToggle";
 import { initials, useProfile } from "@/lib/profile";
 import { OperationalMonitor } from "@/components/OperationalMonitor";
+import { useIdleLogout } from "@/hooks/useIdleLogout";
 
 type NavItem = {
   href: string;
@@ -127,8 +128,20 @@ const CRUMBS: Record<string, string> = {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { profile, signOut } = useProfile();
+  const { profile, user, ready, signOut } = useProfile();
   const isTeacher = pathname.startsWith("/professor");
+
+  useIdleLogout({
+    enabled: ready && Boolean(user),
+    userId: user?.id,
+    onIdle: async () => {
+      try {
+        await signOut("local");
+      } finally {
+        window.location.replace("/login?reason=inatividade");
+      }
+    },
+  });
 
   async function handleSignOut() {
     await signOut();

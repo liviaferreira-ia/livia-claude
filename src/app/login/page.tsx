@@ -6,11 +6,13 @@ import { Suspense, useState } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { createClient } from "@/lib/supabase/client";
+import { markSessionActivity } from "@/lib/sessionActivity";
 
 function LoginInner() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") || "/aluno";
+  const reason = params.get("reason");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,12 +34,13 @@ function LoginInner() {
     setLoading(true);
     const supabase = createClient();
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       setError(friendlyError(error.message));
       return;
     }
+    if (data.user) markSessionActivity(data.user.id);
     router.push(next);
     router.refresh();
   }
@@ -120,6 +123,12 @@ function LoginInner() {
             </div>
           </div>}
 
+          {reason === "inatividade" && (
+            <p className="auth-msg ok">Sua sessão foi encerrada após 15 minutos sem atividade. Entre novamente para continuar.</p>
+          )}
+          {reason === "sessao_expirada" && (
+            <p className="auth-msg err">Sua sessão expirou ou perdeu a conexão. Entre novamente para continuar.</p>
+          )}
           {error && <p className="auth-msg err">{error}</p>}
           {resetSent && <p className="auth-msg ok">Se este e-mail estiver cadastrado, você receberá um link para criar uma nova senha. Verifique também a caixa de spam.</p>}
 

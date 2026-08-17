@@ -8,6 +8,7 @@ import { addTimeSeconds, getMyLearningSnapshot, recordExerciseAttempt, touchLogi
 import { bumpDaily, readDaily, readStreak, touchStreak } from "@/lib/daily";
 import { countCompletedLessons } from "@/lib/lessonProgress";
 import { createClient } from "@/lib/supabase/client";
+import { clearSessionActivity } from "@/lib/sessionActivity";
 
 const CEFR_RE = /^[ABC][12]$/;
 
@@ -286,11 +287,13 @@ export function useProfile() {
     [user],
   );
 
-  const signOut = useCallback(async () => {
+  const signOut = useCallback(async (scope: "global" | "local" = "global") => {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    if (user) clearSessionActivity(user.id);
+    const result = await supabase.auth.signOut({ scope });
     setUser(null);
-  }, []);
+    return result;
+  }, [user]);
 
   return {
     profile,

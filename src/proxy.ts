@@ -7,7 +7,18 @@ const PROTECTED = ["/aluno", "/professor", "/bem-vindo", "/onboarding", "/pagame
 // Áreas do aluno onde checamos bloqueio por atraso (a do professor não é afetada).
 const STUDENT_AREA = ["/aluno", "/bem-vindo", "/onboarding"];
 
-export async function middleware(request: NextRequest) {
+/** Mantém cookies e cabeçalhos de segurança gerados durante a renovação. */
+function redirectWithSession(url: URL, response: NextResponse) {
+  const redirect = NextResponse.redirect(url);
+  response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+  for (const header of ["cache-control", "expires", "pragma"]) {
+    const value = response.headers.get(header);
+    if (value) redirect.headers.set(header, value);
+  }
+  return redirect;
+}
+
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -15,28 +26,38 @@ export async function middleware(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options),
         );
+        Object.entries(headers).forEach(([name, value]) => response.headers.set(name, value));
       },
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const path = request.nextUrl.pathname;
   const isProtected = PROTECTED.some((p) => path === p || path.startsWith(p + "/"));
+
+  let user: { id: string } | null = null;
+  let invalidSession = false;
+  try {
+    const { data, error } = await supabase.auth.getClaims();
+    const subject = data?.claims?.sub;
+    if (!error && typeof subject === "string") user = { id: subject };
+    invalidSession = Boolean(error);
+  } catch {
+    // Sessão corrompida ou Auth temporariamente indisponível não deve virar 500.
+    invalidSession = true;
+  }
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", path);
-    return NextResponse.redirect(url);
+    if (invalidSession) url.searchParams.set("reason", "sessao_expirada");
+    return redirectWithSession(url, response);
   }
 
   const isStudentArea = STUDENT_AREA.some((p) => path === p || path.startsWith(p + "/"));
@@ -52,7 +73,7 @@ export async function middleware(request: NextRequest) {
     if (trial && trial.status !== "converted" && (trialEnded || trial.status === "expired" || trial.status === "cancelled")) {
       const url = request.nextUrl.clone();
       url.pathname = "/continuar";
-      return NextResponse.redirect(url);
+      return redirectWithSession(url, response);
     }
 
     const { data: activity } = await supabase
@@ -63,7 +84,7 @@ export async function middleware(request: NextRequest) {
     if (activity?.blocked) {
       const url = request.nextUrl.clone();
       url.pathname = "/pagamento-pendente";
-      return NextResponse.redirect(url);
+      return redirectWithSession(url, response);
     }
   }
 

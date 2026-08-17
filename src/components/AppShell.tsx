@@ -59,6 +59,9 @@ const I = {
   pulse: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6" /></svg>
   ),
+  game: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="10" rx="5" /><path d="M7 10v4M5 12h4" /><circle cx="15" cy="10.5" r="1" /><circle cx="17.5" cy="13" r="1" /></svg>
+  ),
 };
 
 const studentNav: { section: string; items: NavItem[] }[] = [
@@ -68,6 +71,7 @@ const studentNav: { section: string; items: NavItem[] }[] = [
       { href: "/aluno", label: "Início", icon: I.home },
       { href: "/aluno/curso", label: "Meu curso", icon: I.path },
       { href: "/aluno/praticar", label: "Praticar", icon: I.target },
+      { href: "/aluno/jogos", label: "Central Games", icon: I.game },
       { href: "/aluno/licao", label: "Minha lição", icon: I.book },
     ],
   },
@@ -110,6 +114,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno": "Início",
   "/aluno/curso": "Meu curso",
   "/aluno/praticar": "Praticar",
+  "/aluno/jogos": "Central Games",
   "/aluno/licao": "Minha lição",
   "/aluno/tutor": "Prática de conversa",
   "/aluno/roleplay": "Roleplay por voz",

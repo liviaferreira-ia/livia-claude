@@ -45,6 +45,8 @@ export default function ProfessorAlunosPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteMsg, setInviteMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     if (!ready || !isTeacher) return;
@@ -80,6 +82,8 @@ export default function ProfessorAlunosPage() {
     e.preventDefault();
     setInviting(true);
     setInviteMsg(null);
+    setInviteLink(null);
+    setLinkCopied(false);
     try {
       const res = await fetch("/api/professor/convidar-aluno", {
         method: "POST",
@@ -92,12 +96,28 @@ export default function ProfessorAlunosPage() {
         return;
       }
       setInviteMsg({ kind: "ok", text: `Convite enviado para ${inviteEmail.trim()}.` });
+      // O e-mail do convite às vezes cai em spam — por isso sempre guardamos
+      // o link também, pra dar pro professor copiar e mandar na mão (WhatsApp
+      // etc.) sem depender do e-mail chegar.
+      if (body.inviteLink) setInviteLink(body.inviteLink as string);
       setInviteName("");
       setInviteEmail("");
     } catch {
       setInviteMsg({ kind: "err", text: "Falha de conexão. Tente de novo." });
     } finally {
       setInviting(false);
+    }
+  }
+
+  async function handleCopyInviteLink() {
+    if (!inviteLink) return;
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2500);
+    } catch {
+      // Clipboard pode falhar em contexto não-seguro/permissão negada — o
+      // link continua selecionável na tela, só não copia sozinho.
     }
   }
 
@@ -183,6 +203,34 @@ export default function ProfessorAlunosPage() {
             />
           </div>
           {inviteMsg && <p className={`auth-msg ${inviteMsg.kind === "ok" ? "ok" : "err"}`}>{inviteMsg.text}</p>}
+          {inviteLink && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                padding: "12px 14px",
+                borderRadius: 8,
+                border: "1px solid var(--line)",
+                background: "var(--panel-2)",
+              }}
+            >
+              <p className="est-note" style={{ margin: 0 }}>
+                Se o e-mail não chegar (spam é comum), copie este link e mande direto pro aluno por WhatsApp ou outro canal:
+              </p>
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <input
+                  readOnly
+                  value={inviteLink}
+                  onFocus={(e) => e.currentTarget.select()}
+                  style={{ flex: "1 1 260px", fontSize: 13, fontFamily: "monospace" }}
+                />
+                <button type="button" className="btn" onClick={handleCopyInviteLink}>
+                  {linkCopied ? "Copiado!" : "Copiar link"}
+                </button>
+              </div>
+            </div>
+          )}
           <button
             type="submit"
             className="btn primary"

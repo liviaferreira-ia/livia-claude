@@ -147,7 +147,7 @@ function metaString(user: User | null, key: string): string {
  * Lê a identidade da conta Supabase e as estatísticas do navegador.
  * `ready` fica true depois que a sessão foi verificada, evitando "piscar".
  */
-export type Role = "student" | "teacher";
+export type Role = "student" | "teacher" | "admin";
 
 export function useProfile() {
   const [user, setUser] = useState<User | null>(null);
@@ -300,7 +300,10 @@ export function useProfile() {
     user,
     email,
     role,
-    isTeacher: role === "teacher",
+    // Administradores compartilham o acesso ao painel da escola. Mantemos o
+    // nome `isTeacher` por compatibilidade com as telas existentes.
+    isTeacher: role === "teacher" || role === "admin",
+    isAdmin: role === "admin",
     ready,
     updateIdentity,
     uploadAvatar,

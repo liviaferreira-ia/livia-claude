@@ -44,6 +44,11 @@ export type StudentEvent = {
 
 export type StudentDetail = {
   email: string;
+  auth: {
+    emailConfirmedAt: string | null;
+    invitedAt: string | null;
+    lastSignInAt: string | null;
+  };
   activity: StudentActivity;
   settings: StudentSettings | null;
   notes: TeacherNote[];

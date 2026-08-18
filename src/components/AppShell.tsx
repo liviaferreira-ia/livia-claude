@@ -133,8 +133,8 @@ const CRUMBS: Record<string, string> = {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { profile, user, ready, signOut } = useProfile();
-  const isTeacher = pathname.startsWith("/professor");
+  const { profile, user, role, isTeacher: hasTeacherAccess, ready, signOut } = useProfile();
+  const isTeacherArea = pathname.startsWith("/professor");
 
   useIdleLogout({
     enabled: ready && Boolean(user),
@@ -153,7 +153,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     router.push("/login");
     router.refresh();
   }
-  const nav = isTeacher ? teacherNav : studentNav;
+  const nav = isTeacherArea && hasTeacherAccess ? teacherNav : studentNav;
   const crumb = pathname.startsWith("/professor/alunos/") ? "Detalhes do aluno" : CRUMBS[pathname] ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -162,6 +162,15 @@ export function AppShell({ children }: { children: ReactNode }) {
     const timer = window.setTimeout(() => setMenuOpen(false), 0);
     return () => window.clearTimeout(timer);
   }, [pathname]);
+
+  // Evita que uma conta de aluno permaneça em uma URL da área da escola.
+  // O middleware também aplica essa regra no servidor; este redirecionamento
+  // cobre navegações client-side e mudanças de sessão.
+  useEffect(() => {
+    if (ready && isTeacherArea && !hasTeacherAccess) {
+      router.replace("/aluno");
+    }
+  }, [hasTeacherAccess, isTeacherArea, ready, router]);
 
   return (
     <div className="app-shell">
@@ -202,7 +211,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         ))}
 
         <div className="side-foot">
-          {!isTeacher && (
+          {!isTeacherArea && (
             <Link
               href="/bem-vindo"
               className="nav"
@@ -213,14 +222,16 @@ export function AppShell({ children }: { children: ReactNode }) {
               Como funciona
             </Link>
           )}
-          <Link
-            href={isTeacher ? "/aluno" : "/professor"}
-            className="btn ghost"
-            style={{ width: "100%" }}
-            onClick={() => setMenuOpen(false)}
-          >
-            {isTeacher ? "Ver como aluno" : "Ver como professor"}
-          </Link>
+          {hasTeacherAccess && (
+            <Link
+              href={isTeacherArea ? "/aluno" : "/professor"}
+              className="btn ghost"
+              style={{ width: "100%" }}
+              onClick={() => setMenuOpen(false)}
+            >
+              {isTeacherArea ? "Ver como aluno" : "Ver como professor"}
+            </Link>
+          )}
           <button
             className="btn ghost"
             style={{ width: "100%", marginTop: 6 }}
@@ -255,9 +266,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             <b>{crumb}</b>
           </div>
           <div className="top-right">
-            {isTeacher ? (
+            {isTeacherArea && hasTeacherAccess ? (
               <span className="chip">
-                {profile.name ? `Prof. ${profile.name.split(" ")[0]}` : "Professor(a)"}
+                {role === "admin"
+                  ? profile.name || "Administrador(a)"
+                  : profile.name
+                    ? `Prof. ${profile.name.split(" ")[0]}`
+                    : "Professor(a)"}
               </span>
             ) : (
               <>

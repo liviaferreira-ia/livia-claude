@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Crest } from "@/components/Crest";
 import { SceneArt } from "@/components/SceneArt";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PrivacyConsent, PrivacyPreferencesButton } from "@/components/PrivacyConsent";
 
 // Provisório (número da Livia, 2026-08-12) — trocar pro WhatsApp definitivo da Central School depois.
 const WHATSAPP = "5511933779408";
@@ -355,6 +356,8 @@ export default function LandingPage() {
           <a href="#metodo">Método</a>
           <a href="#planos">Planos</a>
           <Link href="/login">Área do aluno</Link>
+          <Link href="/privacidade">Política de Privacidade</Link>
+          <PrivacyPreferencesButton />
           <a href={waLink} target="_blank" rel="noopener noreferrer">
             WhatsApp
           </a>
@@ -366,6 +369,7 @@ export default function LandingPage() {
         </div>
         <div>© {new Date().getFullYear()} Central School · English as a Lifestyle</div>
       </footer>
+      <PrivacyConsent />
     </div>
   );
 }

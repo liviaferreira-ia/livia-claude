@@ -60,6 +60,21 @@ export async function proxy(request: NextRequest) {
     return redirectWithSession(url, response);
   }
 
+  const isTeacherArea = path === "/professor" || path.startsWith("/professor/");
+  if (isTeacherArea && user) {
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (!error && profile && profile.role !== "teacher" && profile.role !== "admin") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/aluno";
+      url.search = "";
+      return redirectWithSession(url, response);
+    }
+  }
+
   const isStudentArea = STUDENT_AREA.some((p) => path === p || path.startsWith(p + "/"));
   if (isStudentArea && user) {
     // O relógio do trial começa no primeiro acesso autenticado, nunca no cadastro.

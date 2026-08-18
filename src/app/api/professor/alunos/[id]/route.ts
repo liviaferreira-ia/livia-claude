@@ -47,6 +47,11 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 
   return NextResponse.json({
     email: authResult.data.user.email ?? "",
+    auth: {
+      emailConfirmedAt: authResult.data.user.email_confirmed_at ?? null,
+      invitedAt: authResult.data.user.invited_at ?? null,
+      lastSignInAt: authResult.data.user.last_sign_in_at ?? null,
+    },
     activity: activity.data,
     settings: settings.data,
     notes: notes.data ?? [],

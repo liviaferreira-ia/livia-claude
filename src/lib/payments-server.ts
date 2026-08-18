@@ -1,9 +1,11 @@
 import "server-only";
 
-import type { AsaasPayment } from "@/lib/asaas";
+import { getAsaasCustomer, type AsaasPayment } from "@/lib/asaas";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type Admin = ReturnType<typeof createAdminClient>;
+
+const PAID_EVENTS = new Set(["RECEIVED", "CONFIRMED", "RECEIVED_IN_CASH", "DUNNING_RECEIVED"]);
 
 function nullable(value: string | null | undefined): string | null {
   return value || null;
@@ -57,6 +59,35 @@ export async function linkCustomerPayments(admin: Admin, customerId: string, use
     .update({ user_id: userId, updated_at: new Date().toISOString() })
     .eq("asaas_customer_id", customerId);
   if (error) throw new Error(`Não foi possível vincular as cobranças: ${error.message}`);
+}
+
+/** Cria/atualiza uma pendência de conciliação sem abrir conta nem enviar convite. */
+export async function upsertPaymentCandidate(
+  admin: Admin,
+  customerId: string,
+): Promise<void> {
+  const { data: existing, error: existingError } = await admin
+    .from("payment_candidates")
+    .select("status")
+    .eq("asaas_customer_id", customerId)
+    .maybeSingle();
+  if (existingError) throw new Error(`Não foi possível consultar o pré-cadastro: ${existingError.message}`);
+  if (existing && existing.status !== "pending") return;
+
+  const customer = await getAsaasCustomer(customerId);
+  const { error } = await admin.from("payment_candidates").upsert({
+    asaas_customer_id: customerId,
+    payer_name: customer.name || "Cliente Asaas",
+    payer_email: customer.email?.trim().toLowerCase() || null,
+    payer_phone: customer.mobilePhone || null,
+    status: "pending",
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "asaas_customer_id" });
+  if (error) throw new Error(`Não foi possível criar o pré-cadastro: ${error.message}`);
+}
+
+export function isPaidPayment(payment: AsaasPayment): boolean {
+  return PAID_EVENTS.has(payment.status);
 }
 
 /**

@@ -95,21 +95,22 @@ export async function getAsaasCustomer(customerId: string): Promise<AsaasCustome
   return res.json();
 }
 
-/** Lista todas as cobranças de um cliente, percorrendo a paginação do Asaas. */
-export async function listAsaasPayments(customerId: string): Promise<AsaasPayment[]> {
+/** Lista cobranças do Asaas, opcionalmente filtradas por cliente, percorrendo a paginação. */
+export async function listAsaasPayments(customerId?: string): Promise<AsaasPayment[]> {
   const payments: AsaasPayment[] = [];
   const limit = 100;
   let offset = 0;
   let hasMore = true;
 
   while (hasMore) {
-    const params = new URLSearchParams({ customer: customerId, limit: String(limit), offset: String(offset) });
+    const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    if (customerId) params.set("customer", customerId);
     const res = await fetch(`${BASE_URL}/payments?${params}`, {
       headers: { access_token: apiKey() },
       cache: "no-store",
     });
     if (!res.ok) {
-      throw new Error(`Asaas: não consegui listar cobranças de ${customerId} (HTTP ${res.status})`);
+      throw new Error(`Asaas: não consegui listar cobranças${customerId ? ` de ${customerId}` : ""} (HTTP ${res.status})`);
     }
     const page = (await res.json()) as { data?: AsaasPayment[]; hasMore?: boolean };
     payments.push(...(page.data ?? []));

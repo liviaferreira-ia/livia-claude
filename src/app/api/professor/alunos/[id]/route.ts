@@ -5,6 +5,7 @@ import { SITE_URL } from "@/lib/site";
 import { recordAudit, recordIncident } from "@/lib/operational-server";
 
 const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function teacherSession() {
   const supabase = await createClient();
@@ -72,21 +73,35 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (!body) return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
 
   const name = typeof body.name === "string" ? body.name.trim().slice(0, 120) : "";
+  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const level = typeof body.level === "string" && LEVELS.has(body.level) ? body.level : "";
   const whatsapp = typeof body.whatsapp === "string" ? body.whatsapp.trim().slice(0, 30) : "";
   const birthdate = /^\d{4}-\d{2}-\d{2}$/.test(body.birthdate ?? "") ? body.birthdate : null;
   const focus = typeof body.focus === "string" ? body.focus.trim().slice(0, 500) : "";
   const weeklyGoal = Math.max(1, Math.min(7, Number(body.weekly_goal) || 3));
   const accessExpires = /^\d{4}-\d{2}-\d{2}$/.test(body.access_expires_on ?? "") ? body.access_expires_on : null;
-  if (!name || !level) return NextResponse.json({ error: "Informe nome e nível válidos." }, { status: 400 });
+  if (!name || !level || !EMAIL.test(email)) return NextResponse.json({ error: "Informe nome, e-mail e nível válidos." }, { status: 400 });
 
   const admin = createAdminClient();
   const { data: existing, error: userError } = await admin.auth.admin.getUserById(id);
   if (userError || !existing.user) return NextResponse.json({ error: "Aluno não encontrado." }, { status: 404 });
+  const currentEmail = existing.user.email?.toLowerCase() ?? "";
+  const emailChanged = email !== currentEmail;
+  if (emailChanged && existing.user.email_confirmed_at) {
+    return NextResponse.json({ error: "Por segurança, o e-mail de uma conta já ativada não pode ser alterado por esta tela." }, { status: 409 });
+  }
+  if (emailChanged) {
+    const { data: usersPage, error: usersError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    if (usersError) return NextResponse.json({ error: usersError.message }, { status: 500 });
+    if (usersPage.users.some((item) => item.id !== id && item.email?.toLowerCase() === email)) {
+      return NextResponse.json({ error: "Este e-mail já está vinculado a outra conta." }, { status: 409 });
+    }
+  }
   const metadata = { ...existing.user.user_metadata, name, level };
+  const authValues = emailChanged ? { user_metadata: metadata, email } : { user_metadata: metadata };
 
   const [authUpdate, activityUpdate, settingsUpdate] = await Promise.all([
-    admin.auth.admin.updateUserById(id, { user_metadata: metadata }),
+    admin.auth.admin.updateUserById(id, authValues),
     admin.from("student_activity").update({ student_name: name, level, whatsapp: whatsapp || null, birthdate, updated_at: new Date().toISOString() }).eq("user_id", id),
     admin.from("student_settings").upsert({ student_id: id, focus: focus || null, weekly_goal: weeklyGoal, access_expires_on: accessExpires, updated_at: new Date().toISOString() }, { onConflict: "student_id" }),
   ]);
@@ -95,8 +110,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     const trace = await recordIncident({ userId: id, source: "server", area: "professor/aluno", action: "update_student", message: error.message });
     return NextResponse.json({ error: `Não foi possível salvar. Código: ${trace}` }, { status: 500 });
   }
-  await recordAudit(session.user!.id, id, "student_updated", { fields: ["name", "level", "whatsapp", "birthdate", "focus", "weekly_goal", "access_expires_on"] });
-  return NextResponse.json({ ok: true });
+  await recordAudit(session.user!.id, id, "student_updated", { fields: ["name", "email", "level", "whatsapp", "birthdate", "focus", "weekly_goal", "access_expires_on"], email_changed: emailChanged });
+  return NextResponse.json({ ok: true, email_changed: emailChanged });
 }
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {

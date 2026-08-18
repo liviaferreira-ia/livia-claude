@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { listAsaasPayments } from "@/lib/asaas";
-import { refreshStudentPaymentStatus, upsertAsaasPayment } from "@/lib/payments-server";
+import { isPaidPayment, refreshStudentPaymentStatus, upsertAsaasPayment, upsertPaymentCandidate } from "@/lib/payments-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,16 +25,30 @@ export async function POST() {
     .not("asaas_customer_id", "is", null);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  let imported = 0;
-  for (const student of students ?? []) {
-    if (!student.asaas_customer_id) continue;
-    const payments = await listAsaasPayments(student.asaas_customer_id);
-    for (const payment of payments) {
-      await upsertAsaasPayment(admin, payment, "MANUAL_SYNC", student.user_id);
-      imported += 1;
-    }
-    await refreshStudentPaymentStatus(admin, student.user_id);
+  const linkedByCustomer = new Map((students ?? []).flatMap((student) =>
+    student.asaas_customer_id ? [[student.asaas_customer_id, student.user_id] as const] : [],
+  ));
+  const payments = await listAsaasPayments();
+  const unmatchedPaidCustomers = new Set<string>();
+  const touchedUsers = new Set<string>();
+
+  for (const payment of payments) {
+    const userId = linkedByCustomer.get(payment.customer);
+    await upsertAsaasPayment(admin, payment, "MANUAL_SYNC", userId);
+    if (userId) touchedUsers.add(userId);
+    else if (isPaidPayment(payment)) unmatchedPaidCustomers.add(payment.customer);
+  }
+  for (const customerId of unmatchedPaidCustomers) {
+    await upsertPaymentCandidate(admin, customerId);
+  }
+  for (const userId of touchedUsers) {
+    await refreshStudentPaymentStatus(admin, userId);
   }
 
-  return NextResponse.json({ ok: true, students: students?.length ?? 0, payments: imported });
+  return NextResponse.json({
+    ok: true,
+    students: touchedUsers.size,
+    payments: payments.length,
+    candidates: unmatchedPaidCustomers.size,
+  });
 }

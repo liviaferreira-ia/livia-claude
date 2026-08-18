@@ -385,6 +385,22 @@ h3 {
   opacity: 0.55;
   filter: none;
 }
+.finance-stat-card {
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+.finance-stat-card:hover,
+.finance-stat-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--navy);
+  background: var(--panel-2);
+  outline: none;
+}
 .btn.ghost {
   background: var(--panel-2);
   color: var(--ink);

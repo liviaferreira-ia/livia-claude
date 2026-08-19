@@ -78,12 +78,20 @@ export async function proxy(request: NextRequest) {
   const isStudentArea = STUDENT_AREA.some((p) => path === p || path.startsWith(p + "/"));
   if (isStudentArea && user) {
     // O relógio do trial começa no primeiro acesso autenticado, nunca no cadastro.
-    await supabase.rpc("activate_my_trial");
-    const { data: trial } = await supabase
-      .from("student_trials")
-      .select("status,ends_at")
-      .eq("student_id", user.id)
+    // A checagem de bloqueio por atraso não depende do trial, então roda em paralelo
+    // em vez de esperar a cadeia do trial terminar (reduz round-trips sequenciais
+    // ao Supabase nessa rota, que roda em toda navegação da área do aluno).
+    const trialPromise = supabase.rpc("activate_my_trial").then(() =>
+      supabase.from("student_trials").select("status,ends_at").eq("student_id", user.id).maybeSingle(),
+    );
+    const activityPromise = supabase
+      .from("student_activity")
+      .select("blocked")
+      .eq("user_id", user.id)
       .maybeSingle();
+
+    const [{ data: trial }, { data: activity }] = await Promise.all([trialPromise, activityPromise]);
+
     const trialEnded = trial?.ends_at ? new Date(trial.ends_at).getTime() <= Date.now() : false;
     if (trial && trial.status !== "converted" && (trialEnded || trial.status === "expired" || trial.status === "cancelled")) {
       const url = request.nextUrl.clone();
@@ -91,11 +99,6 @@ export async function proxy(request: NextRequest) {
       return redirectWithSession(url, response);
     }
 
-    const { data: activity } = await supabase
-      .from("student_activity")
-      .select("blocked")
-      .eq("user_id", user.id)
-      .maybeSingle();
     if (activity?.blocked) {
       const url = request.nextUrl.clone();
       url.pathname = "/pagamento-pendente";

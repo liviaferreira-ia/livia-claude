@@ -177,7 +177,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <OperationalMonitor />
       <aside className={`sidebar${menuOpen ? " open" : ""}`}>
         <Link
-          href="/"
+          href={isTeacherArea && hasTeacherAccess ? "/professor" : "/aluno"}
           className="brand"
           style={{ textDecoration: "none", color: "inherit" }}
           onClick={() => setMenuOpen(false)}

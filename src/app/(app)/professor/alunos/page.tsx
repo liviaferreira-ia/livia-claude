@@ -14,6 +14,7 @@ import {
 } from "@/lib/activity";
 import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
 import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
+import { studentAdminAction } from "@/lib/student-admin";
 
 /** % do banco de exercícios do nível já feito (0 se nunca praticou, sem nível fixo assume A2). */
 function progressPct(r: StudentActivity): number {
@@ -37,6 +38,7 @@ export default function ProfessorAlunosPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [actionMsg, setActionMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [level, setLevel] = useState("all");
@@ -76,6 +78,26 @@ export default function ProfessorAlunosPage() {
     }
     const { data } = await listStudentActivity();
     setRows(data);
+  }
+
+  async function resendInvite(row: StudentActivity) {
+    const name = row.student_name || "este aluno";
+    if (!confirm(`Reenviar o convite de acesso para ${name}?`)) return;
+
+    setBusyId(row.user_id);
+    setActionMsg(null);
+    try {
+      const error = await studentAdminAction(row.user_id, { action: "reset_password" });
+      setActionMsg(
+        error
+          ? { kind: "err", text: error }
+          : { kind: "ok", text: `Convite reenviado para ${name}.` },
+      );
+    } catch {
+      setActionMsg({ kind: "err", text: "Falha de conexão. Tente novamente." });
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function handleInvite(e: React.FormEvent) {
@@ -256,6 +278,8 @@ export default function ProfessorAlunosPage() {
         </select>
       </div>
 
+      {actionMsg && <p className={`auth-msg ${actionMsg.kind}`}>{actionMsg.text}</p>}
+
       {loading ? (
         <p className="muted">Carregando alunos…</p>
       ) : err ? (
@@ -335,15 +359,28 @@ export default function ProfessorAlunosPage() {
                 <span>
                   <span className={`flag ${situation.cls}`}>{situation.text}</span>
                 </span>
-                <button
-                  type="button"
-                  className="pill-btn"
-                  disabled={busyId === r.user_id}
-                  onClick={() => toggleAccess(r)}
-                  style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
-                >
-                  {busyId === r.user_id ? "…" : r.blocked ? "Reativar" : "Pausar"}
-                </button>
+                <div style={{ display: "flex", gap: 7, alignItems: "center", flexWrap: "wrap" }}>
+                  {!r.last_login_at && (
+                    <button
+                      type="button"
+                      className="pill-btn"
+                      disabled={busyId === r.user_id}
+                      onClick={() => void resendInvite(r)}
+                      style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
+                    >
+                      {busyId === r.user_id ? "Enviando…" : "Reenviar convite"}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="pill-btn"
+                    disabled={busyId === r.user_id}
+                    onClick={() => void toggleAccess(r)}
+                    style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
+                  >
+                    {busyId === r.user_id ? "…" : r.blocked ? "Reativar" : "Pausar"}
+                  </button>
+                </div>
               </div>
             );
           })}

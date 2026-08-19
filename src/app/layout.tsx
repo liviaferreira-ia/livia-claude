@@ -4,9 +4,9 @@ import { ThemeInit } from "@/components/ThemeToggle";
 import { MarketingTags } from "@/components/MarketingTags";
 
 export const metadata: Metadata = {
-  title: "Central School — Inglês como estilo de vida",
+  title: "Central School — Inglês para usar todos os dias",
   description:
-    "Aprenda inglês com prática digital guiada, situações reais e acompanhamento de professores.",
+    "Pratique inglês do A1 ao C2 com trilhas, conversas com IA, situações reais, jogos e acompanhamento de professores. Experimente a plataforma por 7 dias grátis, sem cartão.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

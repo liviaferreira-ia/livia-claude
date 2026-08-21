@@ -341,7 +341,7 @@ function McView({
           if (answered) {
             if (k === item.answer) cls += " ok";
             else if (k === selected) cls += " no";
-          } else if (k === selected) cls += " ok";
+          } else if (k === selected) cls += " sel";
           return (
             <button key={k} className={cls} disabled={answered} onClick={() => onSelect(k)}>
               <span className="k">{"ABCD"[k]}</span>

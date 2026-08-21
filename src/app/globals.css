@@ -1171,6 +1171,10 @@ img.avatar {
   border-color: var(--bad);
   background: var(--bad-soft);
 }
+.opt.sel {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+}
 .fill-input {
   width: 100%;
   font-size: 17px;

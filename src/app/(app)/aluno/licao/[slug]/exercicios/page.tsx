@@ -142,7 +142,7 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
                 if (k === q.answer) cls += " ok";
                 else if (k === selected) cls += " no";
               } else if (k === selected) {
-                cls += " ok";
+                cls += " sel";
               }
               return (
                 <button key={k} className={cls} disabled={answered} onClick={() => setSelected(k)}>

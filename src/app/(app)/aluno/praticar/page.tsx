@@ -25,6 +25,8 @@ const TINTS: Record<Kind, string> = {
   order: "tint-warn",
 };
 
+const EMPTY_IDS: string[] = [];
+
 function shuffle<T>(arr: readonly T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -130,7 +132,7 @@ export default function PraticarPage() {
       bump={reviewMode ? () => {} : bumpPractice}
       reviewMode={reviewMode}
       level={contentLevel}
-      filterIds={smartReviewMode ? reviewIds : []}
+      filterIds={smartReviewMode ? reviewIds : EMPTY_IDS}
       returnHref={smartReviewMode ? "/aluno/revisao" : reviewMode ? "/professor/validacao-conteudo" : "/aluno"}
     />
   );

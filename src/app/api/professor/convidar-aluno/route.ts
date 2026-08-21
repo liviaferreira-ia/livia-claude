@@ -66,6 +66,15 @@ export async function POST(request: Request) {
   // confirmar), essa segunda chamada gera um link válido pro mesmo convite
   // sem duplicar o cadastro. Best-effort: se falhar, o convite em si já foi
   // criado e o e-mail já foi tentado — só não mostra o link de reserva.
+  //
+  // Importante: NÃO usamos `action_link` (o link cru do Supabase, tipo
+  // https://<projeto>.supabase.co/auth/v1/verify?token=...) — esse link já
+  // confirma o convite sozinho no primeiro GET, então qualquer prévia
+  // automática (WhatsApp gerando thumbnail, scanner de segurança de e-mail)
+  // que só "abrir" a URL já queima o token antes do aluno clicar de verdade.
+  // Montamos em vez disso um link pro nosso próprio domínio com
+  // `hashed_token`, que só é trocado por sessão de verdade quando o aluno
+  // clica no botão em /definir-senha (verifyOtp do lado do cliente).
   let inviteLink: string | null = null;
   try {
     const { data: linkData } = await admin.auth.admin.generateLink({
@@ -73,7 +82,8 @@ export async function POST(request: Request) {
       email,
       options: { data: { name }, redirectTo },
     });
-    inviteLink = linkData.properties?.action_link ?? null;
+    const hashedToken = linkData.properties?.hashed_token;
+    inviteLink = hashedToken ? `${redirectTo}?token_hash=${hashedToken}&type=invite` : null;
   } catch {
     inviteLink = null;
   }

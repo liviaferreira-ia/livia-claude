@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { BrandLockup } from "@/components/BrandLockup";
 import { createClient } from "@/lib/supabase/client";
 
@@ -11,6 +12,8 @@ export default function DefinirSenhaPage() {
   const [checking, setChecking] = useState(true);
   const [sessionReady, setSessionReady] = useState(false);
   const [linkError, setLinkError] = useState("");
+  const [pendingConfirm, setPendingConfirm] = useState<{ token_hash: string; type: EmailOtpType } | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -63,12 +66,47 @@ export default function DefinirSenhaPage() {
       return;
     }
 
-    // Sem token no hash (ex: página recarregada) — checa se já tem sessão salva.
+    // Formato novo do link (?token_hash=...&type=...), pra parar de expor o
+    // link cru do Supabase (auth/v1/verify) direto no e-mail — aquele link
+    // faz o próprio GET já confirmar o convite, então qualquer prévia
+    // automática (WhatsApp, scanner de segurança de e-mail corporativo,
+    // pré-carregamento de imagem/link do cliente de e-mail) que só "abrir"
+    // a URL pra gerar thumbnail já queima o token antes do aluno clicar de
+    // verdade — o que combina exatamente com "link inválido" mesmo em
+    // convite recém-criado. Por isso aqui só guardamos o token e exigimos um
+    // clique de verdade da pessoa (handleConfirmInvite) antes de confirmar.
+    const search = new URLSearchParams(window.location.search);
+    const token_hash = search.get("token_hash");
+    const type = search.get("type") as EmailOtpType | null;
+    if (token_hash && type) {
+      const timer = window.setTimeout(() => {
+        setPendingConfirm({ token_hash, type });
+        setChecking(false);
+      }, 0);
+      return () => window.clearTimeout(timer);
+    }
+
+    // Sem token no hash nem na query (ex: página recarregada) — checa se já tem sessão salva.
     supabase.auth.getSession().then(({ data }) => {
       setSessionReady(!!data.session);
       setChecking(false);
     });
   }, []);
+
+  async function handleConfirmInvite() {
+    if (!pendingConfirm) return;
+    setConfirming(true);
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.verifyOtp(pendingConfirm);
+    setConfirming(false);
+    if (error || !data.session) {
+      setLinkError("Esse link de convite não é válido ou já expirou.");
+      setPendingConfirm(null);
+      return;
+    }
+    setSessionReady(true);
+    setPendingConfirm(null);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -98,6 +136,31 @@ export default function DefinirSenhaPage() {
       <div className="login-wrap">
         <div className="login-card">
           <p className="muted">Carregando…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (pendingConfirm) {
+    return (
+      <div className="login-wrap">
+        <div className="login-card">
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <BrandLockup width={230} />
+          </div>
+          <p className="muted" style={{ fontSize: 14, marginTop: 16, textAlign: "center" }}>
+            Bem-vindo(a) à Central School! Toque no botão abaixo pra confirmar seu convite
+            e definir sua senha.
+          </p>
+          <button
+            type="button"
+            className="btn primary"
+            style={{ width: "100%", marginTop: 16, opacity: confirming ? 0.6 : 1 }}
+            onClick={handleConfirmInvite}
+            disabled={confirming}
+          >
+            {confirming ? "Confirmando…" : "Confirmar convite →"}
+          </button>
         </div>
       </div>
     );

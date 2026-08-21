@@ -125,7 +125,41 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   if (action === "reset_password") {
     const { data, error } = await admin.auth.admin.getUserById(id);
     if (error || !data.user?.email) return NextResponse.json({ error: "E-mail do aluno não encontrado." }, { status: 404 });
-    const { error: resetError } = await session.supabase!.auth.resetPasswordForEmail(data.user.email, { redirectTo: `${SITE_URL}/definir-senha` });
+    const email = data.user.email;
+    const redirectTo = `${SITE_URL}/definir-senha`;
+
+    // Convite ainda não aceito (aluno nunca logou): reenviar precisa gerar um
+    // link tipo "invite" de novo, não "recovery" — resetPasswordForEmail é
+    // pra quem já tem senha, e o link antigo do primeiro convite continua
+    // "vivo" até alguém gerar um novo, então reenviar sem invalidar o de
+    // antes deixa dois links circulando (fácil o aluno clicar no errado).
+    // generateLink({ type: "invite" }) sempre funciona mesmo pro mesmo
+    // e-mail de novo e substitui o token anterior por um novo, já expirado
+    // ou não — por isso devolvemos o link fresco pro professor copiar e
+    // mandar direto (mesmo padrão do convite inicial em convidar-aluno).
+    if (!data.user.last_sign_in_at) {
+      const name = typeof data.user.user_metadata?.name === "string" ? data.user.user_metadata.name : undefined;
+      // Best-effort: tenta mandar e-mail de novo. Se o Supabase recusar por o
+      // usuário já existir (esperado num reenvio), seguimos pro generateLink
+      // abaixo, que sempre devolve um link válido independente disso.
+      await admin.auth.admin.inviteUserByEmail(email, { data: { name }, redirectTo });
+      const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+        type: "invite",
+        email,
+        options: { data: { name }, redirectTo },
+      });
+      if (linkError) return NextResponse.json({ error: linkError.message }, { status: 500 });
+      // Mesmo cuidado do convite inicial (convidar-aluno/route.ts): nunca
+      // expor o action_link cru do Supabase, que confirma sozinho no
+      // primeiro GET e pode ser queimado por prévia automática antes do
+      // aluno clicar de verdade. Montamos o link seguro com hashed_token.
+      const hashedToken = linkData.properties?.hashed_token;
+      const inviteLink = hashedToken ? `${redirectTo}?token_hash=${hashedToken}&type=invite` : null;
+      await recordAudit(session.user!.id, id, "invite_resent");
+      return NextResponse.json({ ok: true, inviteLink });
+    }
+
+    const { error: resetError } = await session.supabase!.auth.resetPasswordForEmail(email, { redirectTo });
     if (resetError) return NextResponse.json({ error: resetError.message }, { status: 500 });
     await recordAudit(session.user!.id, id, "password_reset_sent");
     return NextResponse.json({ ok: true });

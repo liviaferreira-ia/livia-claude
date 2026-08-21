@@ -21,6 +21,9 @@ const TIMES: Option[] = [
   { emoji: "🚀", label: "Intenso", desc: "45 min ou mais por dia." },
 ];
 
+/** Traduz a intensidade escolhida em meta semanal (dias/semana), o único campo que a plataforma já usa pra acompanhar frequência. */
+const WEEKLY_GOAL_BY_TIME: Record<string, number> = { Leve: 3, Firme: 5, Intenso: 6 };
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -47,11 +50,21 @@ export default function OnboardingPage() {
     const { error } = await supabase.auth.updateUser({
       data: { onboarded: true, name: name.trim(), goal, level },
     });
-    setSaving(false);
     if (error) {
+      setSaving(false);
       alert("Não consegui salvar seu perfil agora. Tente de novo em instantes.");
       return;
     }
+    try {
+      await fetch("/api/aluno/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weekly_goal: WEEKLY_GOAL_BY_TIME[time] ?? 3 }),
+      });
+    } catch {
+      // Meta semanal é só uma preferência inicial (o professor pode ajustar depois) — não trava o onboarding se isso falhar.
+    }
+    setSaving(false);
     router.push("/bem-vindo");
   }
 

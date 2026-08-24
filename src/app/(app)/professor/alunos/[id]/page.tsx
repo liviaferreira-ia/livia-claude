@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { calcAge, formatDuration, formatLastLogin, practiceTotals, setStudentAccess } from "@/lib/activity";
 import { replyToStudent } from "@/lib/messages";
 import {
+  deleteStudentAccount,
   getStudentDetail,
   requestStudentAccess,
   studentAdminAction,
@@ -64,6 +65,7 @@ function paymentLabel(status: string) {
 
 export default function ProfessorStudentPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const { ready, isTeacher } = useProfile();
   const [detail, setDetail] = useState<StudentDetail | null>(null);
   const [tab, setTab] = useState<Tab>("overview");
@@ -146,6 +148,22 @@ export default function ProfessorStudentPage() {
     }
   }
 
+  async function removeStudent() {
+    const studentName = detail?.activity.student_name || "este aluno";
+    const confirmation = prompt(`Excluir ${studentName}?\n\nEsta ação remove a conta e o progresso do aluno. Para confirmar, escreva DELETAR:`);
+    if (confirmation === null) return;
+    if (confirmation.trim().toUpperCase() !== "DELETAR") {
+      setError("Exclusão cancelada: era necessário escrever DELETAR.");
+      return;
+    }
+    setBusy(true); setError(""); setMessage("");
+    const deleteError = await deleteStudentAccount(id);
+    setBusy(false);
+    if (deleteError) { setError(deleteError); return; }
+    router.push("/professor/alunos");
+    router.refresh();
+  }
+
   if (!ready || loading) return <div className="view"><p className="muted">Carregando aluno…</p></div>;
   if (!isTeacher) return <div className="view"><p>Esta área é exclusiva do professor.</p></div>;
   if (!detail) return <div className="view"><Link href="/professor/alunos">← Alunos</Link><p className="auth-msg err">{error || "Aluno não encontrado."}</p></div>;
@@ -155,6 +173,13 @@ export default function ProfessorStudentPage() {
   const totals = practiceTotals(a);
   const name = a.student_name || "Aluno(a)";
   const invitePending = !detail.auth.lastSignInAt;
+  const accessState = !invitePending || a.invite_status === "active"
+    ? { text: "🟢 Ativo", cls: "ok" }
+    : a.invite_status === "error"
+      ? { text: "🔴 Erro no convite", cls: "bad" }
+      : a.invite_status === "pending"
+        ? { text: "🟡 Convite pendente", cls: "att" }
+        : { text: "⚪ Convite não enviado", cls: "" };
   const avg = a.session_count ? a.total_seconds / a.session_count : 0;
   const weakest = skills.filter((s) => s.done > 0).sort((x, y) => x.pct - y.pct)[0];
   const currentPayment = detail.payments.find((p) => p.status === "OVERDUE") ?? detail.payments.find((p) => ["PENDING", "AWAITING_RISK_ANALYSIS"].includes(p.status));
@@ -175,8 +200,8 @@ export default function ProfessorStudentPage() {
             {calcAge(a.birthdate) !== null && ` · ${calcAge(a.birthdate)} anos`}
           </div>
         </div>
-        <span className={`flag ${a.blocked ? "bad" : a.payment_status === "overdue" || invitePending ? "att" : "ok"}`}>
-          {a.blocked ? (a.manual_block ? "Acesso pausado" : "Bloqueado por atraso") : a.payment_status === "overdue" ? "Pagamento atrasado" : invitePending ? "Convite pendente" : "Acesso ativo"}
+        <span className={`flag ${a.blocked ? "bad" : accessState.cls}`} title={accessState.text.includes("Erro") ? a.invite_error ?? undefined : undefined}>
+          {a.blocked ? (a.manual_block ? "Acesso pausado" : "Bloqueado por atraso") : accessState.text}
         </span>
       </div>
 
@@ -225,6 +250,7 @@ export default function ProfessorStudentPage() {
         <div><div className="card stat"><div className="eyebrow">Acesso à plataforma</div><p className="muted">{a.blocked ? "O aluno está impedido de acessar a área de estudos." : invitePending ? `O convite para ${detail.email} ainda não foi aceito. Confirme o endereço antes de reenviar.` : "O acesso do aluno está ativo."}</p>{!invitePending && <button className={a.blocked ? "btn primary" : "btn light"} disabled={busy} onClick={() => { const action = a.blocked ? "resume" : "pause"; if (!confirm(a.blocked ? `Reativar ${name}?` : `Pausar o acesso de ${name}?`)) return; void run(async () => (await setStudentAccess(id, action)).error, a.blocked ? "Acesso reativado." : "Acesso pausado."); }}>{a.blocked ? "Reativar acesso" : "Pausar acesso"}</button>}</div><div className="card stat" style={{ marginTop: 18 }}><div className="eyebrow">{invitePending ? "Convite e senha" : "Senha"}</div><p className="muted">{invitePending ? "Envia um novo e-mail para o aluno criar a senha e concluir o acesso. O envio aceito pelo sistema não garante a entrega na caixa de entrada." : "Envia um e-mail para o aluno criar uma nova senha. A senha atual nunca fica visível para a escola."}</p><button className="btn light" disabled={busy} onClick={() => { const actionLabel = invitePending ? "Reenviar o e-mail de acesso" : "Enviar redefinição de senha"; if (confirm(`${actionLabel} para ${detail.email}?`)) void resendAccess(); }}>{invitePending ? "Reenviar e-mail de acesso" : "Enviar redefinição de senha"}</button></div></div>
       </div>}
       {tab === "access" && accessLink && <div className="card stat" style={{ marginTop: 18 }}><div className="eyebrow">Link alternativo de acesso</div><p className="muted">Se o e-mail não chegar, envie este link diretamente para o aluno por WhatsApp.</p><div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}><input readOnly value={accessLink} onFocus={(event) => event.currentTarget.select()} style={{ flex: "1 1 280px", fontSize: 13, fontFamily: "monospace" }} /><button type="button" className="btn light" onClick={() => void copyAccessLink()}>{accessLinkCopied ? "Copiado!" : "Copiar link"}</button></div></div>}
+      {tab === "access" && <div className="card stat" style={{ marginTop: 18, borderColor: "var(--bad)" }}><div className="eyebrow" style={{ color: "var(--bad)" }}>Excluir aluno</div><p className="muted">Remove a conta e os dados de estudo deste aluno. Para sua segurança, o sistema pedirá que você escreva DELETAR.</p><button type="button" className="btn light" disabled={busy} onClick={() => void removeStudent()} style={{ color: "var(--bad)", borderColor: "var(--bad)" }}>Excluir aluno</button></div>}
     </div>
   );
 }

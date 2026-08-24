@@ -150,13 +150,17 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         email,
         options: { data: { name }, redirectTo },
       });
-      if (linkError) return NextResponse.json({ error: linkError.message }, { status: 500 });
+      if (linkError) {
+        await admin.from("student_activity").update({ invite_status: "error", invite_error: linkError.message.slice(0, 500), updated_at: new Date().toISOString() }).eq("user_id", id);
+        return NextResponse.json({ error: linkError.message }, { status: 500 });
+      }
       // Mesmo cuidado do convite inicial (convidar-aluno/route.ts): nunca
       // expor o action_link cru do Supabase, que confirma sozinho no
       // primeiro GET e pode ser queimado por prévia automática antes do
       // aluno clicar de verdade. Montamos o link seguro com hashed_token.
       const hashedToken = linkData.properties?.hashed_token;
       const inviteLink = hashedToken ? `${redirectTo}?token_hash=${hashedToken}&type=invite` : null;
+      await admin.from("student_activity").update({ invite_status: "pending", invite_last_sent_at: new Date().toISOString(), invite_error: null, updated_at: new Date().toISOString() }).eq("user_id", id);
       await recordAudit(session.user!.id, id, "invite_resent");
       return NextResponse.json({ ok: true, inviteLink });
     }
@@ -206,4 +210,35 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   }
 
   return NextResponse.json({ error: "Ação inválida." }, { status: 400 });
+}
+
+export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
+  const session = await teacherSession();
+  if (session.error) return session.error;
+  const { id } = await context.params;
+  if (id === session.user!.id) {
+    return NextResponse.json({ error: "Sua própria conta não pode ser excluída por esta tela." }, { status: 409 });
+  }
+
+  const admin = createAdminClient();
+  const [{ data: authData, error: authError }, { data: profile }, { data: activity }] = await Promise.all([
+    admin.auth.admin.getUserById(id),
+    admin.from("profiles").select("role").eq("id", id).maybeSingle(),
+    admin.from("student_activity").select("role,student_name").eq("user_id", id).maybeSingle(),
+  ]);
+  if (authError || !authData.user) return NextResponse.json({ error: "Aluno não encontrado." }, { status: 404 });
+  if (profile?.role === "teacher" || profile?.role === "admin" || activity?.role !== "student") {
+    return NextResponse.json({ error: "Somente contas de aluno podem ser excluídas por esta tela." }, { status: 409 });
+  }
+
+  await recordAudit(session.user!.id, id, "student_deleted", {
+    name: activity?.student_name,
+    email: authData.user.email,
+  });
+  const { error } = await admin.auth.admin.deleteUser(id);
+  if (error) {
+    const trace = await recordIncident({ userId: id, source: "server", area: "professor/aluno", action: "delete_student", message: error.message });
+    return NextResponse.json({ error: `Não foi possível excluir o aluno. Código: ${trace}` }, { status: 500 });
+  }
+  return NextResponse.json({ ok: true });
 }

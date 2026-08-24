@@ -87,6 +87,9 @@ export async function POST(request: Request) {
       payment_status: "ok",
       overdue_since: null,
       blocked: false,
+      invite_status: "pending",
+      invite_last_sent_at: new Date().toISOString(),
+      invite_error: null,
     }, { onConflict: "user_id" });
     if (activityError) {
       await admin.auth.admin.deleteUser(userId);

@@ -141,6 +141,9 @@ export type StudentActivity = {
   whatsapp: string | null;
   birthdate: string | null;
   last_login_at: string | null;
+  invite_status: "active" | "pending" | "error" | "not_sent";
+  invite_last_sent_at: string | null;
+  invite_error: string | null;
   session_count: number;
   total_seconds: number;
   practice_mc_done: number;

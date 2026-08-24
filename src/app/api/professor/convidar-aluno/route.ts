@@ -41,6 +41,18 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    const { data: usersPage } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    const existingUser = usersPage?.users.find((item) => item.email?.toLowerCase() === email);
+    if (existingUser) {
+      await admin.from("student_activity").upsert({
+        user_id: existingUser.id,
+        role: "student",
+        student_name: name,
+        invite_status: "error",
+        invite_error: error.message.slice(0, 500),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "user_id" });
+    }
     // Ferramenta só de professor — é seguro mostrar o motivo real do Supabase,
     // ajuda a diagnosticar sem precisar olhar log de servidor.
     const duplicate = /already registered|already exists|email.*exists|email_exists|user.*registered/.test(error.message.toLowerCase());
@@ -54,7 +66,14 @@ export async function POST(request: Request) {
   if (data.user) {
     await admin
       .from("student_activity")
-      .upsert({ user_id: data.user.id, role: "student", student_name: name }, { onConflict: "user_id" });
+      .upsert({
+        user_id: data.user.id,
+        role: "student",
+        student_name: name,
+        invite_status: "pending",
+        invite_last_sent_at: new Date().toISOString(),
+        invite_error: null,
+      }, { onConflict: "user_id" });
     await recordAudit(user.id, data.user.id, "student_invited", { email });
   }
 

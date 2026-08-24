@@ -114,6 +114,12 @@ export async function requestStudentAccess(id: string): Promise<{ error: string 
   };
 }
 
+export async function deleteStudentAccount(id: string): Promise<string | null> {
+  const res = await fetch(`/api/professor/alunos/${encodeURIComponent(id)}`, { method: "DELETE" });
+  const body = await res.json().catch(() => ({}));
+  return res.ok ? null : body.error || "Não consegui excluir o aluno.";
+}
+
 /** Meta semanal e foco definidos pelo professor (RLS: aluno só lê o próprio). */
 export async function getMySettings(): Promise<StudentSettings | null> {
   const supabase = createClient();

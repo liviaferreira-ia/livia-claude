@@ -14,7 +14,14 @@ import {
 } from "@/lib/activity";
 import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
 import { courseTotalPhases, type CourseProjectionFields } from "@/lib/courseProgress";
-import { requestStudentAccess } from "@/lib/student-admin";
+import { deleteStudentAccount, requestStudentAccess } from "@/lib/student-admin";
+
+function accessStatus(r: StudentActivity) {
+  if (r.last_login_at || r.invite_status === "active") return { id: "active", text: "🟢 Ativo", cls: "ok" as const };
+  if (r.invite_status === "error") return { id: "error", text: "🔴 Erro no convite", cls: "bad" as const };
+  if (r.invite_status === "pending") return { id: "pending", text: "🟡 Convite pendente", cls: "att" as const };
+  return { id: "not_sent", text: "⚪ Convite não enviado", cls: "" as const };
+}
 
 /** Texto curto explicando por que o aluno está em alerta (ou null se está tudo bem). */
 function attentionReason(r: StudentActivity): string | null {
@@ -96,6 +103,27 @@ export default function ProfessorAlunosPage() {
     }
   }
 
+  async function removeStudent(row: StudentActivity) {
+    const name = row.student_name || "este aluno";
+    const confirmation = prompt(`Excluir ${name}?\n\nEsta ação remove a conta e o progresso do aluno. Para confirmar, escreva DELETAR:`);
+    if (confirmation === null) return;
+    if (confirmation.trim().toUpperCase() !== "DELETAR") {
+      setActionMsg({ kind: "err", text: "Exclusão cancelada: era necessário escrever DELETAR." });
+      return;
+    }
+
+    setBusyId(row.user_id);
+    setActionMsg(null);
+    const error = await deleteStudentAccount(row.user_id);
+    setBusyId(null);
+    if (error) {
+      setActionMsg({ kind: "err", text: error });
+      return;
+    }
+    setRows((current) => current.filter((item) => item.user_id !== row.user_id));
+    setActionMsg({ kind: "ok", text: `${name} foi excluído(a) com sucesso.` });
+  }
+
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault();
     setInviting(true);
@@ -162,8 +190,9 @@ export default function ProfessorAlunosPage() {
     );
   }
 
-  const activeCount = rows.filter((r) => !r.blocked && r.last_login_at).length;
-  const pendingInviteCount = rows.filter((r) => !r.last_login_at).length;
+  const activeCount = rows.filter((r) => !r.blocked && accessStatus(r).id === "active").length;
+  const pendingInviteCount = rows.filter((r) => accessStatus(r).id === "pending").length;
+  const inviteProblemCount = rows.filter((r) => ["error", "not_sent"].includes(accessStatus(r).id)).length;
   const staleCount = rows.filter((r) => r.last_login_at && isInactive(r.last_login_at)).length;
   const lowPerfCount = rows.filter((r) => {
     const t = practiceTotals(r);
@@ -174,8 +203,9 @@ export default function ProfessorAlunosPage() {
     const matchesLevel = level === "all" || r.level === level;
     const matchesFilter =
       filter === "all" ||
-      (filter === "pending" && !r.last_login_at) ||
-      (filter === "active" && !r.blocked && !!r.last_login_at) ||
+      (filter === "pending" && accessStatus(r).id === "pending") ||
+      (filter === "invite_problem" && ["error", "not_sent"].includes(accessStatus(r).id)) ||
+      (filter === "active" && !r.blocked && accessStatus(r).id === "active") ||
       (filter === "blocked" && r.blocked) ||
       (filter === "overdue" && r.payment_status === "overdue") ||
       (filter === "inactive" && !!r.last_login_at && isInactive(r.last_login_at));
@@ -193,7 +223,7 @@ export default function ProfessorAlunosPage() {
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 20 }}>
-        {[[activeCount, "Alunos ativos"], [pendingInviteCount, "Convites pendentes"], [staleCount, "Sem entrar há 7 dias"], [lowPerfCount, "Baixo desempenho"]].map(([value, label]) => <div className="card stat" key={String(label)}><b style={{ display: "block", fontSize: 22 }}>{value}</b><span className="muted" style={{ fontSize: 12.5 }}>{label}</span></div>)}
+        {[[activeCount, "Alunos ativos"], [pendingInviteCount, "Convites pendentes"], [inviteProblemCount, "Problemas no convite"], [staleCount, "Sem entrar há 7 dias"], [lowPerfCount, "Baixo desempenho"]].map(([value, label]) => <div className="card stat" key={String(label)}><b style={{ display: "block", fontSize: 22 }}>{value}</b><span className="muted" style={{ fontSize: 12.5 }}>{label}</span></div>)}
       </div>
 
       <details className="card" style={{ padding: 18, marginBottom: 20, maxWidth: 560 }}>
@@ -270,7 +300,7 @@ export default function ProfessorAlunosPage() {
           {["A1", "A2", "B1", "B2", "C1", "C2"].map((l) => <option key={l} value={l}>{l}</option>)}
         </select>
         <select aria-label="Filtrar alunos" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ minWidth: 180 }}>
-          <option value="all">Todos os alunos</option><option value="pending">Convite pendente</option><option value="active">Acesso ativo</option><option value="blocked">Acesso bloqueado</option><option value="overdue">Pagamento atrasado</option><option value="inactive">Inativos há 7 dias</option>
+          <option value="all">Todos os alunos</option><option value="pending">Convite pendente</option><option value="invite_problem">Erro ou não enviado</option><option value="active">Acesso ativo</option><option value="blocked">Acesso bloqueado</option><option value="overdue">Pagamento atrasado</option><option value="inactive">Inativos há 7 dias</option>
         </select>
       </div>
 
@@ -306,7 +336,7 @@ export default function ProfessorAlunosPage() {
             <span>Último acesso</span>
             <span>Progresso / acertos</span>
             <span>Tempo de estudo</span>
-            <span>Situação</span>
+            <span>Status do acesso</span>
             <span>Ações</span>
           </div>
           {visibleRows.map((r) => {
@@ -317,12 +347,13 @@ export default function ProfessorAlunosPage() {
             const coursePct = totalPhases ? Math.round(((course.course_completed_phases ?? 0) / totalPhases) * 100) : 0;
             const name = r.student_name || "Aluno(a)";
             const reason = attentionReason(r);
+            const access = accessStatus(r);
             const paymentFlag = r.blocked
               ? { text: r.manual_block ? "Acesso pausado" : "Bloqueado (atraso)", cls: "bad" }
               : r.payment_status === "overdue"
                 ? { text: "Pagamento atrasado", cls: "att" }
                 : null;
-            const situation = paymentFlag ?? (reason ? { text: reason, cls: "att" as const } : { text: "Em dia", cls: "ok" as const });
+            const situationNote = paymentFlag ?? (r.last_login_at && reason ? { text: reason, cls: "att" as const } : null);
             return (
               <div key={r.user_id} className="rosterrow">
                 <Link href={`/professor/alunos/${r.user_id}`} className="std" style={{ textDecoration: "none", color: "inherit" }}>
@@ -357,10 +388,11 @@ export default function ProfessorAlunosPage() {
                 </span>
                 <span style={{ fontSize: 13.5 }}>{formatDuration(r.total_seconds)}</span>
                 <span>
-                  <span className={`flag ${situation.cls}`}>{situation.text}</span>
+                  <span className={`flag ${access.cls}`} title={access.id === "error" ? r.invite_error ?? "O último envio não foi concluído." : undefined}>{access.text}</span>
+                  {situationNote && <span className={`flag ${situationNote.cls}`} style={{ display: "table", marginTop: 6 }}>{situationNote.text}</span>}
                 </span>
                 <div style={{ display: "flex", gap: 7, alignItems: "center", flexWrap: "wrap" }}>
-                  {!r.last_login_at && (
+                  {access.id !== "active" && (
                     <button
                       type="button"
                       className="pill-btn"
@@ -379,6 +411,15 @@ export default function ProfessorAlunosPage() {
                     style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
                   >
                     {busyId === r.user_id ? "…" : r.blocked ? "Reativar" : "Pausar"}
+                  </button>
+                  <button
+                    type="button"
+                    className="pill-btn"
+                    disabled={busyId === r.user_id}
+                    onClick={() => void removeStudent(r)}
+                    style={{ color: "var(--bad)", borderColor: "var(--bad)" }}
+                  >
+                    Excluir
                   </button>
                 </div>
               </div>

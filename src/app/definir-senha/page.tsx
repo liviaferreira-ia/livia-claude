@@ -121,12 +121,13 @@ export default function DefinirSenhaPage() {
     }
     setLoading(true);
     const supabase = createClient();
-    const { data, error } = await supabase.auth.updateUser({ password });
+    const { data, error } = await supabase.auth.updateUser({ password, data: { must_change_password: false } });
     setLoading(false);
     if (error) {
       setError("Não consegui salvar a senha. Peça um novo convite ao professor.");
       return;
     }
+    await supabase.auth.refreshSession();
     router.push(data.user?.user_metadata?.onboarded === true ? "/aluno" : "/onboarding");
     router.refresh();
   }

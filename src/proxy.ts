@@ -40,12 +40,13 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isProtected = PROTECTED.some((p) => path === p || path.startsWith(p + "/"));
 
-  let user: { id: string } | null = null;
+  let user: { id: string; mustChangePassword: boolean } | null = null;
   let invalidSession = false;
   try {
     const { data, error } = await supabase.auth.getClaims();
     const subject = data?.claims?.sub;
-    if (!error && typeof subject === "string") user = { id: subject };
+    const metadata = data?.claims?.user_metadata as Record<string, unknown> | undefined;
+    if (!error && typeof subject === "string") user = { id: subject, mustChangePassword: metadata?.must_change_password === true };
     invalidSession = Boolean(error);
   } catch {
     // Sessão corrompida ou Auth temporariamente indisponível não deve virar 500.
@@ -57,6 +58,13 @@ export async function proxy(request: NextRequest) {
     url.pathname = "/login";
     url.searchParams.set("next", path);
     if (invalidSession) url.searchParams.set("reason", "sessao_expirada");
+    return redirectWithSession(url, response);
+  }
+
+  if (isProtected && user?.mustChangePassword) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/definir-senha";
+    url.search = "?temporary=1";
     return redirectWithSession(url, response);
   }
 

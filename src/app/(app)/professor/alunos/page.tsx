@@ -14,7 +14,7 @@ import {
 } from "@/lib/activity";
 import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
 import { courseTotalPhases, type CourseProjectionFields } from "@/lib/courseProgress";
-import { deleteStudentAccount, requestStudentAccess } from "@/lib/student-admin";
+import { createTemporaryStudentPassword, deleteStudentAccount, requestStudentAccess } from "@/lib/student-admin";
 
 function accessStatus(r: StudentActivity) {
   if (r.last_login_at || r.invite_status === "active") return { id: "active", text: "🟢 Ativo", cls: "ok" as const };
@@ -49,6 +49,8 @@ export default function ProfessorAlunosPage() {
   const [inviteMsg, setInviteMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [temporaryAccess, setTemporaryAccess] = useState<{ name: string; email: string; password: string } | null>(null);
+  const [temporaryAccessCopied, setTemporaryAccessCopied] = useState(false);
 
   useEffect(() => {
     if (!ready || !isTeacher) return;
@@ -82,7 +84,7 @@ export default function ProfessorAlunosPage() {
 
   async function resendInvite(row: StudentActivity) {
     const name = row.student_name || "este aluno";
-    if (!confirm(`Reenviar o convite de acesso para ${name}?`)) return;
+    if (!confirm(`Gerar um novo acesso para ${name}?`)) return;
 
     setBusyId(row.user_id);
     setActionMsg(null);
@@ -122,6 +124,34 @@ export default function ProfessorAlunosPage() {
     }
     setRows((current) => current.filter((item) => item.user_id !== row.user_id));
     setActionMsg({ kind: "ok", text: `${name} foi excluído(a) com sucesso.` });
+  }
+
+  async function createTemporaryAccess(row: StudentActivity) {
+    const name = row.student_name || "este aluno";
+    if (!confirm(`Criar uma senha provisória para ${name}? A senha anterior deixará de funcionar.`)) return;
+    setBusyId(row.user_id);
+    setActionMsg(null);
+    setTemporaryAccess(null);
+    setTemporaryAccessCopied(false);
+    const result = await createTemporaryStudentPassword(row.user_id);
+    setBusyId(null);
+    if (result.error || !result.email || !result.temporaryPassword) {
+      setActionMsg({ kind: "err", text: result.error || "Não consegui criar o acesso provisório." });
+      return;
+    }
+    setTemporaryAccess({ name, email: result.email, password: result.temporaryPassword });
+    setActionMsg({ kind: "ok", text: `Acesso provisório criado para ${name}. Copie os dados abaixo.` });
+  }
+
+  async function copyTemporaryAccess() {
+    if (!temporaryAccess) return;
+    try {
+      await navigator.clipboard.writeText(`Central School\nLogin: ${temporaryAccess.email}\nSenha provisória: ${temporaryAccess.password}`);
+      setTemporaryAccessCopied(true);
+      window.setTimeout(() => setTemporaryAccessCopied(false), 2500);
+    } catch {
+      setActionMsg({ kind: "err", text: "Não consegui copiar automaticamente. Selecione os dados e copie manualmente." });
+    }
   }
 
   async function handleInvite(e: React.FormEvent) {
@@ -305,6 +335,7 @@ export default function ProfessorAlunosPage() {
       </div>
 
       {actionMsg && <p className={`auth-msg ${actionMsg.kind}`}>{actionMsg.text}</p>}
+      {temporaryAccess && <div className="card stat" style={{ marginBottom: 16, borderColor: "var(--gold)" }}><div className="eyebrow">Acesso provisório de {temporaryAccess.name}</div><p className="muted">Envie estes dados ao aluno. No primeiro acesso, ele será obrigado a criar uma senha própria.</p><div className="field"><label>Login</label><input readOnly value={temporaryAccess.email} onFocus={(event) => event.currentTarget.select()} /></div><div className="field"><label>Senha provisória</label><input readOnly value={temporaryAccess.password} onFocus={(event) => event.currentTarget.select()} style={{ fontFamily: "monospace", fontWeight: 800 }} /></div><button type="button" className="btn light" onClick={() => void copyTemporaryAccess()}>{temporaryAccessCopied ? "Copiado!" : "Copiar login e senha"}</button></div>}
 
       {loading ? (
         <p className="muted">Carregando alunos…</p>
@@ -397,10 +428,20 @@ export default function ProfessorAlunosPage() {
                       type="button"
                       className="pill-btn"
                       disabled={busyId === r.user_id}
+                      onClick={() => void createTemporaryAccess(r)}
+                    >
+                      Senha provisória
+                    </button>
+                  )}
+                  {access.id !== "active" && (
+                    <button
+                      type="button"
+                      className="pill-btn"
+                      disabled={busyId === r.user_id}
                       onClick={() => void resendInvite(r)}
                       style={busyId === r.user_id ? { opacity: 0.6 } : undefined}
                     >
-                      {busyId === r.user_id ? "Enviando…" : "Reenviar convite"}
+                      {busyId === r.user_id ? "Gerando…" : "Gerar novo acesso"}
                     </button>
                   )}
                   <button

@@ -120,6 +120,21 @@ export async function deleteStudentAccount(id: string): Promise<string | null> {
   return res.ok ? null : body.error || "Não consegui excluir o aluno.";
 }
 
+export async function createTemporaryStudentPassword(id: string): Promise<{ error: string | null; email: string | null; temporaryPassword: string | null }> {
+  const res = await fetch(`/api/professor/alunos/${encodeURIComponent(id)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "temporary_password" }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) return { error: body.error || "Não consegui criar a senha provisória.", email: null, temporaryPassword: null };
+  return {
+    error: null,
+    email: typeof body.email === "string" ? body.email : null,
+    temporaryPassword: typeof body.temporaryPassword === "string" ? body.temporaryPassword : null,
+  };
+}
+
 /** Meta semanal e foco definidos pelo professor (RLS: aluno só lê o próprio). */
 export async function getMySettings(): Promise<StudentSettings | null> {
   const supabase = createClient();

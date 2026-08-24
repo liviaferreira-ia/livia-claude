@@ -41,7 +41,7 @@ function LoginInner() {
       return;
     }
     if (data.user) markSessionActivity(data.user.id);
-    router.push(next);
+    router.push(data.user?.user_metadata?.must_change_password === true ? "/definir-senha?temporary=1" : next);
     router.refresh();
   }
 

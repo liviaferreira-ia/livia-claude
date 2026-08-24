@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomBytes } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site";
@@ -124,32 +125,43 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const action = body?.action;
   const admin = createAdminClient();
 
+  if (action === "temporary_password") {
+    const { data, error } = await admin.auth.admin.getUserById(id);
+    if (error || !data.user?.email) return NextResponse.json({ error: "E-mail do aluno não encontrado." }, { status: 404 });
+    const temporaryPassword = `Cs!${randomBytes(9).toString("base64url")}9`;
+    const metadata = { ...data.user.user_metadata, must_change_password: true };
+    const { error: updateError } = await admin.auth.admin.updateUserById(id, {
+      password: temporaryPassword,
+      email_confirm: true,
+      user_metadata: metadata,
+    });
+    if (updateError) {
+      const trace = await recordIncident({ userId: id, source: "server", area: "professor/aluno", action: "temporary_password", message: updateError.message });
+      return NextResponse.json({ error: `Não foi possível criar a senha provisória. Código: ${trace}` }, { status: 500 });
+    }
+    await admin.from("student_activity").update({ invite_status: "pending", invite_error: null, updated_at: new Date().toISOString() }).eq("user_id", id);
+    await recordAudit(session.user!.id, id, "temporary_password_created");
+    return NextResponse.json({ ok: true, email: data.user.email, temporaryPassword });
+  }
+
   if (action === "reset_password") {
     const { data, error } = await admin.auth.admin.getUserById(id);
     if (error || !data.user?.email) return NextResponse.json({ error: "E-mail do aluno não encontrado." }, { status: 404 });
     const email = data.user.email;
     const redirectTo = `${SITE_URL}/definir-senha`;
 
-    // Convite ainda não aceito (aluno nunca logou): reenviar precisa gerar um
-    // link tipo "invite" de novo, não "recovery" — resetPasswordForEmail é
-    // pra quem já tem senha, e o link antigo do primeiro convite continua
-    // "vivo" até alguém gerar um novo, então reenviar sem invalidar o de
-    // antes deixa dois links circulando (fácil o aluno clicar no errado).
-    // generateLink({ type: "invite" }) sempre funciona mesmo pro mesmo
-    // e-mail de novo e substitui o token anterior por um novo, já expirado
-    // ou não — por isso devolvemos o link fresco pro professor copiar e
-    // mandar direto (mesmo padrão do convite inicial em convidar-aluno).
+    // Há dois estados possíveis antes do primeiro login. Uma conta ainda não
+    // confirmada aceita um novo token "invite"; uma conta já confirmada por
+    // scanner de e-mail ou ação administrativa rejeita outro convite como
+    // "already registered", embora o aluno ainda não tenha senha. Nesse
+    // segundo caso geramos um token "recovery", que também abre a página de
+    // definição de senha e evita tentar cadastrar a mesma pessoa novamente.
     if (!data.user.last_sign_in_at) {
       const name = typeof data.user.user_metadata?.name === "string" ? data.user.user_metadata.name : undefined;
-      // Best-effort: tenta mandar e-mail de novo. Se o Supabase recusar por o
-      // usuário já existir (esperado num reenvio), seguimos pro generateLink
-      // abaixo, que sempre devolve um link válido independente disso.
-      await admin.auth.admin.inviteUserByEmail(email, { data: { name }, redirectTo });
-      const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-        type: "invite",
-        email,
-        options: { data: { name }, redirectTo },
-      });
+      const linkType = data.user.email_confirmed_at ? "recovery" : "invite";
+      const { data: linkData, error: linkError } = linkType === "recovery"
+        ? await admin.auth.admin.generateLink({ type: "recovery", email, options: { redirectTo } })
+        : await admin.auth.admin.generateLink({ type: "invite", email, options: { data: { name }, redirectTo } });
       if (linkError) {
         await admin.from("student_activity").update({ invite_status: "error", invite_error: linkError.message.slice(0, 500), updated_at: new Date().toISOString() }).eq("user_id", id);
         return NextResponse.json({ error: linkError.message }, { status: 500 });
@@ -159,9 +171,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       // primeiro GET e pode ser queimado por prévia automática antes do
       // aluno clicar de verdade. Montamos o link seguro com hashed_token.
       const hashedToken = linkData.properties?.hashed_token;
-      const inviteLink = hashedToken ? `${redirectTo}?token_hash=${hashedToken}&type=invite` : null;
+      const inviteLink = hashedToken ? `${redirectTo}?token_hash=${hashedToken}&type=${linkType}` : null;
+      if (!inviteLink) {
+        const message = "O provedor não devolveu um link de acesso.";
+        await admin.from("student_activity").update({ invite_status: "error", invite_error: message, updated_at: new Date().toISOString() }).eq("user_id", id);
+        return NextResponse.json({ error: message }, { status: 500 });
+      }
       await admin.from("student_activity").update({ invite_status: "pending", invite_last_sent_at: new Date().toISOString(), invite_error: null, updated_at: new Date().toISOString() }).eq("user_id", id);
-      await recordAudit(session.user!.id, id, "invite_resent");
+      await recordAudit(session.user!.id, id, "access_link_generated", { type: linkType });
       return NextResponse.json({ ok: true, inviteLink });
     }
 

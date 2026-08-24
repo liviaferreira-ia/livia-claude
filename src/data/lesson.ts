@@ -674,10 +674,67 @@ const CONTANDO_UMA_HISTORIA: Lesson = {
 
 // ================= C1 · Unidade 1 =================
 
+const IDENTITY_VALUES_PERSPECTIVE: Lesson = {
+  slug: "identity-values-perspective",
+  level: "C1",
+  unit: "Unidade 1 · Identity, Values & Perspective",
+  title: "Identity, Values & Perspective",
+  intro: "Nesta lição você vai além de descrever quem é: vai explicar como experiências, valores e decisões moldaram sua visão de mundo, controlando ressalva, ênfase e grau de convicção.",
+  vocab: {
+    title: "Valores, perspectiva e influência",
+    hint: "Ouça cada item e associe-o a uma escolha ou experiência concreta.",
+    items: [
+      { en: "deeply held belief", pt: "convicção profundamente arraigada" },
+      { en: "guiding principle", pt: "princípio orientador" },
+      { en: "worldview", pt: "visão de mundo" },
+      { en: "assumption", pt: "pressuposto" },
+      { en: "open to revision", pt: "aberto(a) a revisão" },
+      { en: "shape one's perspective", pt: "moldar a perspectiva de alguém" },
+      { en: "stand by a decision", pt: "sustentar uma decisão" },
+      { en: "reassess", pt: "reavaliar" },
+    ],
+  },
+  listening: {
+    title: "Como uma perspectiva se transforma",
+    hint: "Observe como a falante equilibra convicção, ressalva e mudança de opinião.",
+    lines: [
+      { who: "Interviewer", en: "Which value has had the greatest influence on your decisions?", pt: "Qual valor teve maior influência nas suas decisões?" },
+      { who: "Leah", en: "I tend to place a great deal of value on independence, although my understanding of it has changed considerably.", pt: "Tendo a valorizar muito a independência, embora minha compreensão dela tenha mudado consideravelmente." },
+      { who: "Interviewer", en: "What prompted that change?", pt: "O que provocou essa mudança?" },
+      { who: "Leah", en: "What really shaped my perspective was leading a team through a difficult period.", pt: "O que realmente moldou minha perspectiva foi liderar uma equipe durante um período difícil." },
+      { who: "Leah", en: "I came to realize that independence doesn't necessarily mean working in isolation.", pt: "Percebi que independência não significa necessariamente trabalhar de forma isolada." },
+    ],
+  },
+  expressions: {
+    title: "Nuance, convicção e revisão",
+    hint: "Combine uma posição, uma ressalva e uma evidência.",
+    items: [
+      { en: "I tend to believe that...", pt: "Tendo a acreditar que..." },
+      { en: "To some extent, I agree...", pt: "Até certo ponto, concordo..." },
+      { en: "What really shaped my opinion was...", pt: "O que realmente moldou minha opinião foi..." },
+      { en: "That isn't necessarily to say that...", pt: "Isso não significa necessariamente que..." },
+      { en: "I've come to reassess...", pt: "Passei a reavaliar..." },
+    ],
+  },
+  exercises: {
+    title: "Minha perspectiva em contexto",
+    praise: "Excelente! Você articulou posição, ressalva e influência com controle de nível C1.",
+    questions: [
+      { kind: "mc", type: "Escolha a formulação mais nuançada", prompt: "___, I agree with that perspective, although there are important exceptions.", hint: "Concordância parcial.", options: ["To some extent", "Completely always", "Without doubt all", "At every extent"], answer: 0, feedbackOk: "Correto! To some extent limita a concordância com precisão.", feedbackNo: "Use To some extent para sinalizar concordância parcial." },
+      { kind: "fill", type: "Complete a frase", prompt: "What really ___ my perspective was leading a diverse team.", hint: "Verbo: moldar, no passado.", answers: ["shaped"], feedbackOk: "Isso! Shaped indica a influência que formou a perspectiva.", feedbackNo: "A forma correta é shaped." },
+      { kind: "mc", type: "Escolha a opção correta", prompt: "That doesn't necessarily ___ that independence requires isolation.", hint: "Estrutura: doesn't + verbo base.", options: ["means", "mean", "meaning", "meant"], answer: 1, feedbackOk: "Perfeito! Depois de doesn't, usamos mean.", feedbackNo: "A estrutura exige o verbo base: doesn't mean." },
+      { kind: "fill", type: "Complete a frase", prompt: "I've come to ___ some of my earlier assumptions.", hint: "Verbo: reavaliar.", answers: ["reassess"], feedbackOk: "Muito bem! Come to reassess expressa mudança reflexiva.", feedbackNo: "A palavra é reassess." },
+      { kind: "mc", type: "Escolha a resposta C1", prompt: "Has your view of success changed?", hint: "Procure posição, mudança e evidência.", options: ["Yes, completely.", "I've come to see success less as status and more as the ability to make choices that align with my values.", "Success changed me yes.", "I think success is good."], answer: 1, feedbackOk: "Exato! A resposta define a mudança com contraste e precisão.", feedbackNo: "A melhor resposta explica como a definição mudou e qual valor passou a orientá-la." },
+    ],
+  },
+};
+
+// ================= C1 · Unidade 3 =================
+
 const DISCORDANDO_COM_TATO: Lesson = {
   slug: "discordando-com-tato",
   level: "C1",
-  unit: "Unidade 1 · Opiniões e debate",
+  unit: "Unidade 3 · Debate & Critical Thinking",
   title: "Discordando com tato",
   intro:
     "Nesta lição você vai aprender a discordar sem soar agressivo — reconhecer o ponto do outro, suavizar a objeção e ainda assim defender sua posição. É a diferença entre “You're wrong” e “I see your point, but…”. Uns 8 minutos.",
@@ -924,6 +981,7 @@ export const LESSONS: Record<string, Lesson> = {
   [CONTANDO_UMA_EXPERIENCIA.slug]: CONTANDO_UMA_EXPERIENCIA,
   [IDENTITY_PERSONAL_DEVELOPMENT.slug]: IDENTITY_PERSONAL_DEVELOPMENT,
   [CONTANDO_UMA_HISTORIA.slug]: CONTANDO_UMA_HISTORIA,
+  [IDENTITY_VALUES_PERSPECTIVE.slug]: IDENTITY_VALUES_PERSPECTIVE,
   [DISCORDANDO_COM_TATO.slug]: DISCORDANDO_COM_TATO,
   [ARGUMENTO_PERSUASIVO.slug]: ARGUMENTO_PERSUASIVO,
 };
@@ -934,7 +992,7 @@ export const LESSONS_BY_LEVEL: Record<CefrLevel, string[]> = {
   A2: [CONHECENDO_VOCE_MELHOR.slug, RESERVAS_E_CHECK_IN.slug],
   B1: [WHO_I_AM.slug, CONTANDO_UMA_EXPERIENCIA.slug],
   B2: [IDENTITY_PERSONAL_DEVELOPMENT.slug, CONTANDO_UMA_HISTORIA.slug],
-  C1: [DISCORDANDO_COM_TATO.slug],
+  C1: [IDENTITY_VALUES_PERSPECTIVE.slug, DISCORDANDO_COM_TATO.slug],
   C2: [ARGUMENTO_PERSUASIVO.slug],
 };
 

@@ -18,6 +18,8 @@ Execute `supabase-setup-15-progresso-pedagogico.sql` no SQL Editor do Supabase, 
 
 Para habilitar a trilha B2 de 14 unidades em uma base que já recebeu a parte 15, execute também `supabase-setup-16-progresso-b2.sql` antes de publicar o B2.
 
+Para habilitar a trilha C1 de 14 unidades e reposicionar corretamente a lição antiga de debate, execute `supabase-setup-17-progresso-c1.sql` depois da parte 16.
+
 Cada conclusão passa a ser registrada em `student_course_progress` por:
 
 - aluno;

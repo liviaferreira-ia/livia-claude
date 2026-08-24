@@ -3,9 +3,24 @@
   Onde colar: Supabase → Authentication → Email Templates → Invite user → Message body
   Assunto sugerido: 🎉 Bem-vindo(a) à Central School — sua jornada em inglês começa agora!
 
-  Variáveis do Supabase usadas: {{ .ConfirmationURL }} e {{ .Data.name }} (nome que o
-  professor digitou ao cadastrar o aluno em /professor/alunos — sempre preenchido,
-  por isso sem lógica condicional aqui: o preview do Supabase não processa {{ if }}/{{ end }}).
+  Variáveis do Supabase usadas: {{ .Data.name }} (nome que o professor digitou ao
+  cadastrar o aluno em /professor/alunos — sempre preenchido, por isso sem lógica
+  condicional aqui: o preview do Supabase não processa {{ if }}/{{ end }}).
+
+  IMPORTANTE (corrigido em 2026-08-21): o link NÃO usa mais {{ .ConfirmationURL }}.
+  Esse merge tag aponta direto pro domínio do Supabase
+  (https://<projeto>.supabase.co/auth/v1/verify?token=...), e esse endereço confirma
+  o convite sozinho já no primeiro GET — qualquer prévia automática de link (WhatsApp
+  gerando thumbnail, scanner de segurança de e-mail corporativo/iCloud) que só "abrir"
+  a URL pra ver do que se trata já queima o token antes do aluno clicar de verdade,
+  fazendo o link parecer "inválido" mesmo sendo um convite recém-criado. Trocado por
+  {{ .SiteURL }}/definir-senha?token_hash={{ .TokenHash }}&type=invite — um link com o
+  domínio da própria escola, que só confirma quando o aluno clica no botão dentro da
+  página (verifyOtp do lado do cliente), não durante o carregamento.
+
+  Fazer o mesmo ajuste no template "Reset Password" (trocar {{ .ConfirmationURL }} por
+  {{ .SiteURL }}/definir-senha?token_hash={{ .TokenHash }}&type=recovery), senão o
+  problema continua acontecendo pra quem já tem conta e esqueceu a senha.
 -->
 <div style="background-color:#f5f1e8; padding:40px 20px; font-family: Georgia, 'Times New Roman', serif;">
   <table role="presentation" width="100%" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e6dfce;">
@@ -36,7 +51,7 @@
         <table role="presentation" style="margin:0 auto;">
           <tr>
             <td style="border-radius:999px; background-color:#b8912f;">
-              <a href="{{ .ConfirmationURL }}"
+              <a href="{{ .SiteURL }}/definir-senha?token_hash={{ .TokenHash }}&type=invite"
                  style="display:inline-block; padding:15px 30px; font-family: Georgia, 'Times New Roman', serif; font-size:15.5px; font-weight:bold; color:#201a08; text-decoration:none; border-radius:999px;">
                 Criar minha senha e começar →
               </a>

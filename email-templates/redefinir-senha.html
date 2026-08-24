@@ -1,0 +1,63 @@
+<!--
+  Central School — e-mail de redefinição de senha
+  Onde colar: Supabase → Authentication → Email Templates → Reset Password → Message body
+  Assunto sugerido: Redefinir sua senha — Central School
+
+  Variáveis do Supabase usadas: nenhuma variável de nome aqui (o Reset Password não
+  recebe .Data como o Invite recebe).
+
+  Mesmo cuidado do convite (ver comentário em convite-aluno.html): o link usa
+  {{ .SiteURL }}/definir-senha?token_hash={{ .TokenHash }}&type=recovery em vez de
+  {{ .ConfirmationURL }}, pra não ser consumido por prévia automática de link antes da
+  pessoa clicar de verdade.
+-->
+<div style="background-color:#f5f1e8; padding:40px 20px; font-family: Georgia, 'Times New Roman', serif;">
+  <table role="presentation" width="100%" style="max-width:480px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e6dfce;">
+    <tr>
+      <td style="background:#1c3252; background-image:linear-gradient(135deg,#16263f,#223f6b); padding:34px 24px; text-align:center;">
+        <img src="https://centralschool.com.br/crest.png" width="60" height="60" alt="Central School"
+             style="display:block; margin:0 auto 12px; border-radius:8px;" />
+        <div style="color:#ffffff; font-size:24px; font-weight:bold; letter-spacing:0.03em;">Central School</div>
+        <div style="color:#e8c874; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; margin-top:6px;">English as a Lifestyle</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:34px 28px 8px; color:#1a2a45;">
+        <p style="font-size:21px; font-weight:bold; margin:0 0 14px; line-height:1.35;">
+          Redefinir sua senha
+        </p>
+        <p style="font-size:15px; line-height:1.65; color:#57627a; margin:0 0 30px;">
+          Recebemos um pedido pra redefinir a senha da sua conta na Central School.
+          Toque no botão abaixo pra escolher uma senha nova:
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 28px 34px; text-align:center;">
+        <table role="presentation" style="margin:0 auto;">
+          <tr>
+            <td style="border-radius:999px; background-color:#b8912f;">
+              <a href="{{ .SiteURL }}/definir-senha?token_hash={{ .TokenHash }}&type=recovery"
+                 style="display:inline-block; padding:15px 30px; font-family: Georgia, 'Times New Roman', serif; font-size:15.5px; font-weight:bold; color:#201a08; text-decoration:none; border-radius:999px;">
+                Definir nova senha →
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 28px 30px;">
+        <p style="font-size:12.5px; line-height:1.6; color:#8b93a4; margin:0;">
+          Se você não pediu essa redefinição, pode ignorar este e-mail com tranquilidade —
+          sua senha continua a mesma até que o link acima seja usado.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:18px 28px; border-top:1px solid #e6dfce; text-align:center;">
+        <p style="font-size:12px; color:#8b93a4; margin:0;">Central School · English as a Lifestyle</p>
+      </td>
+    </tr>
+  </table>
+</div>

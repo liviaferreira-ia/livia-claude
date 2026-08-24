@@ -12,6 +12,7 @@ create table if not exists public.special_activities (
   content_type        text not null default 'external_link'
                         check (content_type in ('external_link','material','mixed','internal','ai_generated')),
   external_url        text,
+  internal_content    text,
   publication_status  text not null default 'draft'
                         check (publication_status in ('draft','published','archived')),
   starts_at           timestamptz,
@@ -32,6 +33,8 @@ create table if not exists public.special_activities (
   updated_at          timestamptz not null default now(),
   check (ends_at is null or starts_at is null or ends_at > starts_at)
 );
+
+alter table public.special_activities add column if not exists internal_content text;
 
 create table if not exists public.special_activity_targets (
   id            uuid primary key default gen_random_uuid(),

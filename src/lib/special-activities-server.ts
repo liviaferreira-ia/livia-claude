@@ -7,6 +7,8 @@ export const SPECIAL_BUCKET = "special-activities";
 export const SPECIAL_LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
 export const SPECIAL_CONTENT_TYPES = new Set(["external_link", "material", "mixed"]);
 export const SPECIAL_SUBMISSION_FORMATS = new Set(["pdf", "docx", "image", "audio", "video", "presentation", "zip"]);
+const CLAUDE_ARTIFACT_URL = /^https:\/\/claude\.ai\/public\/artifacts\/([0-9a-f-]{36})(?:\/embed)?\/?(?:[?#].*)?$/i;
+const BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36";
 
 type Admin = ReturnType<typeof createAdminClient>;
 type ActivityRow = Record<string, unknown> & {
@@ -26,6 +28,27 @@ export function effectiveSpecialStatus(row: ActivityRow) {
   if (row.starts_at && new Date(row.starts_at).getTime() > now) return "scheduled";
   if (row.ends_at && new Date(row.ends_at).getTime() <= now) return "ended";
   return "available";
+}
+
+export async function importClaudeArtifact(sourceUrl: string | null) {
+  const match = sourceUrl?.match(CLAUDE_ARTIFACT_URL);
+  if (!match) return null;
+  const canonicalUrl = `https://claude.ai/public/artifacts/${match[1]}`;
+  const page = await fetch(canonicalUrl, { headers: { "user-agent": BROWSER_USER_AGENT }, signal: AbortSignal.timeout(20_000) });
+  if (!page.ok) throw new Error("Não foi possível acessar o Artifact público. Confira se o link está publicado.");
+  const getSetCookie = (page.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie;
+  const cookies = getSetCookie?.call(page.headers).map((value) => value.split(";", 1)[0]).join("; ") ?? "";
+  const artifact = await fetch(`https://claude.ai/api/published_artifacts/${match[1]}`, {
+    headers: { "user-agent": BROWSER_USER_AGENT, referer: canonicalUrl, accept: "application/json", ...(cookies ? { cookie: cookies } : {}) },
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!artifact.ok) throw new Error("Não foi possível importar o conteúdo do Artifact. Tente salvar novamente em alguns instantes.");
+  const payload = await artifact.json() as { type?: unknown; content?: unknown };
+  if (payload.type !== "text/html" || typeof payload.content !== "string" || !payload.content.trim()) {
+    throw new Error("Este Artifact não contém uma atividade HTML compatível.");
+  }
+  if (payload.content.length > 2_000_000) throw new Error("Este Artifact é grande demais para ser importado automaticamente.");
+  return payload.content;
 }
 
 export function targetsFromRows(rows: TargetRow[]) {

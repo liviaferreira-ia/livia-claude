@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/staff-server";
 import {
   assembleSpecialActivities,
+  importClaudeArtifact,
   loadSpecialActivityCollections,
   normalizeSpecialPayload,
   replaceSpecialTargets,
@@ -28,8 +29,10 @@ export async function POST(request: Request) {
   let activityId: string | null = null;
   try {
     const normalized = normalizeSpecialPayload(body as Record<string, unknown>);
+    const internalContent = await importClaudeArtifact(normalized.values.external_url);
     const { data, error } = await admin.from("special_activities").insert({
       ...normalized.values,
+      internal_content: internalContent,
       publication_status: "draft",
       created_by: session.user!.id,
       updated_by: session.user!.id,

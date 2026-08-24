@@ -6,6 +6,7 @@ import {
   SPECIAL_BUCKET,
   assembleSpecialActivities,
   assignSpecialRecipients,
+  importClaudeArtifact,
   loadSpecialActivityCollections,
   normalizeSpecialPayload,
   replaceSpecialTargets,
@@ -68,7 +69,8 @@ export async function PATCH(request: Request, context: Context) {
   try {
     if (action === "save") {
       const normalized = normalizeSpecialPayload(body as Record<string, unknown>);
-      const { error } = await admin.from("special_activities").update({ ...normalized.values, updated_by: session.user!.id }).eq("id", id);
+      const internalContent = await importClaudeArtifact(normalized.values.external_url);
+      const { error } = await admin.from("special_activities").update({ ...normalized.values, internal_content: internalContent, updated_by: session.user!.id }).eq("id", id);
       if (error) throw error;
       await replaceSpecialTargets(admin, id, normalized.targets);
       if (current.publication_status === "published") await assignSpecialRecipients(admin, id, normalized.targets);

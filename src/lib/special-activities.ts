@@ -29,6 +29,7 @@ export type SpecialActivity = {
   instructions: string | null;
   content_type: SpecialActivityContentType;
   external_url: string | null;
+  internal_content: string | null;
   publication_status: "draft" | "published" | "archived";
   effective_status: SpecialActivityEffectiveStatus;
   starts_at: string | null;

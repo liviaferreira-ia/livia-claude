@@ -1032,6 +1032,33 @@ img.avatar {
 }
 
 /* ---------- Caixa de entrada do professor ---------- */
+.conversation-student-select {
+  width: 100%;
+  max-width: 430px;
+  color-scheme: dark;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--ink);
+  padding: 10px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+.conversation-student-select:focus {
+  outline: 2px solid var(--navy);
+  outline-offset: 1px;
+}
+.conversation-student-select option {
+  background: #152538;
+  color: #eef2f8;
+}
+:root[data-theme="light"] .conversation-student-select {
+  color-scheme: light;
+}
+:root[data-theme="light"] .conversation-student-select option {
+  background: #fff;
+  color: #1a2a45;
+}
 .inbox {
   display: grid;
   grid-template-columns: 300px 1fr;

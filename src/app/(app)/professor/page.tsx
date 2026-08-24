@@ -153,9 +153,9 @@ export default function ProfessorInbox() {
             </label>
             <select
               id="conversation-student"
+              className="conversation-student-select"
               value={selectedId ?? ""}
               onChange={(event) => selectStudent(event.target.value)}
-              style={{ width: "100%", maxWidth: 430 }}
             >
               {conversations.map((conversation) => (
                 <option key={conversation.studentId} value={conversation.studentId}>

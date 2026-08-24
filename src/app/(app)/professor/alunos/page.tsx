@@ -14,7 +14,7 @@ import {
 } from "@/lib/activity";
 import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
 import { courseTotalPhases, type CourseProjectionFields } from "@/lib/courseProgress";
-import { studentAdminAction } from "@/lib/student-admin";
+import { requestStudentAccess } from "@/lib/student-admin";
 
 /** Texto curto explicando por que o aluno está em alerta (ou null se está tudo bem). */
 function attentionReason(r: StudentActivity): string | null {
@@ -79,12 +79,15 @@ export default function ProfessorAlunosPage() {
 
     setBusyId(row.user_id);
     setActionMsg(null);
+    setInviteLink(null);
+    setLinkCopied(false);
     try {
-      const error = await studentAdminAction(row.user_id, { action: "reset_password" });
+      const { error, inviteLink: freshLink } = await requestStudentAccess(row.user_id);
+      if (freshLink) setInviteLink(freshLink);
       setActionMsg(
         error
           ? { kind: "err", text: error }
-          : { kind: "ok", text: `Convite reenviado para ${name}.` },
+          : { kind: "ok", text: freshLink ? `Novo acesso gerado para ${name}. Copie o link abaixo se o e-mail não chegar.` : `E-mail de redefinição enviado para ${name}.` },
       );
     } catch {
       setActionMsg({ kind: "err", text: "Falha de conexão. Tente novamente." });

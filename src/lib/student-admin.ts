@@ -98,6 +98,22 @@ export async function studentAdminAction(id: string, values: Record<string, unkn
   return res.ok ? null : body.error || "Não consegui concluir a ação.";
 }
 
+export async function requestStudentAccess(id: string): Promise<{ error: string | null; inviteLink: string | null }> {
+  const res = await fetch(`/api/professor/alunos/${encodeURIComponent(id)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "reset_password" }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    return { error: body.error || "Não consegui enviar o acesso.", inviteLink: null };
+  }
+  return {
+    error: null,
+    inviteLink: typeof body.inviteLink === "string" ? body.inviteLink : null,
+  };
+}
+
 /** Meta semanal e foco definidos pelo professor (RLS: aluno só lê o próprio). */
 export async function getMySettings(): Promise<StudentSettings | null> {
   const supabase = createClient();

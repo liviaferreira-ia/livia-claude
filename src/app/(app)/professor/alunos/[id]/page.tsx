@@ -7,6 +7,7 @@ import { calcAge, formatDuration, formatLastLogin, practiceTotals, setStudentAcc
 import { replyToStudent } from "@/lib/messages";
 import {
   getStudentDetail,
+  requestStudentAccess,
   studentAdminAction,
   updateStudentDetail,
   type StudentDetail,
@@ -70,6 +71,8 @@ export default function ProfessorStudentPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [accessLink, setAccessLink] = useState<string | null>(null);
+  const [accessLinkCopied, setAccessLinkCopied] = useState(false);
   const [note, setNote] = useState("");
   const [reply, setReply] = useState("");
   const [assignment, setAssignment] = useState({ title: "", details: "", due_date: "" });
@@ -122,6 +125,27 @@ export default function ProfessorStudentPage() {
     return true;
   }
 
+  async function resendAccess() {
+    setBusy(true); setError(""); setMessage(""); setAccessLink(null); setAccessLinkCopied(false);
+    const result = await requestStudentAccess(id);
+    setBusy(false);
+    if (result.error) { setError(result.error); return; }
+    setAccessLink(result.inviteLink);
+    setMessage(result.inviteLink ? "Novo acesso gerado. Se o e-mail não chegar, copie o link abaixo." : "E-mail de redefinição enviado.");
+    await load();
+  }
+
+  async function copyAccessLink() {
+    if (!accessLink) return;
+    try {
+      await navigator.clipboard.writeText(accessLink);
+      setAccessLinkCopied(true);
+      window.setTimeout(() => setAccessLinkCopied(false), 2500);
+    } catch {
+      setError("Não consegui copiar automaticamente. Selecione o link e copie manualmente.");
+    }
+  }
+
   if (!ready || loading) return <div className="view"><p className="muted">Carregando aluno…</p></div>;
   if (!isTeacher) return <div className="view"><p>Esta área é exclusiva do professor.</p></div>;
   if (!detail) return <div className="view"><Link href="/professor/alunos">← Alunos</Link><p className="auth-msg err">{error || "Aluno não encontrado."}</p></div>;
@@ -130,7 +154,7 @@ export default function ProfessorStudentPage() {
   const courseProjection = a as typeof a & CourseProjectionFields;
   const totals = practiceTotals(a);
   const name = a.student_name || "Aluno(a)";
-  const invitePending = !detail.auth.emailConfirmedAt;
+  const invitePending = !detail.auth.lastSignInAt;
   const avg = a.session_count ? a.total_seconds / a.session_count : 0;
   const weakest = skills.filter((s) => s.done > 0).sort((x, y) => x.pct - y.pct)[0];
   const currentPayment = detail.payments.find((p) => p.status === "OVERDUE") ?? detail.payments.find((p) => ["PENDING", "AWAITING_RISK_ANALYSIS"].includes(p.status));
@@ -198,8 +222,9 @@ export default function ProfessorStudentPage() {
 
       {tab === "access" && <div className="grid cols-2">
         <div className="card stat"><div className="eyebrow">Cadastro e plano</div>{[["Nome", "name", "text"], ["E-mail de acesso", "email", "email"], ["WhatsApp", "whatsapp", "text"], ["Nascimento", "birthdate", "date"], ["Validade do acesso", "access_expires_on", "date"]].map(([label, key, type]) => <div className="field" key={key}><label>{label}</label><input type={type} value={String(form[key as keyof typeof form])} disabled={key === "email" && !invitePending} onChange={(e) => setForm({ ...form, [key]: e.target.value })} />{key === "email" && <small className="muted">{invitePending ? "Pode ser corrigido enquanto o convite não foi aceito." : "Conta ativa: a troca de e-mail exige um fluxo de segurança próprio."}</small>}</div>)}<div className="field"><label>Nível</label><select value={form.level} onChange={(e) => setForm({ ...form, level: e.target.value })}>{["A1", "A2", "B1", "B2", "C1", "C2"].map((l) => <option key={l}>{l}</option>)}</select></div><div className="field"><label>Foco recomendado</label><textarea rows={3} value={form.focus} onChange={(e) => setForm({ ...form, focus: e.target.value })} /></div><div className="field"><label>Meta semanal (dias)</label><input type="number" min={1} max={7} value={form.weekly_goal} onChange={(e) => setForm({ ...form, weekly_goal: Number(e.target.value) })} /></div><button className="btn primary" disabled={busy} onClick={() => void run(() => updateStudentDetail(id, form), form.email.trim().toLowerCase() !== detail.email.toLowerCase() ? "Cadastro e e-mail atualizados. Agora reenvie o acesso." : "Cadastro atualizado.")}>Salvar alterações</button></div>
-        <div><div className="card stat"><div className="eyebrow">Acesso à plataforma</div><p className="muted">{a.blocked ? "O aluno está impedido de acessar a área de estudos." : invitePending ? `O convite para ${detail.email} ainda não foi aceito. Confirme o endereço antes de reenviar.` : "O acesso do aluno está ativo."}</p>{!invitePending && <button className={a.blocked ? "btn primary" : "btn light"} disabled={busy} onClick={() => { const action = a.blocked ? "resume" : "pause"; if (!confirm(a.blocked ? `Reativar ${name}?` : `Pausar o acesso de ${name}?`)) return; void run(async () => (await setStudentAccess(id, action)).error, a.blocked ? "Acesso reativado." : "Acesso pausado."); }}>{a.blocked ? "Reativar acesso" : "Pausar acesso"}</button>}</div><div className="card stat" style={{ marginTop: 18 }}><div className="eyebrow">{invitePending ? "Convite e senha" : "Senha"}</div><p className="muted">{invitePending ? "Envia um novo e-mail para o aluno criar a senha e concluir o acesso. O envio aceito pelo sistema não garante a entrega na caixa de entrada." : "Envia um e-mail para o aluno criar uma nova senha. A senha atual nunca fica visível para a escola."}</p><button className="btn light" disabled={busy} onClick={() => { const actionLabel = invitePending ? "Reenviar o e-mail de acesso" : "Enviar redefinição de senha"; if (confirm(`${actionLabel} para ${detail.email}?`)) void run(() => studentAdminAction(id, { action: "reset_password" }), invitePending ? "Novo e-mail de acesso solicitado." : "E-mail de redefinição enviado."); }}>{invitePending ? "Reenviar e-mail de acesso" : "Enviar redefinição de senha"}</button></div></div>
+        <div><div className="card stat"><div className="eyebrow">Acesso à plataforma</div><p className="muted">{a.blocked ? "O aluno está impedido de acessar a área de estudos." : invitePending ? `O convite para ${detail.email} ainda não foi aceito. Confirme o endereço antes de reenviar.` : "O acesso do aluno está ativo."}</p>{!invitePending && <button className={a.blocked ? "btn primary" : "btn light"} disabled={busy} onClick={() => { const action = a.blocked ? "resume" : "pause"; if (!confirm(a.blocked ? `Reativar ${name}?` : `Pausar o acesso de ${name}?`)) return; void run(async () => (await setStudentAccess(id, action)).error, a.blocked ? "Acesso reativado." : "Acesso pausado."); }}>{a.blocked ? "Reativar acesso" : "Pausar acesso"}</button>}</div><div className="card stat" style={{ marginTop: 18 }}><div className="eyebrow">{invitePending ? "Convite e senha" : "Senha"}</div><p className="muted">{invitePending ? "Envia um novo e-mail para o aluno criar a senha e concluir o acesso. O envio aceito pelo sistema não garante a entrega na caixa de entrada." : "Envia um e-mail para o aluno criar uma nova senha. A senha atual nunca fica visível para a escola."}</p><button className="btn light" disabled={busy} onClick={() => { const actionLabel = invitePending ? "Reenviar o e-mail de acesso" : "Enviar redefinição de senha"; if (confirm(`${actionLabel} para ${detail.email}?`)) void resendAccess(); }}>{invitePending ? "Reenviar e-mail de acesso" : "Enviar redefinição de senha"}</button></div></div>
       </div>}
+      {tab === "access" && accessLink && <div className="card stat" style={{ marginTop: 18 }}><div className="eyebrow">Link alternativo de acesso</div><p className="muted">Se o e-mail não chegar, envie este link diretamente para o aluno por WhatsApp.</p><div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}><input readOnly value={accessLink} onFocus={(event) => event.currentTarget.select()} style={{ flex: "1 1 280px", fontSize: 13, fontFamily: "monospace" }} /><button type="button" className="btn light" onClick={() => void copyAccessLink()}>{accessLinkCopied ? "Copiado!" : "Copiar link"}</button></div></div>}
     </div>
   );
 }

@@ -89,7 +89,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
   if (userError || !existing.user) return NextResponse.json({ error: "Aluno não encontrado." }, { status: 404 });
   const currentEmail = existing.user.email?.toLowerCase() ?? "";
   const emailChanged = email !== currentEmail;
-  if (emailChanged && existing.user.email_confirmed_at) {
+  if (emailChanged && existing.user.last_sign_in_at) {
     return NextResponse.json({ error: "Por segurança, o e-mail de uma conta já ativada não pode ser alterado por esta tela." }, { status: 409 });
   }
   if (emailChanged) {

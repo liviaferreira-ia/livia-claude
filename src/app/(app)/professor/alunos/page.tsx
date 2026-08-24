@@ -24,7 +24,7 @@ import {
   type StudentDetail,
 } from "@/lib/student-admin";
 
-type DrawerTab = "overview" | "history" | "messages";
+type DrawerTab = "overview" | "registration" | "history" | "messages";
 
 function accessStatus(r: StudentActivity) {
   if (r.last_login_at || r.invite_status === "active") return { id: "active", text: "🟢 Ativo", cls: "ok" as const };
@@ -44,6 +44,12 @@ function attentionReason(r: StudentActivity): string | null {
 
 function dateTimeLabel(value: string | null) {
   return value ? new Date(value).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
+}
+
+function dateLabel(value: string | null) {
+  if (!value) return "Não informado";
+  const date = new Date(value.length === 10 ? `${value}T12:00:00` : value);
+  return date.toLocaleDateString("pt-BR");
 }
 
 export default function ProfessorAlunosPage() {
@@ -540,10 +546,11 @@ export default function ProfessorAlunosPage() {
       {drawerStudent && <div className="teacher-drawer-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setDrawerStudent(null); }}>
         <aside className="teacher-drawer" aria-label={`Detalhes de ${drawerStudent.student_name || "aluno"}`}>
           <div className="teacher-drawer-header"><div><div className="eyebrow">Detalhes do aluno</div><h3>{drawerStudent.student_name || "Aluno(a)"}</h3><span className="muted">{drawerStudent.level ? levelDisplay(drawerStudent.level) : "Nível não informado"}</span></div><button type="button" className="teacher-drawer-close" aria-label="Fechar detalhes" onClick={() => setDrawerStudent(null)}>×</button></div>
-          <div className="teacher-drawer-tabs">{([['overview','Resumo'],['history','Histórico'],['messages','Mensagens']] as [DrawerTab,string][]).map(([tabId, label]) => <button type="button" key={tabId} className={drawerTab === tabId ? "active" : ""} onClick={() => setDrawerTab(tabId)}>{label}</button>)}</div>
+          <div className="teacher-drawer-tabs">{([['overview','Resumo'],['registration','Cadastro'],['history','Histórico'],['messages','Mensagens']] as [DrawerTab,string][]).map(([tabId, label]) => <button type="button" key={tabId} className={drawerTab === tabId ? "active" : ""} onClick={() => setDrawerTab(tabId)}>{label}</button>)}</div>
           <div className="teacher-drawer-body">
             {drawerLoading && <p className="muted">Carregando dados…</p>}
             {!drawerLoading && drawerDetail && drawerTab === "overview" && (() => { const totals = practiceTotals(drawerDetail.activity); const projection = drawerDetail.activity as StudentActivity & CourseProjectionFields; const drawerLevel = parseCefrLevel(projection.course_level ?? projection.level ?? ""); const total = drawerLevel ? courseTotalPhases(drawerLevel) : 0; const progress = total ? Math.round(((projection.course_completed_phases ?? 0) / total) * 100) : 0; return <><div className="drawer-progress-hero"><span>{progress}% do nível</span><b>{drawerLevel ?? "—"}</b><div className="teacher-progress-track"><i style={{ width: `${progress}%` }} /></div></div><div className="drawer-stat-grid"><div><b>{formatDuration(drawerDetail.activity.total_seconds)}</b><span>Tempo de estudo</span></div><div><b>{drawerDetail.activity.session_count}</b><span>Sessões</span></div><div><b>{totals.pct}%</b><span>Acertos</span></div><div><b>{drawerDetail.assignments.filter((item) => item.status === "assigned").length}</b><span>Tarefas pendentes</span></div></div><div className="card stat"><div className="eyebrow">Próximo passo</div><p>{drawerDetail.settings?.focus || `Continuar a Unidade ${projection.current_unit ?? 1} e acompanhar a evolução dos acertos.`}</p></div></>; })()}
+            {!drawerLoading && drawerDetail && drawerTab === "registration" && (() => { const activity = drawerDetail.activity; const status = activity.blocked ? (activity.manual_block ? "Acesso pausado" : "Bloqueado automaticamente") : accessStatus(activity).text; const age = calcAge(activity.birthdate); return <div className="card stat"><div className="eyebrow">Dados cadastrais</div><div className="drawer-list-item"><div><b>Nome completo</b><span>{activity.student_name || "Não informado"}</span></div></div><div className="drawer-list-item"><div><b>E-mail de acesso</b><span>{drawerDetail.email}</span></div></div><div className="drawer-list-item"><div><b>WhatsApp</b><span>{activity.whatsapp || "Não informado"}</span></div></div><div className="drawer-list-item"><div><b>Data de nascimento</b><span>{dateLabel(activity.birthdate)}{age !== null ? ` · ${age} anos` : ""}</span></div></div><div className="drawer-list-item"><div><b>Nível</b><span>{activity.level ? levelDisplay(activity.level) : "Não informado"}</span></div></div><div className="drawer-list-item"><div><b>Status do acesso</b><span>{status}</span></div></div><div className="drawer-list-item"><div><b>Validade do acesso</b><span>{dateLabel(drawerDetail.settings?.access_expires_on ?? null)}</span></div></div><div className="drawer-list-item"><div><b>Convite enviado</b><span>{dateTimeLabel(drawerDetail.auth.invitedAt)}</span></div></div></div>; })()}
             {!drawerLoading && drawerDetail && drawerTab === "history" && <div>{drawerDetail.events.length === 0 ? <p className="muted">Nenhuma atividade registrada.</p> : drawerDetail.events.slice(0, 20).map((event) => <div className="drawer-list-item" key={event.id}><div><b>{event.event_type === "login" ? "Entrada na plataforma" : event.event_type === "course_phase" ? "Etapa do curso concluída" : event.event_type === "exercise" ? "Exercício respondido" : "Atividade realizada"}</b><span>{event.kind || "Central School"}</span></div><time>{dateTimeLabel(event.created_at)}</time></div>)}</div>}
             {!drawerLoading && drawerDetail && drawerTab === "messages" && <div><div className="drawer-message-list">{drawerDetail.messages.length === 0 ? <p className="muted">Nenhuma mensagem ainda.</p> : drawerDetail.messages.slice(-20).map((item) => <div key={item.id} className={`tutor-msg ${item.sender}`}><p>{item.body}</p><time>{dateTimeLabel(item.created_at)}</time></div>)}</div><textarea className="tutor-input" rows={3} value={drawerReply} onChange={(event) => setDrawerReply(event.target.value)} placeholder="Escreva uma mensagem para o aluno…" /><button type="button" className="btn primary" disabled={bulkBusy || !drawerReply.trim()} onClick={() => void sendDrawerMessage()}>Enviar mensagem</button></div>}
           </div>

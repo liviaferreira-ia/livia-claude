@@ -24,7 +24,7 @@ import {
   type StudentDetail,
 } from "@/lib/student-admin";
 
-type DrawerTab = "overview" | "history" | "messages" | "finance";
+type DrawerTab = "overview" | "history" | "messages";
 
 function accessStatus(r: StudentActivity) {
   if (r.last_login_at || r.invite_status === "active") return { id: "active", text: "🟢 Ativo", cls: "ok" as const };
@@ -44,10 +44,6 @@ function attentionReason(r: StudentActivity): string | null {
 
 function dateTimeLabel(value: string | null) {
   return value ? new Date(value).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
-}
-
-function money(value: number) {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
 }
 
 export default function ProfessorAlunosPage() {
@@ -93,7 +89,7 @@ export default function ProfessorAlunosPage() {
     const pausing = !row.blocked;
     const ok = confirm(
       pausing
-        ? `Pausar o acesso de ${name}? Ele verá um aviso de pagamento pendente ao entrar.`
+        ? `Pausar o acesso de ${name}? O aluno ficará impedido de entrar na área de estudos.`
         : `Reativar o acesso de ${name}?`,
     );
     if (!ok) return;
@@ -352,7 +348,6 @@ export default function ProfessorAlunosPage() {
       (filter === "invite_problem" && ["error", "not_sent"].includes(accessStatus(r).id)) ||
       (filter === "active" && !r.blocked && accessStatus(r).id === "active") ||
       (filter === "blocked" && r.blocked) ||
-      (filter === "overdue" && r.payment_status === "overdue") ||
       (filter === "inactive" && !!r.last_login_at && isInactive(r.last_login_at));
     return matchesName && matchesLevel && matchesFilter;
   });
@@ -444,7 +439,7 @@ export default function ProfessorAlunosPage() {
           {["A1", "A2", "B1", "B2", "C1", "C2"].map((l) => <option key={l} value={l}>{l}</option>)}
         </select>
         <select aria-label="Filtrar alunos" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ minWidth: 180 }}>
-          <option value="all">Todos os alunos</option><option value="pending">Convite pendente</option><option value="invite_problem">Erro ou não enviado</option><option value="active">Acesso ativo</option><option value="blocked">Acesso bloqueado</option><option value="overdue">Pagamento atrasado</option><option value="inactive">Inativos há 7 dias</option>
+          <option value="all">Todos os alunos</option><option value="pending">Convite pendente</option><option value="invite_problem">Erro ou não enviado</option><option value="active">Acesso ativo</option><option value="blocked">Acesso bloqueado</option><option value="inactive">Inativos há 7 dias</option>
         </select>
       </div>
 
@@ -495,12 +490,10 @@ export default function ProfessorAlunosPage() {
             const name = r.student_name || "Aluno(a)";
             const reason = attentionReason(r);
             const access = accessStatus(r);
-            const paymentFlag = r.blocked
-              ? { text: r.manual_block ? "Acesso pausado" : "Bloqueado (atraso)", cls: "bad" }
-              : r.payment_status === "overdue"
-                ? { text: "Pagamento atrasado", cls: "att" }
-                : null;
-            const situationNote = paymentFlag ?? (r.last_login_at && reason ? { text: reason, cls: "att" as const } : null);
+            const accessFlag = r.blocked
+              ? { text: r.manual_block ? "Acesso pausado" : "Bloqueado automaticamente", cls: "bad" }
+              : null;
+            const situationNote = accessFlag ?? (r.last_login_at && reason ? { text: reason, cls: "att" as const } : null);
             return (
               <div key={r.user_id} className={`rosterrow management ${selectedIds.has(r.user_id) ? "selected" : ""}`}>
                 <div className="teacher-student-cell">
@@ -547,13 +540,12 @@ export default function ProfessorAlunosPage() {
       {drawerStudent && <div className="teacher-drawer-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setDrawerStudent(null); }}>
         <aside className="teacher-drawer" aria-label={`Detalhes de ${drawerStudent.student_name || "aluno"}`}>
           <div className="teacher-drawer-header"><div><div className="eyebrow">Detalhes do aluno</div><h3>{drawerStudent.student_name || "Aluno(a)"}</h3><span className="muted">{drawerStudent.level ? levelDisplay(drawerStudent.level) : "Nível não informado"}</span></div><button type="button" className="teacher-drawer-close" aria-label="Fechar detalhes" onClick={() => setDrawerStudent(null)}>×</button></div>
-          <div className="teacher-drawer-tabs">{([['overview','Resumo'],['history','Histórico'],['messages','Mensagens'],['finance','Financeiro']] as [DrawerTab,string][]).map(([tabId, label]) => <button type="button" key={tabId} className={drawerTab === tabId ? "active" : ""} onClick={() => setDrawerTab(tabId)}>{label}</button>)}</div>
+          <div className="teacher-drawer-tabs">{([['overview','Resumo'],['history','Histórico'],['messages','Mensagens']] as [DrawerTab,string][]).map(([tabId, label]) => <button type="button" key={tabId} className={drawerTab === tabId ? "active" : ""} onClick={() => setDrawerTab(tabId)}>{label}</button>)}</div>
           <div className="teacher-drawer-body">
             {drawerLoading && <p className="muted">Carregando dados…</p>}
             {!drawerLoading && drawerDetail && drawerTab === "overview" && (() => { const totals = practiceTotals(drawerDetail.activity); const projection = drawerDetail.activity as StudentActivity & CourseProjectionFields; const drawerLevel = parseCefrLevel(projection.course_level ?? projection.level ?? ""); const total = drawerLevel ? courseTotalPhases(drawerLevel) : 0; const progress = total ? Math.round(((projection.course_completed_phases ?? 0) / total) * 100) : 0; return <><div className="drawer-progress-hero"><span>{progress}% do nível</span><b>{drawerLevel ?? "—"}</b><div className="teacher-progress-track"><i style={{ width: `${progress}%` }} /></div></div><div className="drawer-stat-grid"><div><b>{formatDuration(drawerDetail.activity.total_seconds)}</b><span>Tempo de estudo</span></div><div><b>{drawerDetail.activity.session_count}</b><span>Sessões</span></div><div><b>{totals.pct}%</b><span>Acertos</span></div><div><b>{drawerDetail.assignments.filter((item) => item.status === "assigned").length}</b><span>Tarefas pendentes</span></div></div><div className="card stat"><div className="eyebrow">Próximo passo</div><p>{drawerDetail.settings?.focus || `Continuar a Unidade ${projection.current_unit ?? 1} e acompanhar a evolução dos acertos.`}</p></div></>; })()}
             {!drawerLoading && drawerDetail && drawerTab === "history" && <div>{drawerDetail.events.length === 0 ? <p className="muted">Nenhuma atividade registrada.</p> : drawerDetail.events.slice(0, 20).map((event) => <div className="drawer-list-item" key={event.id}><div><b>{event.event_type === "login" ? "Entrada na plataforma" : event.event_type === "course_phase" ? "Etapa do curso concluída" : event.event_type === "exercise" ? "Exercício respondido" : "Atividade realizada"}</b><span>{event.kind || "Central School"}</span></div><time>{dateTimeLabel(event.created_at)}</time></div>)}</div>}
             {!drawerLoading && drawerDetail && drawerTab === "messages" && <div><div className="drawer-message-list">{drawerDetail.messages.length === 0 ? <p className="muted">Nenhuma mensagem ainda.</p> : drawerDetail.messages.slice(-20).map((item) => <div key={item.id} className={`tutor-msg ${item.sender}`}><p>{item.body}</p><time>{dateTimeLabel(item.created_at)}</time></div>)}</div><textarea className="tutor-input" rows={3} value={drawerReply} onChange={(event) => setDrawerReply(event.target.value)} placeholder="Escreva uma mensagem para o aluno…" /><button type="button" className="btn primary" disabled={bulkBusy || !drawerReply.trim()} onClick={() => void sendDrawerMessage()}>Enviar mensagem</button></div>}
-            {!drawerLoading && drawerDetail && drawerTab === "finance" && <div>{drawerDetail.payments.length === 0 ? <p className="muted">Nenhuma cobrança sincronizada.</p> : drawerDetail.payments.slice(0, 12).map((payment) => <div className="drawer-list-item" key={payment.id}><div><b>{money(Number(payment.value))}</b><span>{payment.status.replaceAll("_", " ")}</span></div><time>{payment.due_date ? new Date(`${payment.due_date}T12:00:00`).toLocaleDateString("pt-BR") : "—"}</time></div>)}</div>}
           </div>
           <div className="teacher-drawer-footer"><Link className="btn light" href={`/professor/alunos/${drawerStudent.user_id}`}>Abrir perfil completo →</Link></div>
         </aside>

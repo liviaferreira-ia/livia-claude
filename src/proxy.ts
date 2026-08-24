@@ -69,6 +69,12 @@ export async function proxy(request: NextRequest) {
   }
 
   const isTeacherArea = path === "/professor" || path.startsWith("/professor/");
+  if (path === "/professor/financeiro" || path.startsWith("/professor/financeiro/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/professor/alunos";
+    url.search = "";
+    return redirectWithSession(url, response);
+  }
   if (isTeacherArea && user) {
     const { data: profile, error } = await supabase
       .from("profiles")

@@ -18,12 +18,11 @@ import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profil
 import { LEARNING_CYCLE } from "@/data/curso";
 import { courseTotalPhases, type CourseProjectionFields } from "@/lib/courseProgress";
 
-type Tab = "overview" | "progress" | "activity" | "finance" | "notes" | "logs" | "access";
+type Tab = "overview" | "progress" | "activity" | "notes" | "logs" | "access";
 const tabs: { id: Tab; label: string }[] = [
   { id: "overview", label: "Visão geral" },
   { id: "progress", label: "Progresso" },
   { id: "activity", label: "Atividades" },
-  { id: "finance", label: "Financeiro" },
   { id: "notes", label: "Recados e anotações" },
   { id: "logs", label: "Logs e suporte" },
   { id: "access", label: "Acesso e cadastro" },
@@ -50,18 +49,6 @@ function dateLabel(value: string | null, withTime = false) {
   if (!value) return "—";
   const date = new Date(value.length === 10 ? `${value}T12:00:00` : value);
   return date.toLocaleDateString("pt-BR", withTime ? { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" } : undefined);
-}
-function money(value: number) {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
-}
-function paid(status: string) {
-  return ["RECEIVED", "CONFIRMED", "RECEIVED_IN_CASH", "DUNNING_RECEIVED"].includes(status);
-}
-function paymentLabel(status: string) {
-  if (status === "OVERDUE") return { text: "Em atraso", cls: "bad" };
-  if (paid(status)) return { text: "Pago", cls: "ok" };
-  if (["PENDING", "AWAITING_RISK_ANALYSIS"].includes(status)) return { text: "Aguardando", cls: "att" };
-  return { text: status.replaceAll("_", " "), cls: "att" };
 }
 
 export default function ProfessorStudentPage() {
@@ -207,7 +194,6 @@ export default function ProfessorStudentPage() {
         : { text: "⚪ Convite não enviado", cls: "" };
   const avg = a.session_count ? a.total_seconds / a.session_count : 0;
   const weakest = skills.filter((s) => s.done > 0).sort((x, y) => x.pct - y.pct)[0];
-  const currentPayment = detail.payments.find((p) => p.status === "OVERDUE") ?? detail.payments.find((p) => ["PENDING", "AWAITING_RISK_ANALYSIS"].includes(p.status));
   const courseLevel = parseCefrLevel(courseProjection.course_level ?? a.level ?? "");
   const totalCoursePhases = courseLevel ? courseTotalPhases(courseLevel) : 0;
   const courseCompleted = courseProjection.course_completed_phases ?? detail.courseProgress.filter((row) => row.level === courseLevel).length;
@@ -226,7 +212,7 @@ export default function ProfessorStudentPage() {
           </div>
         </div>
         <span className={`flag ${a.blocked ? "bad" : accessState.cls}`} title={accessState.text.includes("Erro") ? a.invite_error ?? undefined : undefined}>
-          {a.blocked ? (a.manual_block ? "Acesso pausado" : "Bloqueado por atraso") : accessState.text}
+          {a.blocked ? (a.manual_block ? "Acesso pausado" : "Bloqueado automaticamente") : accessState.text}
         </span>
       </div>
 
@@ -242,7 +228,7 @@ export default function ProfessorStudentPage() {
         </div>
         <div className="grid cols-2" style={{ marginTop: 18 }}>
           <div className="card stat"><div className="eyebrow">Foco recomendado</div><p style={{ lineHeight: 1.6 }}>{form.focus || (weakest ? `Reforçar ${kindLabels[weakest.kind].toLowerCase()}: ${weakest.pct}% de acerto em ${weakest.done} exercícios.` : "O aluno ainda não realizou exercícios suficientes para uma recomendação.")}</p></div>
-          <div className="card stat"><div className="eyebrow">Situação financeira</div><p style={{ lineHeight: 1.6 }}>{currentPayment ? `${paymentLabel(currentPayment.status).text} · ${money(Number(currentPayment.value))} · vence em ${dateLabel(currentPayment.due_date)}` : detail.payments.length ? "Sem cobrança pendente no momento." : "Ainda não há cobranças sincronizadas."}</p><button className="btn light" onClick={() => setTab("finance")}>Ver financeiro →</button></div>
+          <div className="card stat"><div className="eyebrow">Status do acesso</div><p style={{ lineHeight: 1.6 }}>{a.blocked ? (a.manual_block ? "Acesso pausado manualmente." : "Acesso bloqueado automaticamente.") : "Acesso liberado para estudar."}</p><button className="btn light" onClick={() => setTab("access")}>Gerenciar acesso →</button></div>
         </div>
       </>}
 
@@ -257,8 +243,6 @@ export default function ProfessorStudentPage() {
         <div><div className="card stat"><div className="eyebrow">Tarefas</div>{detail.assignments.length === 0 ? <p className="muted">Nenhuma atividade atribuída.</p> : detail.assignments.map((x) => <div key={x.id} style={{ padding: "12px 0", borderBottom: "1px solid var(--line)" }}><b>{x.title}</b><div className="muted" style={{ fontSize: 12.5 }}>{x.due_date ? `Prazo: ${dateLabel(x.due_date)}` : "Sem prazo"} · {x.status === "done" ? "Concluída" : x.status === "cancelled" ? "Cancelada" : "Pendente"}</div>{x.status === "assigned" && <button className="pill-btn" style={{ marginTop: 6 }} onClick={() => void run(() => studentAdminAction(id, { action: "assignment_status", assignment_id: x.id, status: "cancelled" }), "Atividade cancelada.")}>Cancelar</button>}</div>)}</div></div>
         <div className="card stat" style={{ gridColumn: "1 / -1" }}><div className="eyebrow">Linha do tempo recente</div>{detail.events.length === 0 ? <p className="muted">O histórico começará a ser registrado após a migração desta entrega.</p> : detail.events.map((e) => <div key={e.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "10px 0", borderBottom: "1px solid var(--line)", fontSize: 13.5 }}><span>{eventLabel(e)}</span><span className="muted">{dateLabel(e.created_at, true)}</span></div>)}</div>
       </div>}
-
-      {tab === "finance" && <div className="card" style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}><thead><tr>{["Vencimento", "Pagamento", "Valor", "Forma", "Status", "Cobrança"].map((x) => <th key={x} style={{ padding: 12, textAlign: "left", borderBottom: "1px solid var(--line)" }}>{x}</th>)}</tr></thead><tbody>{detail.payments.map((p) => { const flag = paymentLabel(p.status); return <tr key={p.id} style={{ borderBottom: "1px solid var(--line)" }}><td style={{ padding: 12 }}>{dateLabel(p.due_date)}</td><td style={{ padding: 12 }}>{dateLabel(p.payment_date ?? p.confirmed_date)}</td><td style={{ padding: 12 }}>{money(Number(p.value))}</td><td style={{ padding: 12 }}>{p.billing_type?.replaceAll("_", " ") ?? "—"}</td><td style={{ padding: 12 }}><span className={`flag ${flag.cls}`}>{flag.text}</span></td><td style={{ padding: 12 }}>{p.invoice_url ? <a href={p.invoice_url} target="_blank" rel="noopener noreferrer">Abrir ↗</a> : "—"}</td></tr>; })}</tbody></table>{detail.payments.length === 0 && <p className="muted" style={{ padding: 18 }}>Nenhuma cobrança sincronizada.</p>}</div>}
 
       {tab === "notes" && <div className="grid cols-2">
         <div className="card stat"><div className="eyebrow">Conversa com o aluno</div><div style={{ maxHeight: 360, overflowY: "auto", margin: "12px 0" }}>{detail.messages.length === 0 ? <p className="muted">Nenhum recado ainda.</p> : detail.messages.map((m) => <div key={m.id} className={`tutor-msg ${m.sender}`}><p>{m.body}</p><time>{dateLabel(m.created_at, true)}</time></div>)}</div><textarea className="tutor-input" rows={3} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Escreva uma resposta…" /><button className="btn primary" style={{ marginTop: 10 }} disabled={busy || !reply.trim()} onClick={async () => { const ok = await run(async () => (await replyToStudent(id, name, reply)).error, "Recado enviado."); if (ok) setReply(""); }}>Enviar recado</button></div>

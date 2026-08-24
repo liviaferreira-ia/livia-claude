@@ -27,10 +27,13 @@ export function ThemeToggle() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const t = getInitial();
-    setTheme(t);
-    document.documentElement.setAttribute("data-theme", t);
-    setReady(true);
+    const timer = window.setTimeout(() => {
+      const t = getInitial();
+      setTheme(t);
+      document.documentElement.setAttribute("data-theme", t);
+      setReady(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   function toggle() {

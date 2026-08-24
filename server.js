@@ -2,6 +2,7 @@
 // O Passenger define a porta em process.env.PORT e espera um servidor HTTP
 // comum escutando nela — por isso não usamos "next start" direto, e sim a
 // API programática do Next pra criar esse servidor.
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { createServer } = require("http");
 const next = require("next");
 

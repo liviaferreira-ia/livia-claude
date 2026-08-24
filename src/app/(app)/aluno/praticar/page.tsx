@@ -16,7 +16,7 @@ import {
 } from "@/data/exercises";
 import { LEVEL_ORDER, type CefrLevel } from "@/data/placement";
 import { markContentValidated } from "@/lib/content-validation";
-import { courseContextFromLocation, markCoursePhase } from "@/lib/courseProgress";
+import { courseContextFromLocation, markCoursePhase, useCourseContextFromLocation } from "@/lib/courseProgress";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 const TINTS: Record<Kind, string> = {
@@ -39,6 +39,7 @@ function shuffle<T>(arr: readonly T[]): T[] {
 
 export default function PraticarPage() {
   const { profile, ready, isTeacher, bumpPractice } = useProfile();
+  const courseQuery = useCourseContextFromLocation();
   const [kind, setKind] = useState<Kind | null>(null);
   const [reviewLevel, setReviewLevel] = useState<CefrLevel | null>(null);
   const [smartReviewLevel, setSmartReviewLevel] = useState<CefrLevel | null>(null);
@@ -66,12 +67,14 @@ export default function PraticarPage() {
 
   const reviewMode = ready && isTeacher && reviewLevel !== null;
   const smartReviewMode = !reviewMode && smartReviewLevel !== null && reviewIds.length > 0;
-  const studentLevel = reviewMode ? reviewLevel : smartReviewLevel ?? parseCefrLevel(profile.level) ?? "A2";
+  const studentLevel = reviewMode
+    ? reviewLevel
+    : smartReviewLevel ?? courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = reviewMode ? reviewLevel : smartReviewMode ? smartReviewLevel : resolveExerciseLevel(studentLevel);
   const categories = categoriesFor(contentLevel);
   const bank = EXERCISES[contentLevel];
 
-  if (!queryReady || !ready) {
+  if (!queryReady || !courseQuery.ready || !ready) {
     return <div className="view"><p className="muted">Carregando…</p></div>;
   }
 

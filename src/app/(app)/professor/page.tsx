@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useProfile } from "@/lib/profile";
 import { listThreads, replyToStudent, type Thread } from "@/lib/messages";
 
@@ -14,17 +14,18 @@ export default function ProfessorInbox() {
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState("");
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     const { data } = await listThreads();
     setThreads(data);
     setLoading(false);
     setSelectedId((prev) => prev ?? data[0]?.studentId ?? null);
-  }
+  }, []);
 
   useEffect(() => {
     if (!ready || !isTeacher) return;
-    refresh();
-  }, [ready, isTeacher]);
+    const timer = window.setTimeout(() => void refresh(), 0);
+    return () => window.clearTimeout(timer);
+  }, [ready, isTeacher, refresh]);
 
   const selected = threads.find((t) => t.studentId === selectedId) ?? null;
 

@@ -7,6 +7,7 @@ import { SpeakButton } from "@/components/SpeakButton";
 import { PRONUNCIATION, resolvePronunciationLevel } from "@/data/pratica";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 import { completeTrackedModule } from "@/lib/module-events";
+import { useCourseContextFromLocation } from "@/lib/courseProgress";
 import {
   createRecognition,
   isSTTSupported,
@@ -19,6 +20,7 @@ type Phase = "idle" | "listening" | "result";
 
 export default function PronunciaPage() {
   const { profile, ready } = useProfile();
+  const courseQuery = useCourseContextFromLocation();
   const [supported, setSupported] = useState(true);
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -28,7 +30,10 @@ export default function PronunciaPage() {
   const [answered, setAnswered] = useState(0);
   const recRef = useRef<SpeechRecognitionLike | null>(null);
 
-  const SENTENCES = PRONUNCIATION[resolvePronunciationLevel(parseCefrLevel(profile.level) ?? "A2")];
+  const pronunciationLevel = resolvePronunciationLevel(
+    courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2",
+  );
+  const SENTENCES = PRONUNCIATION[pronunciationLevel];
 
   useEffect(() => {
     const timer = window.setTimeout(() => setSupported(isSTTSupported()), 0);
@@ -40,10 +45,10 @@ export default function PronunciaPage() {
 
   // Toca a frase de referência automaticamente ao abrir e ao trocar de frase.
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !courseQuery.ready) return;
     const sentence = SENTENCES[index];
     if (sentence) speak(sentence);
-  }, [index, ready, SENTENCES]);
+  }, [index, ready, courseQuery.ready, SENTENCES]);
 
   const target = SENTENCES[index] ?? "";
   const targetWords = normalize(target).split(" ");
@@ -108,7 +113,7 @@ export default function PronunciaPage() {
     setAnswered(0);
   }
 
-  if (!ready) {
+  if (!ready || !courseQuery.ready) {
     return (
       <div className="view">
         <p className="muted">Carregando…</p>

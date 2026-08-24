@@ -137,6 +137,22 @@ export function courseContextFromLocation(): { level: CefrLevel; unit: number } 
   return { level: level as CefrLevel, unit };
 }
 
+/**
+ * Aguarda a hidratação antes de ler o contexto curricular da URL.
+ * `undefined` significa que a leitura ainda não ocorreu; `null`, que a página
+ * foi aberta fora de uma etapa do curso.
+ */
+export function useCourseContextFromLocation() {
+  const [context, setContext] = useState<ReturnType<typeof courseContextFromLocation> | undefined>(undefined);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setContext(courseContextFromLocation()), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return { context: context ?? null, ready: context !== undefined };
+}
+
 const lessonLocations: Record<string, { level: CefrLevel; unit: number }> = {
   "apresentando-se": { level: "A1", unit: 1 },
   "conhecendo-voce-melhor": { level: "A2", unit: 1 },

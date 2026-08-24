@@ -6,6 +6,7 @@ import { ROLEPLAYS, resolveRoleplayLevel, type Roleplay } from "@/data/pratica";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 import { completeTrackedModule } from "@/lib/module-events";
+import { useCourseContextFromLocation } from "@/lib/courseProgress";
 import {
   createRecognition,
   isSTTSupported,
@@ -18,6 +19,7 @@ type Msg = { who: "ai" | "me"; text: string };
 
 export default function RoleplayPage() {
   const { profile, ready } = useProfile();
+  const courseQuery = useCourseContextFromLocation();
   const [chosenId, setChosenId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [step, setStep] = useState(0);
@@ -27,7 +29,9 @@ export default function RoleplayPage() {
   const recRef = useRef<SpeechRecognitionLike | null>(null);
   const chatRef = useRef<HTMLDivElement>(null);
 
-  const roleplayLevel = resolveRoleplayLevel(parseCefrLevel(profile.level) ?? "A2");
+  const roleplayLevel = resolveRoleplayLevel(
+    courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2",
+  );
   const scenarios = ROLEPLAYS[roleplayLevel];
   const roleplay = scenarios.find((r) => r.id === chosenId) ?? null;
   const SCRIPT = roleplay?.steps ?? [];
@@ -102,7 +106,7 @@ export default function RoleplayPage() {
   }
 
   // Tela inicial do cenário
-  if (!ready) {
+  if (!ready || !courseQuery.ready) {
     return (
       <div className="view">
         <p className="muted">Carregando…</p>

@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/client";
 
+export const MAX_MESSAGE_LENGTH = 2000;
+
 export type Message = {
   id: string;
   user_id: string;
@@ -26,6 +28,7 @@ export async function listMyMessages(): Promise<{ data: Message[]; error: string
 export async function sendMessage(body: string): Promise<{ error: string | null }> {
   const text = body.trim();
   if (!text) return { error: "Escreva uma mensagem." };
+  if (text.length > MAX_MESSAGE_LENGTH) return { error: `A mensagem pode ter no máximo ${MAX_MESSAGE_LENGTH} caracteres.` };
 
   const supabase = createClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -84,6 +87,7 @@ export async function replyToStudent(
 ): Promise<{ error: string | null }> {
   const text = body.trim();
   if (!text) return { error: "Escreva uma resposta." };
+  if (text.length > MAX_MESSAGE_LENGTH) return { error: `A resposta pode ter no máximo ${MAX_MESSAGE_LENGTH} caracteres.` };
 
   const supabase = createClient();
   const { error } = await supabase

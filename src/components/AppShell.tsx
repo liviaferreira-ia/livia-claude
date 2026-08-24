@@ -93,7 +93,10 @@ const studentNav: { section: string; items: NavItem[] }[] = [
   },
   {
     section: "Você",
-    items: [{ href: "/aluno/conta", label: "Minha conta", icon: I.user }],
+    items: [
+      { href: "/aluno/professor", label: "Fale com o professor", icon: I.chat },
+      { href: "/aluno/conta", label: "Minha conta", icon: I.user },
+    ],
   },
 ];
 
@@ -105,7 +108,7 @@ const teacherNav: { section: string; items: NavItem[] }[] = [
       { href: "/professor/financeiro", label: "Financeiro", icon: I.wallet },
       { href: "/professor/operacional", label: "Operacional", icon: I.pulse },
       { href: "/professor/validacao-conteudo", label: "Validação de conteúdo", icon: I.book },
-      { href: "/professor", label: "Recados dos alunos", icon: I.chat },
+      { href: "/professor", label: "Conversas", icon: I.chat },
     ],
   },
 ];
@@ -122,12 +125,13 @@ const CRUMBS: Record<string, string> = {
   "/aluno/revisao": "Revisão",
   "/aluno/progresso": "Meu progresso",
   "/aluno/palavras": "Minhas palavras",
+  "/aluno/professor": "Fale com o professor",
   "/aluno/conta": "Minha conta",
   "/professor/alunos": "Alunos",
   "/professor/financeiro": "Financeiro",
   "/professor/operacional": "Operacional",
   "/professor/validacao-conteudo": "Validação de conteúdo",
-  "/professor": "Recados dos alunos",
+  "/professor": "Conversas",
 };
 
 export function AppShell({ children }: { children: ReactNode }) {

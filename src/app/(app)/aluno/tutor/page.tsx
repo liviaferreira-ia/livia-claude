@@ -80,7 +80,7 @@ export default function TutorPage() {
             <div>
               <b style={{ fontSize: 14 }}>Quer aprofundar com seu professor?</b>
               <div className="muted" style={{ fontSize: 13.5 }}>
-                Mande suas dúvidas pelos recados, na tela inicial — ele lê e responde
+                Envie uma mensagem na conversa com o professor — ele lê e responde
                 pessoalmente, além da correção que você já recebeu do tutor de IA agora.
               </div>
             </div>
@@ -102,7 +102,7 @@ export default function TutorPage() {
           <button className="btn ghost" onClick={() => { setReplies([]); setEnded(false); }}>
             Praticar de novo
           </button>
-          <Link href="/aluno" className="btn ghost">Voltar ao início</Link>
+          <Link href="/aluno/professor" className="btn ghost">Falar com o professor</Link>
         </div>
       </div>
     );

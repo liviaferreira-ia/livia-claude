@@ -888,6 +888,12 @@ img.avatar {
   outline: 2px solid var(--navy);
   border-color: var(--navy);
 }
+.conversation-card .tutor-thread {
+  min-height: 280px;
+  max-height: 480px;
+  padding: 4px;
+  scroll-behavior: smooth;
+}
 
 /* ---------- Cabeçalho de perfil (estilo rede social) ---------- */
 .profile-hero {

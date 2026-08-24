@@ -18,7 +18,7 @@ type UseIdleLogoutOptions = {
 };
 
 /**
- * Encerra a sessao depois de 15 minutos sem interacao. O horario fica no
+ * Encerra a sessao depois de 40 minutos sem interacao. O horario fica no
  * localStorage para que todas as abas compartilhem a mesma atividade e para
  * detectar a expiracao assim que o usuario volta ao navegador.
  */

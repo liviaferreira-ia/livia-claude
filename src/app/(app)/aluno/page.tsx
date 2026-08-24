@@ -299,8 +299,8 @@ export default function AlunoDashboard() {
           </div>
 
           <div className="sec-h" style={{ marginTop: 26 }}>
-            <h3>Fale com seu tutor</h3>
-            <span className="muted">um professor de verdade acompanha você</span>
+            <h3>Fale com seu professor</h3>
+            <Link href="/aluno/professor" className="muted" style={{ fontSize: 13 }}>Abrir conversa completa →</Link>
           </div>
           <div className="card">
             {messages.length > 0 && (
@@ -324,13 +324,14 @@ export default function AlunoDashboard() {
               className="tutor-input"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Escreva um recado, uma dúvida ou peça ajuda ao seu tutor…"
+              placeholder="Escreva uma dúvida ou peça orientação ao seu professor…"
+              maxLength={2000}
               rows={3}
             />
             {msgErr && <p className="auth-msg err" style={{ maxWidth: "none" }}>{msgErr}</p>}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
               <span className="muted" style={{ fontSize: 12.5 }}>
-                Seu tutor responde em breve.
+                Seu professor receberá esta mensagem na plataforma.
               </span>
               <button
                 className="btn primary"

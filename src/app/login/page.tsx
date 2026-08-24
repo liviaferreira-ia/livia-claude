@@ -124,7 +124,7 @@ function LoginInner() {
           </div>}
 
           {reason === "inatividade" && (
-            <p className="auth-msg ok">Sua sessão foi encerrada após 15 minutos sem atividade. Entre novamente para continuar.</p>
+            <p className="auth-msg ok">Sua sessão foi encerrada após 40 minutos sem atividade. Entre novamente para continuar.</p>
           )}
           {reason === "sessao_expirada" && (
             <p className="auth-msg err">Sua sessão expirou ou perdeu a conexão. Entre novamente para continuar.</p>

@@ -1,4 +1,4 @@
-export const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
+export const IDLE_TIMEOUT_MS = 40 * 60 * 1000;
 
 function activityKey(userId: string) {
   return `central_last_activity_${userId}`;

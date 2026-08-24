@@ -17,6 +17,7 @@ function count(text, pattern) {
 const a1 = section("const COURSE_A1", "const COURSE_A2");
 const a2 = section("const COURSE_A2", "const b1Unit");
 const b1 = section("const COURSE_B1", "const COURSE_B2");
+const b2 = section("const COURSE_B2", "const COURSE_C1");
 
 const checks = [
   ["A1 possui 12 unidades", count(a1, /\bn:\s*\d+,/g) === 12],
@@ -28,6 +29,9 @@ const checks = [
   ["B1 possui 14 unidades", count(b1, /\bb1Unit\(/g) === 14],
   ["B1 define as 6 fases do ciclo", count(source.slice(source.indexOf("const b1Unit"), source.indexOf("const COURSE_B1")), /phase:\s*"(?:learn|understand|practice|speak|mission|mastery)"/g) === 6],
   ["B1 possui 3 checkpoints", count(b1, /Checkpoint [123]/g) === 3],
+  ["B2 possui 14 unidades", count(b2, /\bb2Unit\(/g) === 14],
+  ["B2 define as 6 fases do ciclo", count(source.slice(source.indexOf("const b2Unit"), source.indexOf("const COURSE_B2")), /phase:\s*"(?:learn|understand|practice|speak|mission|mastery)"/g) === 6],
+  ["B2 possui 3 checkpoints", count(b2, /Checkpoint [123]/g) === 3],
 ];
 
 const failed = checks.filter(([, ok]) => !ok);

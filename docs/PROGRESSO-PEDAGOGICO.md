@@ -16,6 +16,8 @@ Por isso era possível estudar por vários minutos e continuar com zero exercíc
 
 Execute `supabase-setup-15-progresso-pedagogico.sql` no SQL Editor do Supabase, depois da parte 12 e antes de publicar o código desta entrega.
 
+Para habilitar a trilha B2 de 14 unidades em uma base que já recebeu a parte 15, execute também `supabase-setup-16-progresso-b2.sql` antes de publicar o B2.
+
 Cada conclusão passa a ser registrada em `student_course_progress` por:
 
 - aluno;

@@ -498,10 +498,68 @@ const CONTANDO_UMA_EXPERIENCIA: Lesson = {
 
 // ================= B2 · Unidade 1 =================
 
+const IDENTITY_PERSONAL_DEVELOPMENT: Lesson = {
+  slug: "identity-personal-development",
+  level: "B2",
+  unit: "Unidade 1 · Identity & Personal Development",
+  title: "Identity & Personal Development",
+  intro: "Nesta lição você vai construir uma reflexão mais profunda sobre quem é, como mudou e o que vem desenvolvendo. O foco não é apenas descrever características, mas relacionar experiências, hábitos e escolhas à sua identidade atual.",
+  vocab: {
+    title: "Desenvolvimento pessoal com nuance",
+    hint: "Ouça as expressões e pense em uma evidência verdadeira para cada uma.",
+    items: [
+      { en: "self-aware", pt: "consciente de si" },
+      { en: "resilient", pt: "resiliente" },
+      { en: "adaptable", pt: "adaptável" },
+      { en: "strength", pt: "ponto forte" },
+      { en: "weakness", pt: "ponto a desenvolver" },
+      { en: "mindset", pt: "mentalidade" },
+      { en: "turning point", pt: "momento decisivo" },
+      { en: "work on", pt: "trabalhar para melhorar" },
+    ],
+  },
+  listening: {
+    title: "Uma mudança construída ao longo do tempo",
+    hint: "Observe a diferença entre uma mudança concluída e um processo que continua.",
+    lines: [
+      { who: "Interviewer", en: "How would you say you've changed over the last few years?", pt: "Como você diria que mudou nos últimos anos?" },
+      { who: "Sam", en: "I've become more self-aware, especially since I started leading a team.", pt: "Tornei-me mais consciente de mim, especialmente desde que comecei a liderar uma equipe." },
+      { who: "Interviewer", en: "Was there a particular turning point?", pt: "Houve algum momento decisivo?" },
+      { who: "Sam", en: "Yes. I received difficult feedback two years ago, and it changed the way I communicate.", pt: "Sim. Recebi um feedback difícil há dois anos, e isso mudou minha forma de me comunicar." },
+      { who: "Interviewer", en: "What have you been working on recently?", pt: "Em que você vem trabalhando recentemente?" },
+      { who: "Sam", en: "I've been working on listening more carefully before offering a solution.", pt: "Venho trabalhando em ouvir com mais atenção antes de oferecer uma solução." },
+    ],
+  },
+  expressions: {
+    title: "Conectando passado, presente e desenvolvimento",
+    hint: "Use as estruturas para acrescentar evidência e reflexão, não apenas uma lista de adjetivos.",
+    items: [
+      { en: "Looking back, I'd say...", pt: "Olhando para trás, eu diria..." },
+      { en: "One of my main strengths is...", pt: "Um dos meus principais pontos fortes é..." },
+      { en: "I've become more... since...", pt: "Eu me tornei mais... desde..." },
+      { en: "I've been working on...", pt: "Venho trabalhando em..." },
+      { en: "That experience changed the way I...", pt: "Essa experiência mudou a forma como eu..." },
+    ],
+  },
+  exercises: {
+    title: "Minha trajetória de desenvolvimento",
+    praise: "Excelente! Você conectou mudança, duração e reflexão com a precisão esperada no B2.",
+    questions: [
+      { kind: "mc", type: "Escolha a opção correta", prompt: "I've ___ more confident since I started presenting regularly.", hint: "Mudança que ocorreu ao longo do tempo.", options: ["become", "became", "becoming", "been become"], answer: 0, feedbackOk: "Correto! Present perfect: I've become more confident.", feedbackNo: "Depois de have usamos o particípio become: I've become." },
+      { kind: "fill", type: "Complete a frase", prompt: "I've been working ___ my communication skills for months.", hint: "Uma preposição.", answers: ["on"], feedbackOk: "Isso! Work on significa trabalhar para desenvolver algo.", feedbackNo: "A expressão é work on." },
+      { kind: "mc", type: "Escolha a opção correta", prompt: "I ___ difficult feedback two years ago.", hint: "O momento passado está definido.", options: ["have received", "receive", "received", "have been receiving"], answer: 2, feedbackOk: "Perfeito! Two years ago pede past simple: received.", feedbackNo: "Com um tempo passado definido, usamos received." },
+      { kind: "fill", type: "Complete a frase", prompt: "What have you been ___ on recently?", hint: "Forma -ing do verbo work.", answers: ["working"], feedbackOk: "Muito bem! Have been working descreve um processo recente.", feedbackNo: "A forma correta é working." },
+      { kind: "mc", type: "Escolha a melhor resposta", prompt: "What is one of your strengths?", hint: "A resposta B2 inclui característica e evidência.", options: ["I'm adaptable because I've learned to work well with different teams.", "Adaptable.", "I adaptation very.", "I was strength."], answer: 0, feedbackOk: "Exato! A resposta apresenta a força e a sustenta com evidência.", feedbackNo: "No B2, escolha a resposta que acrescenta uma justificativa concreta." },
+    ],
+  },
+};
+
+// ================= B2 · Unidade 2 =================
+
 const CONTANDO_UMA_HISTORIA: Lesson = {
   slug: "contando-uma-historia",
   level: "B2",
-  unit: "Unidade 1 · Contando histórias",
+  unit: "Unidade 2 · Experiences & Storytelling",
   title: "Contando uma história real",
   intro:
     "Nesta lição você vai aprender a narrar um acontecimento com precisão: o que já tinha acontecido antes, o que você estava fazendo quando algo interrompeu, e como terminou. Past perfect e present perfect continuous são as ferramentas. Uns 8 minutos.",
@@ -864,6 +922,7 @@ export const LESSONS: Record<string, Lesson> = {
   [RESERVAS_E_CHECK_IN.slug]: RESERVAS_E_CHECK_IN,
   [WHO_I_AM.slug]: WHO_I_AM,
   [CONTANDO_UMA_EXPERIENCIA.slug]: CONTANDO_UMA_EXPERIENCIA,
+  [IDENTITY_PERSONAL_DEVELOPMENT.slug]: IDENTITY_PERSONAL_DEVELOPMENT,
   [CONTANDO_UMA_HISTORIA.slug]: CONTANDO_UMA_HISTORIA,
   [DISCORDANDO_COM_TATO.slug]: DISCORDANDO_COM_TATO,
   [ARGUMENTO_PERSUASIVO.slug]: ARGUMENTO_PERSUASIVO,
@@ -874,7 +933,7 @@ export const LESSONS_BY_LEVEL: Record<CefrLevel, string[]> = {
   A1: [APRESENTANDO_SE.slug],
   A2: [CONHECENDO_VOCE_MELHOR.slug, RESERVAS_E_CHECK_IN.slug],
   B1: [WHO_I_AM.slug, CONTANDO_UMA_EXPERIENCIA.slug],
-  B2: [CONTANDO_UMA_HISTORIA.slug],
+  B2: [IDENTITY_PERSONAL_DEVELOPMENT.slug, CONTANDO_UMA_HISTORIA.slug],
   C1: [DISCORDANDO_COM_TATO.slug],
   C2: [ARGUMENTO_PERSUASIVO.slug],
 };

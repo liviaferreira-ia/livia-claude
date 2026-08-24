@@ -14,6 +14,8 @@ type NavItem = {
   label: string;
   icon: ReactNode;
   badge?: string;
+  dynamicBadge?: "special";
+  nested?: boolean;
 };
 
 const I = {
@@ -66,6 +68,7 @@ const studentNav: { section: string; items: NavItem[] }[] = [
     section: "Aprender",
     items: [
       { href: "/aluno", label: "Início", icon: I.home },
+      { href: "/aluno/especial", label: "Especial para você", icon: I.star, dynamicBadge: "special" },
       { href: "/aluno/curso", label: "Meu curso", icon: I.path },
       { href: "/aluno/praticar", label: "Praticar", icon: I.target },
       { href: "/aluno/jogos", label: "Central Games", icon: I.game },
@@ -102,6 +105,7 @@ const teacherNav: { section: string; items: NavItem[] }[] = [
     section: "Professor",
     items: [
       { href: "/professor/alunos", label: "Alunos", icon: I.users },
+      { href: "/professor/atividades-especiais", label: "Atividades especiais", icon: I.star, nested: true },
       { href: "/professor/operacional", label: "Operacional", icon: I.pulse },
       { href: "/professor/validacao-conteudo", label: "Validação de conteúdo", icon: I.book },
       { href: "/professor", label: "Conversas", icon: I.chat },
@@ -123,7 +127,9 @@ const CRUMBS: Record<string, string> = {
   "/aluno/palavras": "Minhas palavras",
   "/aluno/professor": "Fale com o professor",
   "/aluno/conta": "Minha conta",
+  "/aluno/especial": "Especial para você",
   "/professor/alunos": "Painel do Professor · Gestão de Alunos",
+  "/professor/atividades-especiais": "Atividades Especiais",
   "/professor/operacional": "Operacional",
   "/professor/validacao-conteudo": "Validação de conteúdo",
   "/professor": "Conversas",
@@ -153,8 +159,19 @@ export function AppShell({ children }: { children: ReactNode }) {
     router.refresh();
   }
   const nav = isTeacherArea && hasTeacherAccess ? teacherNav : studentNav;
-  const crumb = pathname.startsWith("/professor/alunos/") ? "Detalhes do aluno" : CRUMBS[pathname] ?? "";
+  const crumb = pathname.startsWith("/professor/alunos/") ? "Detalhes do aluno"
+    : pathname.startsWith("/professor/atividades-especiais/") ? "Atividades Especiais"
+      : pathname.startsWith("/aluno/especial/") ? "Especial para você"
+        : CRUMBS[pathname] ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [specialCount, setSpecialCount] = useState(0);
+
+  useEffect(() => {
+    if (!ready || !user || role !== "student") return;
+    fetch("/api/aluno/especiais", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((body) => {
+      if (typeof body?.unseenCount === "number") setSpecialCount(body.unseenCount);
+    }).catch(() => {});
+  }, [pathname, ready, role, user]);
 
   // Fecha o menu-gaveta ao trocar de página.
   useEffect(() => {
@@ -192,17 +209,17 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div key={group.section}>
             <div className="navlabel">{group.section}</div>
             {group.items.map((item) => {
-              const active = pathname === item.href;
+              const active = pathname === item.href || (item.href !== "/aluno" && item.href !== "/professor" && pathname.startsWith(`${item.href}/`));
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`nav${active ? " on" : ""}`}
+                  className={`nav${active ? " on" : ""}${item.nested ? " nested" : ""}`}
                   onClick={() => setMenuOpen(false)}
                 >
                   {item.icon}
                   {item.label}
-                  {item.badge ? <span className="badge">{item.badge}</span> : null}
+                  {item.badge ? <span className="badge">{item.badge}</span> : item.dynamicBadge === "special" && specialCount > 0 ? <span className="badge">{specialCount}</span> : null}
                 </Link>
               );
             })}

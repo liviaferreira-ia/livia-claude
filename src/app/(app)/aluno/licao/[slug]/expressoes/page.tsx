@@ -4,6 +4,8 @@ import { LESSONS } from "@/data/lesson";
 import { SpeakButton } from "@/components/SpeakButton";
 import { SaveWordButton } from "@/components/SaveWordButton";
 import { ConcluirEtapa } from "@/components/ConcluirEtapa";
+import { PhrasePracticeButton } from "@/components/PhrasePracticeButton";
+import { SelfIntroductionPractice } from "@/components/SelfIntroductionPractice";
 
 export default async function ExpressoesPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -28,11 +30,13 @@ export default async function ExpressoesPage({ params }: { params: Promise<{ slu
             </span>
             <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <SpeakButton text={e.en} />
+              <PhrasePracticeButton text={e.en} />
               <SaveWordButton en={e.en} pt={e.pt} source={`Lição · ${lesson.title}`} />
             </span>
           </div>
         ))}
       </div>
+      {slug === "apresentando-se" && <SelfIntroductionPractice />}
       <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
         <ConcluirEtapa slug={slug} id="expressoes" />
         <Link href={`/aluno/licao/${slug}`} className="btn ghost">

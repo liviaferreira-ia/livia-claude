@@ -138,6 +138,11 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
   }
 
   const promptHtml = q.prompt.split("___");
+  const selectedWord = q.kind === "mc" && selected !== null ? q.options[selected] : "";
+
+  function chooseWord(optionIndex: number) {
+    if (!answered) setSelected(optionIndex);
+  }
 
   return (
     <div className="view" style={{ maxWidth: 680 }}>
@@ -161,7 +166,23 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
         </div>
         <p className="q-prompt">
           {promptHtml[0]}
-          {promptHtml.length > 1 && <span className="blank">______</span>}
+          {promptHtml.length > 1 && q.kind === "mc" ? (
+            <span
+              className={`word-dropzone${selectedWord ? " filled" : ""}${answered ? (wasRight ? " ok" : " no") : ""}`}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault();
+                const optionIndex = Number(event.dataTransfer.getData("text/plain"));
+                if (Number.isInteger(optionIndex) && optionIndex >= 0 && optionIndex < q.options.length) {
+                  chooseWord(optionIndex);
+                }
+              }}
+            >
+              {selectedWord || "clique ou arraste aqui"}
+            </span>
+          ) : promptHtml.length > 1 ? (
+            <span className="blank">______</span>
+          ) : null}
           {promptHtml[1]}
         </p>
         <p className="muted" style={{ margin: "0 0 20px" }}>
@@ -169,9 +190,9 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
         </p>
 
         {q.kind === "mc" ? (
-          <div>
+          <div className="word-bank" aria-label="Palavras disponíveis">
             {q.options.map((opt, k) => {
-              let cls = "opt";
+              let cls = "word-chip exercise-word";
               if (answered) {
                 if (k === q.answer) cls += " ok";
                 else if (k === selected) cls += " no";
@@ -179,8 +200,15 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
                 cls += " sel";
               }
               return (
-                <button key={k} className={cls} disabled={answered} onClick={() => setSelected(k)}>
-                  <span className="k">{"ABCD"[k]}</span>
+                <button
+                  key={k}
+                  type="button"
+                  className={cls}
+                  disabled={answered}
+                  draggable={!answered}
+                  onDragStart={(event) => event.dataTransfer.setData("text/plain", String(k))}
+                  onClick={() => chooseWord(k)}
+                >
                   {opt}
                 </button>
               );
@@ -210,7 +238,12 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
         {saveError && <p className="auth-msg err" role="alert">{saveError}</p>}
 
         <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-          <button className="btn primary" style={{ flex: 1 }} disabled={saving} onClick={() => void check()}>
+          <button
+            className="btn primary"
+            style={{ flex: 1 }}
+            disabled={saving || (!answered && (q.kind === "mc" ? selected === null : !text.trim()))}
+            onClick={() => void check()}
+          >
             {saving ? "Salvando…" : answered ? (isLast ? "Concluir tarefa" : "Próxima →") : "Verificar"}
           </button>
           <Link href={`/aluno/licao/${slug}`} className="btn ghost">

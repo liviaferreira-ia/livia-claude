@@ -56,17 +56,17 @@ const APRESENTANDO_SE: Lesson = {
   intro:
     "Nesta lição você vai aprender a se apresentar em inglês: dizer seu nome, de onde você é e cumprimentar alguém pela primeira vez. Vamos ver as palavras essenciais, ouvir duas pessoas se conhecendo, treinar as frases mais usadas e praticar no final. Leva uns 6 minutos!",
   vocab: {
-    title: "Palavras para se apresentar",
-    hint: "Toque em “Ouvir” para escutar a pronúncia de cada palavra.",
+    title: "Frases essenciais para se apresentar",
+    hint: "Aprenda blocos de fala completos. Ouça e repita — assim você já consegue usá-los em uma conversa.",
     items: [
-      { en: "hello", pt: "olá" },
-      { en: "hi", pt: "oi" },
-      { en: "name", pt: "nome" },
-      { en: "friend", pt: "amigo(a)" },
-      { en: "student", pt: "aluno(a)" },
-      { en: "teacher", pt: "professor(a)" },
-      { en: "Brazil", pt: "Brasil" },
-      { en: "goodbye", pt: "tchau" },
+      { en: "Hello!", pt: "Olá!" },
+      { en: "My name is…", pt: "Meu nome é…" },
+      { en: "I'm…", pt: "Eu sou…" },
+      { en: "What's your name?", pt: "Qual é o seu nome?" },
+      { en: "Nice to meet you!", pt: "Prazer em conhecer você!" },
+      { en: "I'm from Brazil.", pt: "Eu sou do Brasil." },
+      { en: "Where are you from?", pt: "De onde você é?" },
+      { en: "Goodbye!", pt: "Tchau!" },
     ],
   },
   listening: {
@@ -86,7 +86,7 @@ const APRESENTANDO_SE: Lesson = {
   },
   expressions: {
     title: "Frases para o primeiro “oi”",
-    hint: "Frases que você vai usar sempre que conhecer alguém. Toque em “Ouvir” e repita em voz alta.",
+    hint: "Ouça cada frase e use “Repetir” para o sistema conferir o que entendeu da sua fala.",
     items: [
       { en: "Hello! My name is Ana.", pt: "Olá! Meu nome é Ana." },
       { en: "What's your name?", pt: "Qual é o seu nome?" },

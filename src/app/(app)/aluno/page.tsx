@@ -17,6 +17,7 @@ import {
   type StudentAssignment,
   type StudentSettings,
 } from "@/lib/student-admin";
+import { listMySpecialActivities, type SpecialActivity } from "@/lib/special-activities";
 
 export default function AlunoDashboard() {
   const { profile, ready, signOut } = useProfile();
@@ -34,6 +35,7 @@ export default function AlunoDashboard() {
   const [settings, setSettings] = useState<StudentSettings | null>(null);
   const [activeDays, setActiveDays] = useState(0);
   const [reviewTargets, setReviewTargets] = useState<ReviewTarget[]>([]);
+  const [specialActivities, setSpecialActivities] = useState<SpecialActivity[]>([]);
 
   useEffect(() => {
     if (!ready || !profile.onboarded) return;
@@ -42,6 +44,7 @@ export default function AlunoDashboard() {
     getMySettings().then(setSettings);
     countMyActiveDaysThisWeek().then(setActiveDays);
     listMyReviewTargets().then(setReviewTargets);
+    listMySpecialActivities().then((result) => setSpecialActivities(result.current)).catch(() => {});
   }, [ready, profile.onboarded]);
 
   async function handleSend() {
@@ -196,6 +199,14 @@ export default function AlunoDashboard() {
         </p>
       </div>
       </div>
+
+      {specialActivities.length > 0 && (
+        <div className="card student-special-highlight">
+          <span className="student-special-star">⭐</span>
+          <div><div className="eyebrow">Especial para você</div><h3>{specialActivities[0].title}</h3><p>{specialActivities[0].description || "Uma nova atividade foi preparada especialmente para você."}</p></div>
+          <Link href={`/aluno/especial/${specialActivities[0].id}`} className="btn gold">Ver atividade →</Link>
+        </div>
+      )}
 
       {settings && (
         <div id="atividades" className="card" style={{ padding: 18, marginBottom: 22 }}>

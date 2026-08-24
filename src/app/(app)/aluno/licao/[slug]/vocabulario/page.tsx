@@ -4,6 +4,7 @@ import { LESSONS } from "@/data/lesson";
 import { SpeakButton } from "@/components/SpeakButton";
 import { SaveWordButton } from "@/components/SaveWordButton";
 import { ConcluirEtapa } from "@/components/ConcluirEtapa";
+import { PhrasePracticeButton } from "@/components/PhrasePracticeButton";
 
 export default async function VocabularioPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -28,6 +29,7 @@ export default async function VocabularioPage({ params }: { params: Promise<{ sl
             </span>
             <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <SpeakButton text={v.en} />
+              <PhrasePracticeButton text={v.en.replace("…", "")} />
               <SaveWordButton en={v.en} pt={v.pt} source={`Lição · ${lesson.title}`} />
             </span>
           </div>

@@ -152,6 +152,62 @@ const APRESENTANDO_SE: Lesson = {
   },
 };
 
+// ================= A2 · Unidade 1 =================
+
+const CONHECENDO_VOCE_MELHOR: Lesson = {
+  slug: "conhecendo-voce-melhor",
+  level: "A2",
+  unit: "Unidade 1 · Getting to Know You Better",
+  title: "Conhecendo você melhor",
+  intro: "Nesta lição você vai ampliar sua apresentação: falar de trabalho ou estudos, interesses, rotina e personalidade, além de fazer perguntas para manter a conversa.",
+  vocab: {
+    title: "Informações pessoais com mais detalhes",
+    hint: "Ouça e repita cada expressão antes de montar seu perfil.",
+    items: [
+      { en: "I work as...", pt: "Eu trabalho como..." },
+      { en: "I'm studying...", pt: "Eu estou estudando..." },
+      { en: "in my free time", pt: "no meu tempo livre" },
+      { en: "outgoing", pt: "extrovertido(a)" },
+      { en: "organized", pt: "organizado(a)" },
+      { en: "usually", pt: "geralmente" },
+      { en: "sometimes", pt: "às vezes" },
+      { en: "interested in", pt: "interessado(a) em" },
+    ],
+  },
+  listening: {
+    title: "Dois colegas se conhecem",
+    hint: "Perceba como cada resposta abre espaço para uma nova pergunta.",
+    lines: [
+      { who: "Nina", en: "What do you do, Leo?", pt: "O que você faz, Leo?" },
+      { who: "Leo", en: "I work as a designer, and I'm studying English at night.", pt: "Trabalho como designer e estudo inglês à noite." },
+      { who: "Nina", en: "Nice! What do you usually do in your free time?", pt: "Legal! O que você geralmente faz no tempo livre?" },
+      { who: "Leo", en: "I usually cook or meet my friends. What about you?", pt: "Geralmente cozinho ou encontro meus amigos. E você?" },
+    ],
+  },
+  expressions: {
+    title: "Perguntas que mantêm a conversa",
+    hint: "Use uma resposta e uma pergunta de acompanhamento.",
+    items: [
+      { en: "What do you do?", pt: "O que você faz?" },
+      { en: "What are you interested in?", pt: "Em que você se interessa?" },
+      { en: "What do you usually do on weekends?", pt: "O que você geralmente faz nos fins de semana?" },
+      { en: "How would you describe yourself?", pt: "Como você se descreveria?" },
+      { en: "What about you?", pt: "E você?" },
+    ],
+  },
+  exercises: {
+    title: "Meu perfil em inglês",
+    praise: "Muito bem! Você já consegue se apresentar com mais detalhes e manter a conversa.",
+    questions: [
+      { kind: "mc", type: "Escolha a opção correta", prompt: "I ___ work from home on Fridays.", hint: "Use um advérbio de frequência.", options: ["usually", "yesterday", "now", "last"], answer: 0, feedbackOk: "Correto! Usually indica um hábito.", feedbackNo: "A opção adequada é usually: I usually work from home on Fridays." },
+      { kind: "fill", type: "Complete a frase", prompt: "I'm interested ___ photography.", hint: "Uma preposição.", answers: ["in"], feedbackOk: "Isso! Dizemos interested in.", feedbackNo: "A expressão é interested in." },
+      { kind: "mc", type: "Escolha a pergunta", prompt: "Quero saber a profissão de alguém.", hint: "Qual pergunta é usada para ocupação?", options: ["What do you do?", "Where do you do?", "How do you work?", "Who are you do?"], answer: 0, feedbackOk: "Perfeito! What do you do? pergunta a ocupação.", feedbackNo: "Use What do you do? para perguntar a ocupação." },
+      { kind: "fill", type: "Tradução PT → EN", prompt: "E você? → What ___ you?", hint: "Uma preposição.", answers: ["about"], feedbackOk: "Muito bem! What about you?", feedbackNo: "A palavra é about." },
+      { kind: "mc", type: "Escolha a opção correta", prompt: "She ___ English at night.", hint: "Rotina de she.", options: ["study", "studies", "studying", "studied"], answer: 1, feedbackOk: "Correto! Com she, usamos studies.", feedbackNo: "No present simple, she studies." },
+    ],
+  },
+};
+
 // ================= A2 · Unidade 3 =================
 
 const RESERVAS_E_CHECK_IN: Lesson = {
@@ -266,6 +322,63 @@ const RESERVAS_E_CHECK_IN: Lesson = {
 };
 
 // ================= B1 · Unidade 1 =================
+
+const WHO_I_AM: Lesson = {
+  slug: "who-i-am",
+  level: "B1",
+  unit: "Unidade 1 · Who I Am",
+  title: "Who I Am",
+  intro: "Nesta lição você vai construir uma apresentação mais autêntica: descrever sua personalidade, interesses e experiências, conectando passado e presente com clareza.",
+  vocab: {
+    title: "Identidade, valores e trajetória",
+    hint: "Ouça e pense em um exemplo verdadeiro sobre você.",
+    items: [
+      { en: "open-minded", pt: "mente aberta" },
+      { en: "reliable", pt: "confiável" },
+      { en: "curious", pt: "curioso(a)" },
+      { en: "background", pt: "histórico / trajetória" },
+      { en: "achievement", pt: "conquista" },
+      { en: "challenge", pt: "desafio" },
+      { en: "value", pt: "valorizar" },
+      { en: "grow", pt: "crescer / se desenvolver" },
+    ],
+  },
+  listening: {
+    title: "Uma apresentação profissional e pessoal",
+    hint: "Observe como Maya conecta uma experiência passada à pessoa que é hoje.",
+    lines: [
+      { who: "Maya", en: "I'm a curious and practical person. I've always enjoyed solving problems.", pt: "Sou uma pessoa curiosa e prática. Sempre gostei de resolver problemas." },
+      { who: "Ben", en: "Has that influenced your career?", pt: "Isso influenciou sua carreira?" },
+      { who: "Maya", en: "Definitely. I started in customer service, but I moved into technology three years ago.", pt: "Com certeza. Comecei em atendimento, mas migrei para tecnologia há três anos." },
+      { who: "Ben", en: "What have you learned from that change?", pt: "O que você aprendeu com essa mudança?" },
+      { who: "Maya", en: "I've learned to adapt quickly and ask better questions.", pt: "Aprendi a me adaptar rapidamente e fazer perguntas melhores." },
+    ],
+  },
+  expressions: {
+    title: "Apresentando quem você é",
+    hint: "Conecte característica, evidência e aprendizado.",
+    items: [
+      { en: "I'd describe myself as...", pt: "Eu me descreveria como..." },
+      { en: "I've always been interested in...", pt: "Sempre me interessei por..." },
+      { en: "That experience taught me to...", pt: "Essa experiência me ensinou a..." },
+      { en: "One thing I really value is...", pt: "Uma coisa que valorizo muito é..." },
+      { en: "How did that affect you?", pt: "Como isso afetou você?" },
+    ],
+  },
+  exercises: {
+    title: "Minha identidade e trajetória",
+    praise: "Excelente! Você conectou identidade, experiência e aprendizado em nível B1.",
+    questions: [
+      { kind: "mc", type: "Escolha a opção correta", prompt: "I've always ___ interested in languages.", hint: "Present perfect com estado contínuo.", options: ["be", "been", "being", "was"], answer: 1, feedbackOk: "Correto! I've always been interested in...", feedbackNo: "Depois de have, usamos been." },
+      { kind: "fill", type: "Complete a frase", prompt: "That experience taught me ___ adapt quickly.", hint: "Uma palavra.", answers: ["to"], feedbackOk: "Isso! Taught me to adapt.", feedbackNo: "Use to antes do verbo: taught me to adapt." },
+      { kind: "mc", type: "Escolha a opção correta", prompt: "I ___ into technology three years ago.", hint: "A ação tem tempo passado definido.", options: ["have moved", "move", "moved", "have move"], answer: 2, feedbackOk: "Perfeito! Three years ago pede past simple: moved.", feedbackNo: "Com ago, usamos past simple: moved." },
+      { kind: "fill", type: "Tradução PT → EN", prompt: "Eu me descreveria como curioso. → I'd describe myself ___ curious.", hint: "Uma preposição.", answers: ["as"], feedbackOk: "Muito bem! Describe myself as curious.", feedbackNo: "A expressão é describe myself as." },
+      { kind: "mc", type: "Escolha a melhor continuação", prompt: "I've changed careers twice. ___", hint: "Demonstre interesse e aprofunde.", options: ["How did that affect you?", "Where you affect?", "Did affect that?", "How that you did?"], answer: 0, feedbackOk: "Exato! A pergunta mantém a conversa e pede reflexão.", feedbackNo: "Use How did that affect you?" },
+    ],
+  },
+};
+
+// ================= B1 · Unidade 2 =================
 
 const CONTANDO_UMA_EXPERIENCIA: Lesson = {
   slug: "contando-uma-experiencia",
@@ -747,7 +860,9 @@ const ARGUMENTO_PERSUASIVO: Lesson = {
 
 export const LESSONS: Record<string, Lesson> = {
   [APRESENTANDO_SE.slug]: APRESENTANDO_SE,
+  [CONHECENDO_VOCE_MELHOR.slug]: CONHECENDO_VOCE_MELHOR,
   [RESERVAS_E_CHECK_IN.slug]: RESERVAS_E_CHECK_IN,
+  [WHO_I_AM.slug]: WHO_I_AM,
   [CONTANDO_UMA_EXPERIENCIA.slug]: CONTANDO_UMA_EXPERIENCIA,
   [CONTANDO_UMA_HISTORIA.slug]: CONTANDO_UMA_HISTORIA,
   [DISCORDANDO_COM_TATO.slug]: DISCORDANDO_COM_TATO,
@@ -757,8 +872,8 @@ export const LESSONS: Record<string, Lesson> = {
 /** Lições de cada nível, na ordem em que devem ser feitas. */
 export const LESSONS_BY_LEVEL: Record<CefrLevel, string[]> = {
   A1: [APRESENTANDO_SE.slug],
-  A2: [RESERVAS_E_CHECK_IN.slug],
-  B1: [CONTANDO_UMA_EXPERIENCIA.slug],
+  A2: [CONHECENDO_VOCE_MELHOR.slug, RESERVAS_E_CHECK_IN.slug],
+  B1: [WHO_I_AM.slug, CONTANDO_UMA_EXPERIENCIA.slug],
   B2: [CONTANDO_UMA_HISTORIA.slug],
   C1: [DISCORDANDO_COM_TATO.slug],
   C2: [ARGUMENTO_PERSUASIVO.slug],

@@ -71,7 +71,7 @@ export async function recordExerciseAttempt(input: {
   exerciseId: string; level: CefrLevel; kind: Kind; correct: boolean; path?: string; title?: string;
 }): Promise<void> {
   const supabase = createClient();
-  await supabase.rpc("record_exercise_attempt", {
+  const { error } = await supabase.rpc("record_exercise_attempt", {
     p_exercise_id: input.exerciseId,
     p_level: input.level,
     p_kind: input.kind,
@@ -79,6 +79,7 @@ export async function recordExerciseAttempt(input: {
     p_path: input.path ?? "/aluno/praticar",
     p_title: input.title ?? "Prática",
   });
+  if (error) throw new Error(`Não foi possível salvar a atividade: ${error.message}`);
 }
 
 export async function recordLearningPosition(path: string, title: string, activityType: string): Promise<void> {

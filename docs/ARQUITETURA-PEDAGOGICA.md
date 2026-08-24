@@ -83,6 +83,16 @@ As 12 unidades do A2 mantêm o mesmo ciclo do A1. Os três checkpoints incluem p
 
 Uma pontuação automática não deve ser apresentada como diagnóstico absoluto. O resultado precisa indicar evidências por habilidade, pontos fortes, melhorias e uma ação de prática conectada à unidade correspondente.
 
+## Progressão para o B1
+
+No B1, o aluno deixa de depender apenas de situações previsíveis e passa a sustentar conversas, narrar experiências, justificar opiniões e negociar soluções. A trilha possui 14 unidades, do perfil pessoal ao circuito integrado “Real Life B1”, mantendo o ciclo de seis etapas.
+
+- **Checkpoint 1:** unidades 1 a 5, com fala obrigatória.
+- **Checkpoint 2:** unidades 6 a 10, com fala obrigatória.
+- **Checkpoint 3:** unidades 11 a 14 e avaliação final integrada, com fala obrigatória.
+
+O domínio B1 deve observar independência funcional, clareza da mensagem, capacidade de conectar ideias e uso de estratégias quando faltar vocabulário. Correção gramatical isolada não substitui essas evidências.
+
 ## Critério para produção de novas lições
 
 Uma lição só deve ser publicada quando:
@@ -98,12 +108,12 @@ Uma lição só deve ser publicada quando:
 
 ## Implementação incremental
 
-1. Manter as 12 unidades de A1 e A2 visíveis na trilha.
-2. Produzir e revisar a Unidade 1 do A1 completa no novo contrato.
-3. Conectar missão, fala e domínio a eventos de aprendizagem.
-4. Repetir o processo nas unidades 2 a 4 e validar o Checkpoint 1 do A1.
-5. Produzir o A2 em blocos de quatro unidades, preservando o salto de autonomia.
-6. Migrar B1 a C2 somente depois de validar o modelo nos níveis básicos.
+1. Manter visíveis as 12 unidades de A1, as 12 de A2 e as 14 de B1.
+2. Disponibilizar uma primeira jornada completa e coerente em cada um desses níveis.
+3. Conectar exercício, missão, fala e domínio a eventos de aprendizagem confiáveis.
+4. Produzir as demais atividades em blocos até completar o Checkpoint 1 de cada nível.
+5. Validar uso, dificuldade e conclusão com os alunos ativos antes do próximo bloco.
+6. Não expandir B2 a C2 antes de consolidar A1, A2 e B1.
 
 ## Fora do escopo atual
 
@@ -111,4 +121,5 @@ Uma lição só deve ser publicada quando:
 - afirmação de certificação oficial pelo CEFR;
 - nota automática de proficiência baseada apenas em IA;
 - desbloqueio e progressão persistidos em banco;
-- criação completa das atividades das 12 unidades em um único lote.
+- criação completa das atividades de todas as unidades em um único lote;
+- expansão pedagógica de B2 a C2 nesta etapa.

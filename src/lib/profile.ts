@@ -230,7 +230,8 @@ export function useProfile() {
     [],
   );
 
-  const bumpPractice = useCallback((kind: Kind, correct: boolean, exerciseId = "unknown", level: CefrLevel = "A2", title = "Prática") => {
+  const bumpPractice = useCallback(async (kind: Kind, correct: boolean, exerciseId = "unknown", level: CefrLevel = "A2", title = "Prática") => {
+    await recordExerciseAttempt({ exerciseId, level, kind, correct, title });
     const daily = bumpDaily();
     setStats((prev) => {
       const stat = prev.practice[kind];
@@ -245,7 +246,6 @@ export function useProfile() {
       saveStats(next);
       return next;
     });
-    recordExerciseAttempt({ exerciseId, level, kind, correct, title }).catch(() => {});
   }, []);
 
   /** Recalcula lições concluídas e ofensiva (ex.: ao voltar de uma lição). */

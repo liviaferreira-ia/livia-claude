@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { use, useState } from "react";
 import { LESSONS } from "@/data/lesson";
 import { markSectionDone } from "@/lib/lessonProgress";
+import { useProfile } from "@/lib/profile";
 
 function normalize(s: string) {
   return (s ?? "")
@@ -17,6 +18,7 @@ function normalize(s: string) {
 export default function TarefaFinalPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const lesson = LESSONS[slug];
+  const { bumpPractice } = useProfile();
 
   const [index, setIndex] = useState(0);
   const [answered, setAnswered] = useState(false);
@@ -25,6 +27,8 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
   const [text, setText] = useState("");
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   if (!lesson) notFound();
 
@@ -32,7 +36,7 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
   const q = questions[index];
   const isLast = index === questions.length - 1;
 
-  function check() {
+  async function check() {
     if (answered) {
       next();
       return;
@@ -45,9 +49,18 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
       if (!text.trim()) return;
       ok = q.answers.some((a) => normalize(a) === normalize(text));
     }
-    setWasRight(ok);
-    setAnswered(true);
-    if (ok) setCorrect((c) => c + 1);
+    setSaving(true);
+    setSaveError("");
+    try {
+      await bumpPractice(q.kind, ok, `${slug}-final-${index + 1}`, lesson.level, lesson.exercises.title);
+      setWasRight(ok);
+      setAnswered(true);
+      if (ok) setCorrect((c) => c + 1);
+    } catch {
+      setSaveError("Não foi possível salvar esta resposta. Confira sua conexão e tente novamente.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function next() {
@@ -161,7 +174,7 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
             placeholder="Digite sua resposta em inglês…"
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") check();
+              if (e.key === "Enter") void check();
             }}
           />
         )}
@@ -173,9 +186,11 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
           </div>
         )}
 
+        {saveError && <p className="auth-msg err" role="alert">{saveError}</p>}
+
         <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-          <button className="btn primary" style={{ flex: 1 }} onClick={check}>
-            {answered ? (isLast ? "Concluir tarefa" : "Próxima →") : "Verificar"}
+          <button className="btn primary" style={{ flex: 1 }} disabled={saving} onClick={() => void check()}>
+            {saving ? "Salvando…" : answered ? (isLast ? "Concluir tarefa" : "Próxima →") : "Verificar"}
           </button>
           <Link href={`/aluno/licao/${slug}`} className="btn ghost">
             Sair

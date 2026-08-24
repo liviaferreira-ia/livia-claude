@@ -129,7 +129,7 @@ export default function PraticarPage() {
       bank={bank}
       categories={categories}
       onExit={() => setKind(null)}
-      bump={reviewMode ? () => {} : bumpPractice}
+      bump={reviewMode ? async () => {} : bumpPractice}
       reviewMode={reviewMode}
       level={contentLevel}
       filterIds={smartReviewMode ? reviewIds : EMPTY_IDS}
@@ -153,7 +153,7 @@ function Runner({
   bank: LevelBank;
   categories: { kind: Kind; title: string; desc: string; count: number }[];
   onExit: () => void;
-  bump: (k: Kind, correct: boolean, exerciseId?: string, level?: CefrLevel, title?: string) => void;
+  bump: (k: Kind, correct: boolean, exerciseId?: string, level?: CefrLevel, title?: string) => Promise<void>;
   reviewMode: boolean;
   level: CefrLevel;
   filterIds: string[];
@@ -172,6 +172,8 @@ function Runner({
   const [wasRight, setWasRight] = useState(false);
   const [correct, setCorrect] = useState(0);
   const [done, setDone] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [validationState, setValidationState] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   // per-question inputs
@@ -206,7 +208,7 @@ function Runner({
     return { ok: normalize(attempt) === normalize(q.answer), explain: `Resposta: “${q.answer}”` };
   }
 
-  function check() {
+  async function check() {
     if (answered) {
       // next
       if (i === queue.length - 1) {
@@ -223,10 +225,18 @@ function Runner({
     if ((kind === "fill" || kind === "translate") && !text.trim()) return;
     if (kind === "order" && built.length === 0) return;
     const { ok } = evaluate();
-    setWasRight(ok);
-    setAnswered(true);
-    if (ok) setCorrect((c) => c + 1);
-    bump(kind, ok, item.id, level, title);
+    setSaving(true);
+    setSaveError("");
+    try {
+      await bump(kind, ok, item.id, level, title);
+      setWasRight(ok);
+      setAnswered(true);
+      if (ok) setCorrect((c) => c + 1);
+    } catch {
+      setSaveError("Não foi possível salvar esta resposta. Confira sua conexão e tente novamente.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function validateLevel() {
@@ -301,7 +311,7 @@ function Runner({
             text={text}
             answered={answered}
             onChange={setText}
-            onEnter={check}
+            onEnter={() => void check()}
           />
         )}
         {kind === "order" && (
@@ -315,8 +325,10 @@ function Runner({
           </div>
         )}
 
-        <button className="btn primary" style={{ width: "100%", marginTop: 18 }} onClick={check}>
-          {answered ? (i === queue.length - 1 ? "Ver resultado" : "Próxima →") : "Verificar"}
+        {saveError && <p className="auth-msg err" role="alert">{saveError}</p>}
+
+        <button className="btn primary" style={{ width: "100%", marginTop: 18 }} disabled={saving} onClick={() => void check()}>
+          {saving ? "Salvando…" : answered ? (i === queue.length - 1 ? "Ver resultado" : "Próxima →") : "Verificar"}
         </button>
       </div>
     </div>

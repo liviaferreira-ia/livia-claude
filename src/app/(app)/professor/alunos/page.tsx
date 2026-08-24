@@ -12,16 +12,8 @@ import {
   setStudentAccess,
   type StudentActivity,
 } from "@/lib/activity";
-import { categoriesFor, resolveExerciseLevel } from "@/data/exercises";
-import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
+import { initials, levelDisplay, useProfile } from "@/lib/profile";
 import { studentAdminAction } from "@/lib/student-admin";
-
-/** % do banco de exercícios do nível já feito (0 se nunca praticou, sem nível fixo assume A2). */
-function progressPct(r: StudentActivity): number {
-  const level = resolveExerciseLevel(parseCefrLevel(r.level ?? "") ?? "A2");
-  const total = categoriesFor(level).reduce((sum, c) => sum + c.count, 0);
-  return total ? Math.min(100, Math.round((practiceTotals(r).done / total) * 100)) : 0;
-}
 
 /** Texto curto explicando por que o aluno está em alerta (ou null se está tudo bem). */
 function attentionReason(r: StudentActivity): string | null {
@@ -308,7 +300,7 @@ export default function ProfessorAlunosPage() {
             <span>Aluno</span>
             <span>Nível</span>
             <span>Último acesso</span>
-            <span>Progresso / acertos</span>
+            <span>Prática / acertos</span>
             <span>Tempo de estudo</span>
             <span>Situação</span>
             <span>Ações</span>
@@ -349,10 +341,10 @@ export default function ProfessorAlunosPage() {
                 <span style={{ fontSize: 13.5 }}>{r.level ? levelDisplay(r.level) : "—"}</span>
                 <span style={{ fontSize: 13.5 }}>{formatLastLogin(r.last_login_at)}</span>
                 <span style={{ fontSize: 13.5 }}>
-                  {progressPct(r)}% do nível
+                  {totals.done} respostas registradas
                   <br />
                   <span className="muted" style={{ fontSize: 12.5 }}>
-                    {totals.done} exercícios · {totals.pct}% de acerto
+                    {totals.pct}% de acerto
                   </span>
                 </span>
                 <span style={{ fontSize: 13.5 }}>{formatDuration(r.total_seconds)}</span>

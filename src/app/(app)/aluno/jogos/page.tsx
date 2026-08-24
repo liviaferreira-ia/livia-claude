@@ -147,11 +147,19 @@ export default function JogosPage() {
   const [speed, setSpeed] = useState<SpeedState>(EMPTY_SPEED);
   const [order, setOrder] = useState<OrderState>(EMPTY_ORDER);
   const [memory, setMemory] = useState<MemoryState>(EMPTY_MEMORY);
+  const [saveError, setSaveError] = useState("");
   const memoryTimer = useRef<number | null>(null);
 
   const studentLevel = parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = resolveExerciseLevel(studentLevel);
   const bank = EXERCISES[contentLevel];
+
+  function saveAttempt(kind: "mc" | "order" | "translate", correct: boolean, exerciseId: string, title: string) {
+    setSaveError("");
+    void bumpPractice(kind, correct, exerciseId, contentLevel, title).catch(() => {
+      setSaveError("O resultado do jogo não foi salvo. Confira sua conexão antes de continuar.");
+    });
+  }
 
   useEffect(() => {
     if (activeGame !== "speed" || speed.phase !== "playing") return;
@@ -191,7 +199,7 @@ export default function JogosPage() {
     const question = speed.questions[speed.index];
     if (!question || speed.selected !== null || speed.phase !== "playing") return;
     const correct = option === question.answer;
-    bumpPractice("mc", correct, question.id, contentLevel, "Jogo · Palavra Relâmpago");
+    saveAttempt("mc", correct, question.id, "Jogo · Palavra Relâmpago");
     setSpeed((current) => ({
       ...current,
       selected: option,
@@ -240,7 +248,7 @@ export default function JogosPage() {
     const round = order.rounds[order.index];
     if (!round || order.built.length !== round.words.length || order.feedback) return;
     const correct = normalize(order.built.map((item) => item.word).join(" ")) === normalize(round.answer);
-    bumpPractice("order", correct, round.id, contentLevel, "Jogo · Monte a Frase");
+    saveAttempt("order", correct, round.id, "Jogo · Monte a Frase");
     setOrder((current) => ({
       ...current,
       feedback: correct ? "correct" : "wrong",
@@ -309,7 +317,7 @@ export default function JogosPage() {
         };
       });
       if (willFinish) {
-        bumpPractice("translate", true, `memory-${contentLevel}`, contentLevel, "Jogo · Memória Bilíngue");
+        saveAttempt("translate", true, `memory-${contentLevel}`, "Jogo · Memória Bilíngue");
       }
     }, 650);
   }
@@ -367,6 +375,8 @@ export default function JogosPage() {
           <span className={styles.stageIcon} aria-hidden="true">{gameInfo.icon}</span>
           <div><span>{gameInfo.eyebrow}</span><h2>{gameInfo.title}</h2></div>
         </header>
+
+        {saveError && <p className="auth-msg err" role="alert">{saveError}</p>}
 
         {activeGame === "speed" && speed.phase === "playing" && speedQuestion && (
           <div className={styles.gameBody}>

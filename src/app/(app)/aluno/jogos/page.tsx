@@ -6,6 +6,7 @@ import {
   EXERCISES,
   normalize,
   resolveExerciseLevel,
+  type Fill,
   type MC,
   type Order,
   type Translate,
@@ -13,7 +14,7 @@ import {
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 import styles from "./jogos.module.css";
 
-type GameKey = "speed" | "order" | "memory";
+type GameKey = "speed" | "order" | "memory" | "fill";
 type Phase = "idle" | "playing" | "finished";
 
 type SpeedState = {
@@ -84,6 +85,24 @@ const EMPTY_MEMORY: MemoryState = {
   locked: false,
 };
 
+type FillState = {
+  phase: Phase;
+  rounds: Fill[];
+  index: number;
+  value: string;
+  score: number;
+  feedback: "correct" | "wrong" | null;
+};
+
+const EMPTY_FILL: FillState = {
+  phase: "idle",
+  rounds: [],
+  index: 0,
+  value: "",
+  score: 0,
+  feedback: null,
+};
+
 function shuffle<T>(items: T[]): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i -= 1) {
@@ -139,6 +158,14 @@ const GAME_CARDS: Array<{
     meta: "6 pares · inglês e português",
     icon: "🧠",
   },
+  {
+    key: "fill",
+    eyebrow: "Gramática",
+    title: "Complete a Frase",
+    description: "Preencha a lacuna com a palavra certa em oito frases do seu nível.",
+    meta: "8 rodadas · completar lacuna",
+    icon: "✏️",
+  },
 ];
 
 export default function JogosPage() {
@@ -147,6 +174,7 @@ export default function JogosPage() {
   const [speed, setSpeed] = useState<SpeedState>(EMPTY_SPEED);
   const [order, setOrder] = useState<OrderState>(EMPTY_ORDER);
   const [memory, setMemory] = useState<MemoryState>(EMPTY_MEMORY);
+  const [fill, setFill] = useState<FillState>(EMPTY_FILL);
   const [saveError, setSaveError] = useState("");
   const memoryTimer = useRef<number | null>(null);
 
@@ -154,7 +182,7 @@ export default function JogosPage() {
   const contentLevel = resolveExerciseLevel(studentLevel);
   const bank = EXERCISES[contentLevel];
 
-  function saveAttempt(kind: "mc" | "order" | "translate", correct: boolean, exerciseId: string, title: string) {
+  function saveAttempt(kind: "mc" | "order" | "translate" | "fill", correct: boolean, exerciseId: string, title: string) {
     setSaveError("");
     void bumpPractice(kind, correct, exerciseId, contentLevel, title).catch(() => {
       setSaveError("O resultado do jogo não foi salvo. Confira sua conexão antes de continuar.");
@@ -181,6 +209,7 @@ export default function JogosPage() {
     if (game === "speed") startSpeed();
     if (game === "order") startOrder();
     if (game === "memory") startMemory();
+    if (game === "fill") startFill();
   }
 
   function closeGame() {
@@ -189,6 +218,7 @@ export default function JogosPage() {
     setSpeed(EMPTY_SPEED);
     setOrder(EMPTY_ORDER);
     setMemory(EMPTY_MEMORY);
+    setFill(EMPTY_FILL);
   }
 
   function startSpeed() {
@@ -322,6 +352,30 @@ export default function JogosPage() {
     }, 650);
   }
 
+  function startFill() {
+    setFill({ ...EMPTY_FILL, phase: "playing", rounds: shuffle(bank.fill).slice(0, 8) });
+  }
+
+  function checkFill() {
+    const round = fill.rounds[fill.index];
+    if (!round || fill.feedback || !fill.value.trim()) return;
+    const correct = round.answers.some((answer) => normalize(answer) === normalize(fill.value));
+    saveAttempt("fill", correct, round.id, "Jogo · Complete a Frase");
+    setFill((current) => ({
+      ...current,
+      feedback: correct ? "correct" : "wrong",
+      score: current.score + (correct ? 1 : 0),
+    }));
+  }
+
+  function nextFill() {
+    setFill((current) => {
+      const nextIndex = current.index + 1;
+      if (nextIndex >= current.rounds.length) return { ...current, phase: "finished" };
+      return { ...current, index: nextIndex, value: "", feedback: null };
+    });
+  }
+
   if (!ready) {
     return <div className="view"><p className="muted">Carregando jogos…</p></div>;
   }
@@ -362,6 +416,7 @@ export default function JogosPage() {
   const gameInfo = GAME_CARDS.find((game) => game.key === activeGame)!;
   const speedQuestion = speed.questions[speed.index];
   const orderRound = order.rounds[order.index];
+  const fillRound = fill.rounds[fill.index];
 
   return (
     <div className="view">
@@ -450,6 +505,33 @@ export default function JogosPage() {
 
         {activeGame === "memory" && memory.phase === "finished" && (
           <ResultPanel icon="🧠" title="Memória completa!" score={`${memory.attempts} tentativas`} text={memory.attempts <= 9 ? "Memória afiada! Você encontrou os pares rapidamente." : "Muito bem! Jogue novamente para tentar usar menos tentativas."} onRestart={startMemory} onClose={closeGame} />
+        )}
+
+        {activeGame === "fill" && fill.phase === "playing" && fillRound && (
+          <div className={styles.gameBody}>
+            <div className={styles.scoreRow}><span>Frase <b>{fill.index + 1}/{fill.rounds.length}</b></span><span>Pontos <b>{fill.score}</b></span></div>
+            <div className={styles.progress}><i style={{ width: `${(fill.index / fill.rounds.length) * 100}%` }} /></div>
+            <div className={styles.questionCard}>
+              <span className={styles.promptLabel}>Complete a lacuna</span>
+              <h3>{fillRound.prompt}</h3>
+              <input
+                className="fill-input"
+                type="text"
+                value={fill.value}
+                disabled={fill.feedback !== null}
+                placeholder={fillRound.hint}
+                onChange={(e) => setFill((current) => ({ ...current, value: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") checkFill(); }}
+              />
+              {!fill.feedback && <button className="btn light" disabled={!fill.value.trim()} onClick={checkFill}>Conferir resposta</button>}
+              {fill.feedback === "wrong" && <div className={styles.feedbackBad}><div><b>Ainda não é isso.</b><p>{fillRound.explain}</p></div><button className="btn light" onClick={nextFill}>{fill.index + 1 === fill.rounds.length ? "Ver resultado" : "Próxima →"}</button></div>}
+              {fill.feedback === "correct" && <div className={styles.feedbackGood}><div><b>Isso aí!</b><p>{fillRound.explain}</p></div><button className="btn light" onClick={nextFill}>{fill.index + 1 === fill.rounds.length ? "Ver resultado" : "Próxima →"}</button></div>}
+            </div>
+          </div>
+        )}
+
+        {activeGame === "fill" && fill.phase === "finished" && (
+          <ResultPanel icon="✏️" title="Rodada concluída!" score={`${fill.score} de ${fill.rounds.length}`} text={fill.score === fill.rounds.length ? "Perfeito! Você completou todas as frases certinho." : "Bom treino! Revise as explicações das que errou."} onRestart={startFill} onClose={closeGame} />
         )}
       </section>
 

@@ -363,7 +363,7 @@ export default function ProfessorAlunosPage() {
   return (
     <div className="view teacher-management-view">
       <div className="teacher-management-header">
-        <div><div className="eyebrow" style={{ marginBottom: 8 }}>Painel do professor</div><h2>Gestão de alunos</h2><p className="muted">Progresso, atividade, comunicação e acesso em um só lugar.</p></div>
+        <div><h2>Gestão de alunos</h2><p className="muted">Progresso, atividade, comunicação e acesso em um só lugar.</p></div>
         <button type="button" className="btn gold teacher-add-button" onClick={() => setShowInvite((open) => !open)}>＋ Novo aluno</button>
       </div>
 
@@ -499,7 +499,9 @@ export default function ProfessorAlunosPage() {
             const accessFlag = r.blocked
               ? { text: r.manual_block ? "Acesso pausado" : "Bloqueado automaticamente", cls: "bad" }
               : null;
-            const situationNote = accessFlag ?? (r.last_login_at && reason ? { text: reason, cls: "att" as const } : null);
+            const situation = accessFlag
+              ?? (access.id !== "active" ? access : null)
+              ?? (reason ? { text: reason, cls: "att" as const } : access);
             return (
               <div key={r.user_id} className={`rosterrow management ${selectedIds.has(r.user_id) ? "selected" : ""}`}>
                 <div className="teacher-student-cell">
@@ -521,9 +523,8 @@ export default function ProfessorAlunosPage() {
                 <span style={{ fontSize: 13.5 }}>{formatLastLogin(r.last_login_at)}</span>
                 <span className="teacher-metric"><span><b>{coursePct}%</b> do nível</span><span className="teacher-progress-track"><i style={{ width: `${coursePct}%` }} /></span><small>U{course.current_unit ?? 1} · {course.course_completed_phases ?? 0} etapas · {totals.pct}% acerto</small></span>
                 <span className="teacher-metric"><span>◷ <b>{formatDuration(r.total_seconds)}</b></span><span className="teacher-progress-track time"><i style={{ width: `${Math.max(4, Math.round((r.total_seconds / maxStudySeconds) * 100))}%` }} /></span></span>
-                <span>
-                  <span className={`flag ${access.cls}`} title={access.id === "error" ? r.invite_error ?? "O último envio não foi concluído." : undefined}>{access.text}</span>
-                  {situationNote && <span className={`flag ${situationNote.cls}`} style={{ display: "table", marginTop: 6 }}>{situationNote.text}</span>}
+                <span className="teacher-status-cell">
+                  <span className={`flag ${situation.cls}`} title={access.id === "error" ? r.invite_error ?? "O último envio não foi concluído." : undefined}>{situation.text}</span>
                 </span>
                 <div className="teacher-action-wrap" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpenMenuId(null); }}>
                   <button type="button" className="teacher-more-button" aria-label={`Ações de ${name}`} aria-expanded={openMenuId === r.user_id} disabled={busyId === r.user_id} onClick={() => setOpenMenuId((current) => current === r.user_id ? null : r.user_id)}>{busyId === r.user_id ? "…" : "•••"}</button>

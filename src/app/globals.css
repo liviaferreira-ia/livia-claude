@@ -630,7 +630,9 @@ h3 {
 .teacher-kpi.info .teacher-kpi-icon { color: var(--navy); background: color-mix(in srgb, var(--navy), transparent 86%); }
 .teacher-invite-card { padding: 20px; margin-bottom: 20px; max-width: 650px; }
 .teacher-invite-card form { margin-top: 16px; }
-.teacher-filterbar { padding: 12px; margin-bottom: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+.teacher-filterbar { padding: 12px; margin-bottom: 12px; display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; }
+.teacher-filterbar > input, .teacher-filterbar > select { height: 44px; box-sizing: border-box; margin: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); color: var(--ink); padding: 0 13px; font: inherit; font-size: 14px; }
+.teacher-filterbar > input:focus, .teacher-filterbar > select:focus { outline: 2px solid color-mix(in srgb, var(--navy), transparent 60%); border-color: var(--navy); }
 .bulk-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; margin-bottom: 12px; border: 1px solid color-mix(in srgb, var(--navy), transparent 70%); border-radius: 12px; background: color-mix(in srgb, var(--navy), transparent 92%); }
 .bulk-toolbar b { margin-right: 6px; font-size: 13px; }
 .bulk-toolbar button { border: 0; background: transparent; color: var(--ink-soft); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 7px 9px; border-radius: 8px; }
@@ -642,7 +644,8 @@ h3 {
 .teacher-student-button { border: 0; background: transparent; color: inherit; font: inherit; padding: 0; text-align: left; cursor: pointer; }
 .teacher-student-button:hover b { color: var(--navy); text-decoration: underline; }
 .teacher-metric { display: grid; gap: 5px; font-size: 12.5px; }
-.teacher-metric small { color: var(--ink-faint); font-size: 10.5px; }
+.teacher-metric small { color: var(--ink-soft); font-size: 10.5px; }
+.teacher-status-cell { display: flex; align-items: center; min-width: 0; }
 .teacher-progress-track { display: block; width: 100%; height: 6px; overflow: hidden; border-radius: 999px; background: var(--panel-2); }
 .teacher-progress-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a855f7, #39d98a); }
 .teacher-progress-track.time i { background: linear-gradient(90deg, var(--navy), var(--gold)); }

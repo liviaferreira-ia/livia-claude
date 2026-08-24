@@ -123,8 +123,9 @@ export default function AlunoDashboard() {
   ];
 
   return (
-    <div className="view">
-      <div className="profile-hero">
+    <div className="view student-dashboard-view">
+      <div className="student-dashboard-header"><div><div className="eyebrow">Meu painel</div><h2>Olá, {first}! 👋</h2><p className="muted">Seu próximo passo está pronto. Continue avançando no seu ritmo.</p></div><Link href="/aluno/conta" className="btn light">Minha conta</Link></div>
+      <div className="profile-hero student-profile-modern">
         <div className="profile-hero-banner" />
         <div className="profile-hero-body">
           <div className="profile-hero-avatar">
@@ -142,9 +143,6 @@ export default function AlunoDashboard() {
               {profile.goal && <span className="muted">🎯 {profile.goal}</span>}
             </div>
           </div>
-          <Link href="/aluno/conta" className="btn ghost profile-hero-btn">
-            Ver minha conta
-          </Link>
         </div>
         <div className="profile-stats">
           <div>
@@ -166,13 +164,14 @@ export default function AlunoDashboard() {
         </div>
       </div>
 
-      <p className="muted" style={{ margin: "14px 2px 20px" }}>
+      <p className="muted student-welcome-copy">
         {totals.done === 0
           ? `Bem-vindo(a), ${first}! Que tal começar com alguns exercícios?`
           : `Continue assim, ${first}! Você já fez ${totals.done} exercícios.`}
       </p>
 
-      <div className="hero" style={{ marginBottom: 22 }}>
+      <div className="student-focus-grid">
+      <div className="hero student-mission-card">
         <div className="eyebrow">{mission.eyebrow}</div>
         <h2>{mission.title}</h2>
         <p>{mission.text}</p>
@@ -180,7 +179,7 @@ export default function AlunoDashboard() {
       </div>
 
       {/* Meta do dia */}
-      <div className="card" style={{ padding: 18, marginBottom: 22 }}>
+      <div className="card student-daily-card">
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
           <div className="eyebrow">Meta de hoje</div>
           <span className="muted" style={{ fontSize: 13, fontWeight: 700 }}>
@@ -195,6 +194,7 @@ export default function AlunoDashboard() {
             ? `Meta batida! 🎉 ${profile.stats.streak > 1 ? `${profile.stats.streak} dias seguidos — não perca a chama.` : "Volte amanhã para começar uma ofensiva."}`
             : `Faltam ${DAILY_GOAL - dailyDone} exercícios para fechar o dia.`}
         </p>
+      </div>
       </div>
 
       {settings && (

@@ -127,7 +127,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/palavras": "Minhas palavras",
   "/aluno/professor": "Fale com o professor",
   "/aluno/conta": "Minha conta",
-  "/professor/alunos": "Alunos",
+  "/professor/alunos": "Painel do Professor · Gestão de Alunos",
   "/professor/financeiro": "Financeiro",
   "/professor/operacional": "Operacional",
   "/professor/validacao-conteudo": "Validação de conteúdo",

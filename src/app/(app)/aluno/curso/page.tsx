@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { COURSES, resolveCourseLevel } from "@/data/curso";
+import { COURSES, LEARNING_CYCLE, resolveCourseLevel } from "@/data/curso";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
+import styles from "./curso.module.css";
 
 const icons = {
   done: (
@@ -29,6 +30,7 @@ export default function CursoPage() {
   const studentLevel = parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = resolveCourseLevel(studentLevel);
   const course = COURSES[contentLevel];
+  const usesLearningCycle = course.units.some((unit) => unit.canDo?.length);
 
   if (!ready) {
     return (
@@ -45,12 +47,11 @@ export default function CursoPage() {
       </div>
       <h2 style={{ fontSize: 24, marginBottom: 6 }}>Inglês · {levelBadge(contentLevel)}</h2>
       <p className="muted" style={{ margin: "0 0 6px" }}>
-        Sua trilha de aprendizado. Conclua uma lição para desbloquear a próxima.
+        Avance uma capacidade de cada vez. Você sempre verá o que vai aprender, praticar e conseguir fazer.
       </p>
       {contentLevel !== studentLevel && (
         <p className="muted" style={{ margin: "0 0 6px", fontSize: 13 }}>
-          Ainda não temos trilha própria pro nível {studentLevel} — mostrando a de {contentLevel} por
-          enquanto.
+          Ainda não temos trilha própria para o nível {studentLevel} — mostrando a de {contentLevel} por enquanto.
         </p>
       )}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0 22px" }}>
@@ -62,67 +63,132 @@ export default function CursoPage() {
         </span>
       </div>
 
+      {usesLearningCycle && (
+        <section className={styles.cycle} aria-labelledby="learning-cycle-title">
+          <div>
+            <span className={styles.cycleEyebrow}>Como você aprende</span>
+            <h3 id="learning-cycle-title">Um caminho simples até usar o inglês</h3>
+          </div>
+          <ol className={styles.cycleSteps}>
+            {LEARNING_CYCLE.map((phase, index) => (
+              <li key={phase.id}>
+                <span>{index + 1}</span>
+                {phase.label}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       <div className="trilha">
         {course.units.map((unit) => {
-          const tint =
-            unit.status === "done"
-              ? "tint-navy"
-              : unit.status === "current"
-                ? "tint-gold"
-                : "";
+          const tint = unit.status === "done" ? "tint-navy" : unit.status === "current" ? "tint-gold" : "";
+          const isLocked = unit.status === "locked";
+
           return (
-            <div key={unit.n} className={`card unit${unit.status === "locked" ? " locked" : ""}`}>
-              <div className="unit-head">
-                <span
-                  className={`unit-num ${tint}`}
-                  style={unit.status === "locked" ? { background: "var(--panel-2)", color: "var(--ink-faint)" } : undefined}
-                >
-                  {unit.n}
-                </span>
-                <div className="unit-title">
-                  <h3>{unit.title}</h3>
-                  <p>{unit.objective}</p>
+            <details
+              key={unit.n}
+              className={`card unit ${styles.unit}${isLocked ? " locked" : ""}`}
+              open={!isLocked}
+            >
+              <summary className={styles.unitSummary}>
+                <div className="unit-head">
+                  <span
+                    className={`unit-num ${tint}`}
+                    style={isLocked ? { background: "var(--panel-2)", color: "var(--ink-faint)" } : undefined}
+                  >
+                    {unit.n}
+                  </span>
+                  <div className="unit-title">
+                    <h3>{unit.title}</h3>
+                    <p>Você vai conseguir: {unit.objective}</p>
+                  </div>
+                  <span className={styles.summaryMeta}>
+                    {unit.checkpoint && <small>{unit.checkpoint}</small>}
+                    <span className="unit-pct">
+                      {isLocked ? "Ver unidade" : unit.status === "done" ? "Concluída ✓" : `${unit.pct}%`}
+                    </span>
+                  </span>
                 </div>
-                <span className="unit-pct">
-                  {unit.status === "locked"
-                    ? "Bloqueada"
-                    : unit.status === "done"
-                      ? "Concluída ✓"
-                      : `${unit.pct}%`}
-                </span>
-              </div>
+              </summary>
 
-              {unit.status !== "locked" && (
-                <div className="unit-bar">
-                  <i style={{ width: `${unit.pct}%` }} />
+              <div className={styles.unitBody}>
+                {unit.canDo && unit.canDo.length > 0 && (
+                  <section className={styles.canDo} aria-label={`Resultados da unidade ${unit.n}`}>
+                    <h4>Ao final, eu consigo</h4>
+                    <ul>
+                      {unit.canDo.map((outcome) => (
+                        <li key={outcome}>{outcome}</li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+                {unit.languageFocus && unit.languageFocus.length > 0 && (
+                  <div className={styles.focus} aria-label="Focos da unidade">
+                    {unit.languageFocus.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
+                )}
+
+                {(unit.pronunciation || unit.communicationStrategy) && (
+                  <div className={styles.supportGrid}>
+                    {unit.pronunciation && (
+                      <p>
+                        <b>Pronúncia</b>
+                        {unit.pronunciation}
+                      </p>
+                    )}
+                    {unit.communicationStrategy && (
+                      <p>
+                        <b>Frase de apoio</b>
+                        <span lang="en">{unit.communicationStrategy}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {unit.mission && (
+                  <div className={styles.mission}>
+                    <span>Missão da unidade</span>
+                    <p>{unit.mission}</p>
+                  </div>
+                )}
+
+                {!isLocked && (
+                  <div className="unit-bar">
+                    <i style={{ width: `${unit.pct}%` }} />
+                  </div>
+                )}
+
+                <div className={styles.lessonList}>
+                  {unit.lessons.map((lesson, index) => {
+                    const clickable = lesson.status === "now" && lesson.href;
+                    const inner = (
+                      <>
+                        <span className={`lesson-ic ${lesson.status}`}>{icons[lesson.status]}</span>
+                        <span className="lesson-info">
+                          <b>{lesson.title}</b>
+                          <span>{lesson.meta}</span>
+                        </span>
+                        {clickable && <span className="lesson-cta">Começar →</span>}
+                      </>
+                    );
+
+                    return clickable ? (
+                      <Link key={index} href={lesson.href!} className="lesson-row clickable">
+                        {inner}
+                      </Link>
+                    ) : (
+                      <div key={index} className="lesson-row">
+                        {inner}
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-
-              <div style={{ marginTop: 6 }}>
-                {unit.lessons.map((lesson, k) => {
-                  const clickable = lesson.status === "now" && lesson.href;
-                  const inner = (
-                    <>
-                      <span className={`lesson-ic ${lesson.status}`}>{icons[lesson.status]}</span>
-                      <span className="lesson-info">
-                        <b>{lesson.title}</b>
-                        <span>{lesson.meta}</span>
-                      </span>
-                      {lesson.status === "now" && <span className="lesson-cta">Continuar →</span>}
-                    </>
-                  );
-                  return clickable ? (
-                    <Link key={k} href={lesson.href!} className="lesson-row clickable">
-                      {inner}
-                    </Link>
-                  ) : (
-                    <div key={k} className="lesson-row">
-                      {inner}
-                    </div>
-                  );
-                })}
               </div>
-            </div>
+            </details>
           );
         })}
       </div>

@@ -1,0 +1,225 @@
+.cycle {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 22px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 10%, var(--panel)), var(--panel));
+}
+
+.cycleEyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cycle h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.cycleSteps {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cycleSteps li {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.cycleSteps li span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, var(--line));
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--gold);
+  font-size: 12px;
+}
+
+details.unit {
+  padding: 0;
+  overflow: clip;
+}
+
+.unitSummary {
+  padding: 20px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.unitSummary::-webkit-details-marker {
+  display: none;
+}
+
+.unitSummary:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--gold) 55%, transparent);
+  outline-offset: -3px;
+}
+
+.summaryMeta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  min-width: 112px;
+}
+
+.summaryMeta small {
+  max-width: 150px;
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.unitBody {
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--line);
+}
+
+.canDo {
+  padding: 18px 0 10px;
+}
+
+.canDo h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.canDo ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.canDo li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.canDo li::before {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  color: var(--gold);
+  font-weight: 900;
+  content: "✓";
+}
+
+.focus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 4px 0 14px;
+}
+
+.focus span {
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-2);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.supportGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.supportGrid p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.supportGrid b {
+  color: var(--ink);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.mission {
+  margin-bottom: 14px;
+  padding: 13px 14px;
+  border-left: 3px solid var(--gold);
+  border-radius: 0 12px 12px 0;
+  background: color-mix(in srgb, var(--gold) 9%, var(--panel));
+}
+
+.mission span {
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mission p {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.lessonList {
+  margin-top: 8px;
+}
+
+@media (max-width: 680px) {
+  .cycleSteps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 14px;
+  }
+
+  .unitSummary,
+  .unitBody {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .summaryMeta {
+    min-width: auto;
+  }
+
+  .summaryMeta small {
+    display: none;
+  }
+
+  .supportGrid {
+    grid-template-columns: 1fr;
+  }
+}

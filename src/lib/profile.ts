@@ -170,14 +170,15 @@ export function useProfile() {
       if (!mounted) return;
       setUser(data.user);
       if (data.user) {
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", data.user.id)
-          .maybeSingle();
-        if (mounted) setRole((prof?.role as Role) ?? "student");
         touchLogin(metaString(data.user, "name"), metaString(data.user, "level")).catch(() => {});
-        const snapshot = await getMyLearningSnapshot();
+        // profiles.role e o snapshot de aprendizado não dependem um do outro -
+        // paralelizar corta um round-trip sequencial ao Supabase logo após o
+        // login, quando isso já é o gargalo percebido (tudo na tela espera `ready`).
+        const [{ data: prof }, snapshot] = await Promise.all([
+          supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle(),
+          getMyLearningSnapshot(data.user.id),
+        ]);
+        if (mounted) setRole((prof?.role as Role) ?? "student");
         if (mounted && snapshot) {
           setStats((current) => ({ ...current, ...snapshot }));
         }

@@ -33,14 +33,17 @@ export type LearningSnapshot = {
   lastActivityType: string;
 };
 
-/** Lê do servidor o estado que deve acompanhar o aluno em qualquer aparelho. */
-export async function getMyLearningSnapshot(): Promise<LearningSnapshot | null> {
+/**
+ * Lê do servidor o estado que deve acompanhar o aluno em qualquer aparelho.
+ * Recebe o `userId` de quem já chamou (evita repetir `getUser()`, que o
+ * `useProfile` já resolveu — cada chamada extra é um round-trip a mais no
+ * caminho crítico do login/carregamento do painel).
+ */
+export async function getMyLearningSnapshot(userId: string): Promise<LearningSnapshot | null> {
   const supabase = createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return null;
   const [{ data: activity }, { data: sections }] = await Promise.all([
-    supabase.from("student_activity").select("practice_mc_done,practice_mc_correct,practice_fill_done,practice_fill_correct,practice_translate_done,practice_translate_correct,practice_order_done,practice_order_correct,daily_activity_date,daily_exercise_done,streak_count,best_streak,last_path,last_title,last_activity_type").eq("user_id", auth.user.id).maybeSingle(),
-    supabase.from("student_lesson_progress").select("lesson_slug,section_id").eq("student_id", auth.user.id),
+    supabase.from("student_activity").select("practice_mc_done,practice_mc_correct,practice_fill_done,practice_fill_correct,practice_translate_done,practice_translate_correct,practice_order_done,practice_order_correct,daily_activity_date,daily_exercise_done,streak_count,best_streak,last_path,last_title,last_activity_type").eq("user_id", userId).maybeSingle(),
+    supabase.from("student_lesson_progress").select("lesson_slug,section_id").eq("student_id", userId),
   ]);
   if (!activity) return null;
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());

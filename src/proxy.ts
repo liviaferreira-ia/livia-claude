@@ -77,20 +77,29 @@ export async function proxy(request: NextRequest) {
 
   const isStudentArea = STUDENT_AREA.some((p) => path === p || path.startsWith(p + "/"));
   if (isStudentArea && user) {
-    // O relógio do trial começa no primeiro acesso autenticado, nunca no cadastro.
     // A checagem de bloqueio por atraso não depende do trial, então roda em paralelo
     // em vez de esperar a cadeia do trial terminar (reduz round-trips sequenciais
     // ao Supabase nessa rota, que roda em toda navegação da área do aluno).
-    const trialPromise = supabase.rpc("activate_my_trial").then(() =>
-      supabase.from("student_trials").select("status,ends_at").eq("student_id", user.id).maybeSingle(),
-    );
-    const activityPromise = supabase
-      .from("student_activity")
-      .select("blocked")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const [{ data: trialRow }, { data: activity }] = await Promise.all([
+      supabase.from("student_trials").select("status,ends_at,starts_at").eq("student_id", user.id).maybeSingle(),
+      supabase.from("student_activity").select("blocked").eq("user_id", user.id).maybeSingle(),
+    ]);
 
-    const [{ data: trial }, { data: activity }] = await Promise.all([trialPromise, activityPromise]);
+    let trial = trialRow;
+    // O relógio do trial começa no primeiro acesso autenticado, nunca no cadastro.
+    // A RPC só faz algo quando o trial ainda está "pending" sem starts_at (mesma
+    // condição do WHERE dela) - fora disso é sempre um no-op no banco, então só
+    // chamamos (e reconsultamos) quando pode haver algo pra ativar. Isso evita um
+    // round-trip extra ao Supabase em toda navegação depois da primeira.
+    if (trial && trial.status === "pending" && !trial.starts_at) {
+      await supabase.rpc("activate_my_trial");
+      const { data: refreshed } = await supabase
+        .from("student_trials")
+        .select("status,ends_at,starts_at")
+        .eq("student_id", user.id)
+        .maybeSingle();
+      trial = refreshed;
+    }
 
     const trialEnded = trial?.ends_at ? new Date(trial.ends_at).getTime() <= Date.now() : false;
     if (trial && trial.status !== "converted" && (trialEnded || trial.status === "expired" || trial.status === "cancelled")) {

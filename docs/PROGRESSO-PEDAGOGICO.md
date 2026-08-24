@@ -20,6 +20,8 @@ Para habilitar a trilha B2 de 14 unidades em uma base que já recebeu a parte 15
 
 Para habilitar a trilha C1 de 14 unidades e reposicionar corretamente a lição antiga de debate, execute `supabase-setup-17-progresso-c1.sql` depois da parte 16.
 
+Para concluir a projeção curricular com as 14 unidades do C2 e reposicionar a lição persuasiva antiga, execute `supabase-setup-18-progresso-c2.sql` depois da parte 17.
+
 Cada conclusão passa a ser registrada em `student_course_progress` por:
 
 - aluno;

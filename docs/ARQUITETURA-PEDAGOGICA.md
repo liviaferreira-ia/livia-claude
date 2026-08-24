@@ -113,6 +113,16 @@ No C1, o aluno usa o idioma para analisar, influenciar e atuar profissionalmente
 
 O C1 trabalha reading de 700 a 1.200 palavras, listening de 3 a 6 minutos e writing de 250 a 350 palavras. Trilhas opcionais de Business, Technology, Academic e Professional English podem personalizar exemplos e missões sem retirar o núcleo comum.
 
+## Progressão para o C2
+
+O C2 não promete transformar o aluno em falante nativo. Seu objetivo é permitir uso altamente preciso, flexível e autônomo do idioma, inclusive para interpretar implicações, adaptar registro, liderar interações e agir em situações abstratas ou complexas.
+
+- **Checkpoint 1:** unidades 1 a 5, com negociação e interação espontânea.
+- **Checkpoint 2:** unidades 6 a 10, com apresentação, análise retórica e interpretação.
+- **Checkpoint 3:** unidades 11 a 14 e o C2 Master Challenge.
+
+O C2 trabalha reading de 900 a 1.500 palavras, listening de 5 a 10 minutos e writing de 300 a 450 palavras. Múltipla escolha torna-se apoio secundário; desafios de performance, análise, mediação, negociação e apresentação produzem as principais evidências.
+
 ## Critério para produção de novas lições
 
 Uma lição só deve ser publicada quando:
@@ -128,12 +138,12 @@ Uma lição só deve ser publicada quando:
 
 ## Implementação incremental
 
-1. Manter visíveis as 12 unidades de A1, as 12 de A2 e as 14 unidades de B1, B2 e C1.
+1. Manter visíveis as 12 unidades de A1 e A2 e as 14 unidades de B1, B2, C1 e C2.
 2. Disponibilizar uma primeira jornada completa e coerente em cada um desses níveis.
 3. Conectar exercício, missão, fala e domínio a eventos de aprendizagem confiáveis.
 4. Produzir as demais atividades em blocos até completar o Checkpoint 1 de cada nível.
 5. Validar uso, dificuldade e conclusão com os alunos ativos antes do próximo bloco.
-6. Manter somente a Unidade 1 de B2 e C1 disponível enquanto a produção detalhada se concentra no Checkpoint 1 do B1.
+6. Manter somente a Unidade 1 de B2, C1 e C2 disponível enquanto a produção detalhada se concentra no Checkpoint 1 do B1.
 
 ## Fora do escopo atual
 
@@ -143,5 +153,5 @@ Uma lição só deve ser publicada quando:
 - desbloqueio e progressão persistidos em banco;
 - criação completa das atividades de todas as unidades em um único lote;
 - produção detalhada das unidades 2 a 14 do B2;
-- produção detalhada das unidades 2 a 14 do C1;
-- expansão pedagógica de C2 nesta etapa.
+- produção detalhada das unidades 2 a 14 de C1 e C2;
+- trilhas pós-CEFR antes da consolidação dos níveis principais.

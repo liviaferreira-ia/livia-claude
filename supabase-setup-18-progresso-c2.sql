@@ -1,6 +1,6 @@
 -- ============================================================
--- Central School — parte 16: ampliar a projeção curricular do B2
--- Execute depois da parte 15. Seguro para rodar novamente.
+-- Central School — parte 18: ampliar a projeção curricular do C2
+-- Execute depois da parte 17. Seguro para rodar novamente.
 -- ============================================================
 
 create or replace function public.refresh_course_projection(p_student_id uuid, p_level text)
@@ -120,24 +120,24 @@ begin
 end;
 $$;
 
--- Corrige evidências da antiga lição B2, que antes era classificada como U1.
+-- A antiga lição persuasiva era classificada como C2 U1; agora pertence à U6.
 insert into public.student_course_progress
   (student_id, level, unit_number, phase, source, evidence_id, completed_at)
-select student_id, level, 2, phase, source, evidence_id, completed_at
+select student_id, level, 6, phase, source, evidence_id, completed_at
 from public.student_course_progress
-where level = 'B2' and unit_number = 1 and evidence_id like 'contando-uma-historia:%'
+where level = 'C2' and unit_number = 1 and evidence_id like 'argumento-persuasivo:%'
 on conflict (student_id, level, unit_number, phase) do nothing;
 
 delete from public.student_course_progress
-where level = 'B2' and unit_number = 1 and evidence_id like 'contando-uma-historia:%';
+where level = 'C2' and unit_number = 1 and evidence_id like 'argumento-persuasivo:%';
 
 insert into public.student_course_progress
   (student_id, level, unit_number, phase, source, evidence_id, completed_at)
-select student_id, 'B2', 1,
+select student_id, 'C2', 1,
   case section_id when 'vocabulario' then 'learn' when 'expressoes' then 'learn' when 'listening' then 'understand' when 'exercicios' then 'practice' end,
   'historical_lesson_section', lesson_slug || ':' || section_id, completed_at
 from public.student_lesson_progress
-where lesson_slug = 'identity-personal-development'
+where lesson_slug = 'precision-nuance'
   and section_id in ('vocabulario','expressoes','listening','exercicios')
 on conflict (student_id, level, unit_number, phase) do nothing;
 
@@ -145,9 +145,9 @@ do $$
 declare r record;
 begin
   for r in select user_id from public.student_activity
-    where substring(level from '(A1|A2|B1|B2|C1|C2)') = 'B2'
+    where substring(level from '(A1|A2|B1|B2|C1|C2)') = 'C2'
   loop
-    perform public.refresh_course_projection(r.user_id, 'B2');
+    perform public.refresh_course_projection(r.user_id, 'C2');
   end loop;
 end $$;
 

@@ -853,10 +853,66 @@ const DISCORDANDO_COM_TATO: Lesson = {
 
 // ================= C2 · Unidade 1 =================
 
+const PRECISION_NUANCE: Lesson = {
+  slug: "precision-nuance",
+  level: "C2",
+  unit: "Unidade 1 · Precision & Nuance",
+  title: "Precision & Nuance",
+  intro: "No C2, a pergunta já não é apenas se uma frase está correta, mas se ela comunica exatamente a intenção desejada. Nesta lição você vai controlar força, ressalva, implicação, conotação e registro.",
+  vocab: {
+    title: "Ajustando significado e intensidade",
+    hint: "Compare não apenas a definição, mas o efeito de cada escolha no interlocutor.",
+    items: [
+      { en: "underlying assumption", pt: "pressuposto subjacente" },
+      { en: "tentative conclusion", pt: "conclusão provisória" },
+      { en: "broadly speaking", pt: "em termos gerais" },
+      { en: "misleading", pt: "enganoso(a)" },
+      { en: "implausible", pt: "pouco plausível" },
+      { en: "overstate", pt: "exagerar / afirmar além da evidência" },
+      { en: "qualify a statement", pt: "fazer uma ressalva a uma afirmação" },
+      { en: "convey", pt: "transmitir uma ideia ou impressão" },
+    ],
+  },
+  listening: {
+    title: "Discordância, dúvida ou rejeição?",
+    hint: "Observe como pequenas escolhas mudam a força e o alvo da crítica.",
+    lines: [
+      { who: "Chair", en: "Would you say the proposal is fundamentally flawed?", pt: "Você diria que a proposta é fundamentalmente falha?" },
+      { who: "Analyst", en: "I wouldn't go quite that far. The overall direction is sound, but I'm not entirely convinced by the assumptions behind the forecast.", pt: "Eu não iria tão longe. A direção geral é sólida, mas não estou totalmente convencido dos pressupostos por trás da previsão." },
+      { who: "Chair", en: "So you reject the projected outcome?", pt: "Então você rejeita o resultado projetado?" },
+      { who: "Analyst", en: "Not necessarily. I'd describe it as plausible, though somewhat overstated given the evidence currently available.", pt: "Não necessariamente. Eu o descreveria como plausível, embora um pouco exagerado diante das evidências disponíveis atualmente." },
+    ],
+  },
+  expressions: {
+    title: "Precisão sem rigidez",
+    hint: "Identifique o que cada formulação aceita, questiona ou deixa em aberto.",
+    items: [
+      { en: "I'm not entirely convinced that...", pt: "Não estou totalmente convencido de que..." },
+      { en: "I wouldn't go quite that far.", pt: "Eu não iria tão longe." },
+      { en: "That may be overstating the case.", pt: "Isso talvez esteja exagerando a questão." },
+      { en: "I broadly agree, with one important qualification.", pt: "Concordo em linhas gerais, com uma ressalva importante." },
+      { en: "The distinction may seem subtle, but...", pt: "A distinção pode parecer sutil, mas..." },
+    ],
+  },
+  exercises: {
+    title: "Dizer exatamente o necessário",
+    praise: "Excelente! Você controlou força, implicação e ressalva com precisão de nível C2.",
+    questions: [
+      { kind: "mc", type: "Escolha a formulação precisa", prompt: "Você concorda com a ideia geral, mas possui uma ressalva importante.", hint: "Evite concordância absoluta.", options: ["I broadly agree, with one important qualification.", "I totally agree with everything.", "I disagree absolutely.", "It is maybe good."], answer: 0, feedbackOk: "Correto! Broadly agree preserva a concordância geral e qualification introduz o limite.", feedbackNo: "A formulação adequada é I broadly agree, with one important qualification." },
+      { kind: "fill", type: "Complete a frase", prompt: "That may be ___ the case; the evidence is still limited.", hint: "Verbo: exagerar uma afirmação.", answers: ["overstating"], feedbackOk: "Isso! Overstating questiona a força da conclusão, não necessariamente sua direção.", feedbackNo: "A palavra é overstating." },
+      { kind: "mc", type: "Escolha a opção correta", prompt: "The outcome is possible, but not strongly supported. It is ___.", hint: "Possível e razoável, sem certeza.", options: ["plausible", "inevitable", "proven", "undeniable"], answer: 0, feedbackOk: "Perfeito! Plausible indica que algo é possível ou crível, sem tratá-lo como comprovado.", feedbackNo: "Use plausible para uma conclusão possível, mas não comprovada." },
+      { kind: "fill", type: "Complete a frase", prompt: "I'm not entirely ___ by the assumptions behind the forecast.", hint: "Particípio de convince.", answers: ["convinced"], feedbackOk: "Muito bem! Not entirely convinced sinaliza dúvida fundamentada.", feedbackNo: "A forma correta é convinced." },
+      { kind: "mc", type: "Escolha a resposta mais precisa", prompt: "Is the proposal fundamentally flawed?", hint: "A resposta deve limitar a discordância.", options: ["I wouldn't go quite that far; the direction is sound, although some assumptions need revisiting.", "Yes, bad.", "No, perfect.", "Maybe all wrong."], answer: 0, feedbackOk: "Exato! A resposta separa direção, grau e aspecto problemático.", feedbackNo: "No C2, a melhor resposta distingue o que funciona do que precisa ser revisto." },
+    ],
+  },
+};
+
+// ================= C2 · Unidade 6 =================
+
 const ARGUMENTO_PERSUASIVO: Lesson = {
   slug: "argumento-persuasivo",
   level: "C2",
-  unit: "Unidade 1 · Retórica e persuasão",
+  unit: "Unidade 6 · Persuasion & Influence",
   title: "Construindo um argumento persuasivo",
   intro:
     "Nesta lição você vai usar recursos retóricos de alto nível: inversão enfática, condicionais invertidos e a arte de conceder um ponto para fortalecer o seu. É o inglês de quem convence uma sala. Uns 8 minutos.",
@@ -983,6 +1039,7 @@ export const LESSONS: Record<string, Lesson> = {
   [CONTANDO_UMA_HISTORIA.slug]: CONTANDO_UMA_HISTORIA,
   [IDENTITY_VALUES_PERSPECTIVE.slug]: IDENTITY_VALUES_PERSPECTIVE,
   [DISCORDANDO_COM_TATO.slug]: DISCORDANDO_COM_TATO,
+  [PRECISION_NUANCE.slug]: PRECISION_NUANCE,
   [ARGUMENTO_PERSUASIVO.slug]: ARGUMENTO_PERSUASIVO,
 };
 
@@ -993,7 +1050,7 @@ export const LESSONS_BY_LEVEL: Record<CefrLevel, string[]> = {
   B1: [WHO_I_AM.slug, CONTANDO_UMA_EXPERIENCIA.slug],
   B2: [IDENTITY_PERSONAL_DEVELOPMENT.slug, CONTANDO_UMA_HISTORIA.slug],
   C1: [IDENTITY_VALUES_PERSPECTIVE.slug, DISCORDANDO_COM_TATO.slug],
-  C2: [ARGUMENTO_PERSUASIVO.slug],
+  C2: [PRECISION_NUANCE.slug, ARGUMENTO_PERSUASIVO.slug],
 };
 
 export function levelHasLesson(level: CefrLevel): boolean {

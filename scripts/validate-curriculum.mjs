@@ -19,6 +19,7 @@ const a2 = section("const COURSE_A2", "const b1Unit");
 const b1 = section("const COURSE_B1", "const COURSE_B2");
 const b2 = section("const COURSE_B2", "const COURSE_C1");
 const c1 = section("const COURSE_C1", "const COURSE_C2");
+const c2 = section("const COURSE_C2", "export const COURSES");
 
 const checks = [
   ["A1 possui 12 unidades", count(a1, /\bn:\s*\d+,/g) === 12],
@@ -36,6 +37,9 @@ const checks = [
   ["C1 possui 14 unidades", count(c1, /\bc1Unit\(/g) === 14],
   ["C1 define as 6 fases do ciclo", count(source.slice(source.indexOf("const c1Unit"), source.indexOf("const COURSE_C1")), /phase:\s*"(?:learn|understand|practice|speak|mission|mastery)"/g) === 6],
   ["C1 possui 3 checkpoints", count(c1, /Checkpoint [123]/g) === 3],
+  ["C2 possui 14 unidades", count(c2, /\bc2Unit\(/g) === 14],
+  ["C2 define as 6 fases do ciclo", count(source.slice(source.indexOf("const c2Unit"), source.indexOf("const COURSE_C2")), /phase:\s*"(?:learn|understand|practice|speak|mission|mastery)"/g) === 6],
+  ["C2 possui 3 checkpoints", count(c2, /Checkpoint [123]/g) === 3],
 ];
 
 const failed = checks.filter(([, ok]) => !ok);

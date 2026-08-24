@@ -147,7 +147,8 @@ const lessonLocations: Record<string, { level: CefrLevel; unit: number }> = {
   "contando-uma-historia": { level: "B2", unit: 2 },
   "identity-values-perspective": { level: "C1", unit: 1 },
   "discordando-com-tato": { level: "C1", unit: 3 },
-  "argumento-persuasivo": { level: "C2", unit: 1 },
+  "precision-nuance": { level: "C2", unit: 1 },
+  "argumento-persuasivo": { level: "C2", unit: 6 },
 };
 
 export function lessonCourseLocation(slug: string) {

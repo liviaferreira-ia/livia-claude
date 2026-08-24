@@ -7,7 +7,7 @@ create or replace function public.refresh_course_projection(p_student_id uuid, p
 returns void language plpgsql security definer set search_path = public as $$
 declare
   phases text[] := array['learn','understand','practice','speak','mission','mastery'];
-  max_units integer := case p_level when 'A1' then 12 when 'A2' then 12 when 'B1' then 14 when 'B2' then 14 when 'C1' then 14 else 3 end;
+  max_units integer := case p_level when 'A1' then 12 when 'A2' then 12 when 'B1' then 14 when 'B2' then 14 when 'C1' then 14 when 'C2' then 14 end;
   completed integer;
   next_unit integer := max_units;
   next_phase text := 'mastery';
@@ -52,7 +52,7 @@ create or replace function public.mark_course_phase(
 ) returns void language plpgsql security definer set search_path = public as $$
 declare
   uid uuid := auth.uid();
-  max_units integer := case p_level when 'A1' then 12 when 'A2' then 12 when 'B1' then 14 when 'B2' then 14 when 'C1' then 14 else 3 end;
+  max_units integer := case p_level when 'A1' then 12 when 'A2' then 12 when 'B1' then 14 when 'B2' then 14 when 'C1' then 14 when 'C2' then 14 end;
 begin
   if uid is null then raise exception 'not authenticated'; end if;
   if p_level not in ('A1','A2','B1','B2','C1','C2') then raise exception 'invalid level'; end if;
@@ -89,6 +89,7 @@ begin
     when 'contando-uma-historia' then 'B2'
     when 'identity-values-perspective' then 'C1'
     when 'discordando-com-tato' then 'C1'
+    when 'precision-nuance' then 'C2'
     when 'argumento-persuasivo' then 'C2'
   end;
   mapped_unit := case p_slug
@@ -101,6 +102,8 @@ begin
     when 'contando-uma-historia' then 2
     when 'identity-values-perspective' then 1
     when 'discordando-com-tato' then 3
+    when 'precision-nuance' then 1
+    when 'argumento-persuasivo' then 6
     else 1
   end;
   mapped_phase := case p_section

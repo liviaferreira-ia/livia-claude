@@ -16,6 +16,7 @@ import {
 } from "@/data/exercises";
 import { LEVEL_ORDER, type CefrLevel } from "@/data/placement";
 import { markContentValidated } from "@/lib/content-validation";
+import { courseContextFromLocation, markCoursePhase } from "@/lib/courseProgress";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 const TINTS: Record<Kind, string> = {
@@ -212,6 +213,26 @@ function Runner({
     if (answered) {
       // next
       if (i === queue.length - 1) {
+        const context = courseContextFromLocation();
+        if (!reviewMode && context) {
+          setSaving(true);
+          setSaveError("");
+          try {
+            await markCoursePhase({
+              ...context,
+              phase: "practice",
+              source: "exercise_set",
+              evidenceId: `${kind}:${correct}/${queue.length}`,
+              path: "/aluno/praticar",
+              title,
+            });
+          } catch {
+            setSaveError("Os exercícios foram respondidos, mas não foi possível concluir a etapa. Tente novamente.");
+            setSaving(false);
+            return;
+          }
+          setSaving(false);
+        }
         setDone(true);
         return;
       }

@@ -6,6 +6,7 @@ import { use, useState } from "react";
 import { LESSONS } from "@/data/lesson";
 import { markSectionDone } from "@/lib/lessonProgress";
 import { useProfile } from "@/lib/profile";
+import { lessonCourseLocation, markCoursePhase } from "@/lib/courseProgress";
 
 function normalize(s: string) {
   return (s ?? "")
@@ -38,7 +39,7 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
 
   async function check() {
     if (answered) {
-      next();
+      await next();
       return;
     }
     let ok = false;
@@ -63,10 +64,30 @@ export default function TarefaFinalPage({ params }: { params: Promise<{ slug: st
     }
   }
 
-  function next() {
+  async function next() {
     if (isLast) {
-      markSectionDone(slug, "exercicios");
-      setDone(true);
+      setSaving(true);
+      setSaveError("");
+      try {
+        await markSectionDone(slug, "exercicios");
+        const location = lessonCourseLocation(slug);
+        const pct = Math.round((correct / questions.length) * 100);
+        if (location && pct >= 80) {
+          await markCoursePhase({
+            ...location,
+            phase: "mastery",
+            source: "lesson_assessment",
+            evidenceId: `${slug}:${correct}/${questions.length}`,
+            path: `/aluno/licao/${slug}/exercicios`,
+            title: lesson.exercises.title,
+          });
+        }
+        setDone(true);
+      } catch {
+        setSaveError("Não foi possível concluir a tarefa. Confira sua conexão e tente novamente.");
+      } finally {
+        setSaving(false);
+      }
       return;
     }
     setIndex((i) => i + 1);

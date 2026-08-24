@@ -6,7 +6,7 @@ import { normalize } from "@/data/exercises";
 import { SpeakButton } from "@/components/SpeakButton";
 import { PRONUNCIATION, resolvePronunciationLevel } from "@/data/pratica";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
-import { logModuleEvent } from "@/lib/module-events";
+import { completeTrackedModule } from "@/lib/module-events";
 import {
   createRecognition,
   isSTTSupported,
@@ -31,8 +31,11 @@ export default function PronunciaPage() {
   const SENTENCES = PRONUNCIATION[resolvePronunciationLevel(parseCefrLevel(profile.level) ?? "A2")];
 
   useEffect(() => {
-    setSupported(isSTTSupported());
-    return () => recRef.current?.abort();
+    const timer = window.setTimeout(() => setSupported(isSTTSupported()), 0);
+    return () => {
+      window.clearTimeout(timer);
+      recRef.current?.abort();
+    };
   }, []);
 
   // Toca a frase de referência automaticamente ao abrir e ao trocar de frase.
@@ -85,7 +88,9 @@ export default function PronunciaPage() {
     if (index === SENTENCES.length - 1) {
       setIndex(SENTENCES.length); // marca fim
       const finalAvg = answered ? Math.round(scoreSum / answered) : 0;
-      void logModuleEvent("pronunciation", String(SENTENCES.length), finalAvg >= 70);
+      void completeTrackedModule("pronunciation", String(SENTENCES.length), finalAvg >= 70).catch(() => {
+        setError("A prática terminou, mas não foi possível registrar o progresso. Tente novamente.");
+      });
       return;
     }
     setIndex((i) => i + 1);

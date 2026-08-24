@@ -11,7 +11,9 @@ import {
   updateStudentDetail,
   type StudentDetail,
 } from "@/lib/student-admin";
-import { initials, levelDisplay, useProfile } from "@/lib/profile";
+import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
+import { LEARNING_CYCLE } from "@/data/curso";
+import { courseTotalPhases, type CourseProjectionFields } from "@/lib/courseProgress";
 
 type Tab = "overview" | "progress" | "activity" | "finance" | "notes" | "logs" | "access";
 const tabs: { id: Tab; label: string }[] = [
@@ -26,6 +28,11 @@ const tabs: { id: Tab; label: string }[] = [
 const kindLabels = { mc: "Múltipla escolha", fill: "Completar", translate: "Tradução", order: "Ordenar" };
 
 function eventLabel(e: { event_type: string; kind: string | null; correct: boolean | null }): string {
+  if (e.event_type === "course_phase") {
+    const [level, unit, phase] = (e.kind ?? "").split(":");
+    const phaseLabel = LEARNING_CYCLE.find((item) => item.id === phase)?.label ?? "Etapa";
+    return `✓ ${phaseLabel} concluída · ${level} Unidade ${unit}`;
+  }
   if (e.event_type === "login") return "Entrou na plataforma";
   if (e.event_type === "tutor") return "Praticou no tutor de conversa (IA)";
   if (e.event_type === "roleplay") return "Completou um roleplay por voz";
@@ -120,12 +127,17 @@ export default function ProfessorStudentPage() {
   if (!detail) return <div className="view"><Link href="/professor/alunos">← Alunos</Link><p className="auth-msg err">{error || "Aluno não encontrado."}</p></div>;
 
   const a = detail.activity;
+  const courseProjection = a as typeof a & CourseProjectionFields;
   const totals = practiceTotals(a);
   const name = a.student_name || "Aluno(a)";
   const invitePending = !detail.auth.emailConfirmedAt;
   const avg = a.session_count ? a.total_seconds / a.session_count : 0;
   const weakest = skills.filter((s) => s.done > 0).sort((x, y) => x.pct - y.pct)[0];
   const currentPayment = detail.payments.find((p) => p.status === "OVERDUE") ?? detail.payments.find((p) => ["PENDING", "AWAITING_RISK_ANALYSIS"].includes(p.status));
+  const courseLevel = parseCefrLevel(courseProjection.course_level ?? a.level ?? "");
+  const totalCoursePhases = courseLevel ? courseTotalPhases(courseLevel) : 0;
+  const courseCompleted = courseProjection.course_completed_phases ?? detail.courseProgress.filter((row) => row.level === courseLevel).length;
+  const coursePct = totalCoursePhases ? Math.round((courseCompleted / totalCoursePhases) * 100) : 0;
 
   return (
     <div className="view">
@@ -161,6 +173,7 @@ export default function ProfessorStudentPage() {
       </>}
 
       {tab === "progress" && <div className="grid cols-2">
+        <div className="card stat"><div className="eyebrow">Jornada curricular</div><h3 style={{ marginTop: 10 }}>{coursePct}% do nível {courseLevel ?? "—"}</h3><div className="unit-bar" style={{ marginTop: 12 }}><i style={{ width: `${coursePct}%` }} /></div><p className="muted">{courseCompleted} de {totalCoursePhases} etapas · Unidade {courseProjection.current_unit ?? 1} · {LEARNING_CYCLE.find((phase) => phase.id === courseProjection.current_phase)?.label ?? "Aprender"}</p><div style={{ marginTop: 12 }}>{detail.courseProgress.slice(0, 8).map((row) => <div key={`${row.level}-${row.unit_number}-${row.phase}`} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "7px 0", borderTop: "1px solid var(--line)", fontSize: 13 }}><span>{row.level} · Unidade {row.unit_number} · {LEARNING_CYCLE.find((phase) => phase.id === row.phase)?.label}</span><span className="muted">{dateLabel(row.completed_at)}</span></div>)}</div></div>
         <div className="card stat"><div className="eyebrow">Desempenho por exercício</div><div style={{ marginTop: 14 }}>{skills.map((s) => <div className="skill-row" key={s.kind}><span className="lbl">{kindLabels[s.kind]}</span><span className="track"><i style={{ width: `${s.pct}%`, background: s.done && s.pct < 60 ? "linear-gradient(90deg,var(--warn),var(--gold))" : undefined }} /></span><span className="val">{s.done ? `${s.pct}%` : "—"}</span></div>)}</div></div>
         <div className="card stat"><div className="eyebrow">Leitura pedagógica</div><ul style={{ lineHeight: 1.8, paddingLeft: 18 }}><li>{totals.done ? `${totals.correct} respostas corretas em ${totals.done}.` : "Nenhuma prática registrada."}</li><li>{weakest ? `Maior oportunidade: ${kindLabels[weakest.kind]} (${weakest.pct}%).` : "Aguardando mais dados."}</li><li>Média de {formatDuration(avg)} por sessão.</li><li>Meta semanal: {detail.settings?.weekly_goal ?? 3} dias.</li></ul></div>
       </div>}

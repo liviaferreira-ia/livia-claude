@@ -12,7 +12,8 @@ import {
   setStudentAccess,
   type StudentActivity,
 } from "@/lib/activity";
-import { initials, levelDisplay, useProfile } from "@/lib/profile";
+import { initials, levelDisplay, parseCefrLevel, useProfile } from "@/lib/profile";
+import { courseTotalPhases, type CourseProjectionFields } from "@/lib/courseProgress";
 import { studentAdminAction } from "@/lib/student-admin";
 
 /** Texto curto explicando por que o aluno está em alerta (ou null se está tudo bem). */
@@ -300,13 +301,17 @@ export default function ProfessorAlunosPage() {
             <span>Aluno</span>
             <span>Nível</span>
             <span>Último acesso</span>
-            <span>Prática / acertos</span>
+            <span>Progresso / acertos</span>
             <span>Tempo de estudo</span>
             <span>Situação</span>
             <span>Ações</span>
           </div>
           {visibleRows.map((r) => {
             const totals = practiceTotals(r);
+            const course = r as StudentActivity & CourseProjectionFields;
+            const cefr = parseCefrLevel(course.course_level ?? r.level ?? "");
+            const totalPhases = cefr ? courseTotalPhases(cefr) : 0;
+            const coursePct = totalPhases ? Math.round(((course.course_completed_phases ?? 0) / totalPhases) * 100) : 0;
             const name = r.student_name || "Aluno(a)";
             const reason = attentionReason(r);
             const paymentFlag = r.blocked
@@ -341,10 +346,10 @@ export default function ProfessorAlunosPage() {
                 <span style={{ fontSize: 13.5 }}>{r.level ? levelDisplay(r.level) : "—"}</span>
                 <span style={{ fontSize: 13.5 }}>{formatLastLogin(r.last_login_at)}</span>
                 <span style={{ fontSize: 13.5 }}>
-                  {totals.done} respostas registradas
+                  {coursePct}% do nível
                   <br />
                   <span className="muted" style={{ fontSize: 12.5 }}>
-                    {totals.pct}% de acerto
+                    U{course.current_unit ?? 1} · {course.course_completed_phases ?? 0} etapas · {totals.pct}% acerto
                   </span>
                 </span>
                 <span style={{ fontSize: 13.5 }}>{formatDuration(r.total_seconds)}</span>

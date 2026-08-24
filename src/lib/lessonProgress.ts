@@ -70,17 +70,18 @@ export function countCompletedLessons(): number {
 }
 
 /** Marca uma etapa como concluída fora de um componente React (ex.: ao finalizar a tarefa). */
-export function markSectionDone(slug: string, sectionId: string) {
+export async function markSectionDone(slug: string, sectionId: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("mark_lesson_section", {
+    p_slug: slug,
+    p_section: sectionId,
+    p_title: LESSONS[slug]?.title ?? "Lição",
+  });
+  if (error) throw new Error(`Não foi possível salvar a etapa: ${error.message}`);
   try {
     const raw = window.localStorage.getItem(KEY);
     const done = raw ? (JSON.parse(raw) as Done) : {};
     done[keyFor(slug, sectionId)] = true;
     window.localStorage.setItem(KEY, JSON.stringify(done));
   } catch {}
-  const supabase = createClient();
-  void supabase.rpc("mark_lesson_section", {
-    p_slug: slug,
-    p_section: sectionId,
-    p_title: LESSONS[slug]?.title ?? "Lição",
-  });
 }

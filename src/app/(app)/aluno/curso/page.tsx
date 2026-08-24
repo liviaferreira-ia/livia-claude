@@ -4,6 +4,7 @@ import Link from "next/link";
 import { COURSES, LEARNING_CYCLE, resolveCourseLevel } from "@/data/curso";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
+import { useCourseProgress } from "@/lib/courseProgress";
 import styles from "./curso.module.css";
 
 const icons = {
@@ -30,7 +31,10 @@ export default function CursoPage() {
   const studentLevel = parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = resolveCourseLevel(studentLevel);
   const course = COURSES[contentLevel];
+  const progress = useCourseProgress(contentLevel);
   const usesLearningCycle = course.units.some((unit) => unit.canDo?.length);
+  const measured = progress.ready && !progress.error;
+  const coursePct = measured ? progress.pct : course.pct;
 
   if (!ready) {
     return (
@@ -56,10 +60,10 @@ export default function CursoPage() {
       )}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0 22px" }}>
         <div style={{ flex: 1, maxWidth: 320 }} className="unit-bar">
-          <i style={{ width: `${course.pct}%` }} />
+          <i style={{ width: `${coursePct}%` }} />
         </div>
         <span className="muted" style={{ fontSize: 13, fontWeight: 700 }}>
-          {course.pct}% do nível
+          {coursePct}% do nível · {measured ? `${progress.completedCount} de ${progress.total} etapas` : "carregando medição"}
         </span>
       </div>
 
@@ -82,8 +86,11 @@ export default function CursoPage() {
 
       <div className="trilha">
         {course.units.map((unit) => {
-          const tint = unit.status === "done" ? "tint-navy" : unit.status === "current" ? "tint-gold" : "";
-          const isLocked = unit.status === "locked";
+          const measuredUnit = measured ? progress.unitState(unit.n) : null;
+          const unitStatus = measuredUnit?.status ?? unit.status;
+          const unitPct = measuredUnit?.pct ?? unit.pct;
+          const tint = unitStatus === "done" ? "tint-navy" : unitStatus === "current" ? "tint-gold" : "";
+          const isLocked = unitStatus === "locked";
 
           return (
             <details
@@ -106,7 +113,7 @@ export default function CursoPage() {
                   <span className={styles.summaryMeta}>
                     {unit.checkpoint && <small>{unit.checkpoint}</small>}
                     <span className="unit-pct">
-                      {isLocked ? "Ver unidade" : unit.status === "done" ? "Concluída ✓" : `${unit.pct}%`}
+                      {isLocked ? "Bloqueada" : unitStatus === "done" ? "Concluída ✓" : `${unitPct}%`}
                     </span>
                   </span>
                 </div>
@@ -158,16 +165,17 @@ export default function CursoPage() {
 
                 {!isLocked && (
                   <div className="unit-bar">
-                    <i style={{ width: `${unit.pct}%` }} />
+                    <i style={{ width: `${unitPct}%` }} />
                   </div>
                 )}
 
                 <div className={styles.lessonList}>
                   {unit.lessons.map((lesson, index) => {
-                    const clickable = lesson.status === "now" && lesson.href;
+                    const phaseStatus = measured && lesson.phase ? progress.phaseStatus(unit.n, lesson.phase) : lesson.status;
+                    const clickable = (phaseStatus === "now" || phaseStatus === "done") && lesson.href;
                     const inner = (
                       <>
-                        <span className={`lesson-ic ${lesson.status}`}>{icons[lesson.status]}</span>
+                        <span className={`lesson-ic ${phaseStatus}`}>{icons[phaseStatus]}</span>
                         <span className="lesson-info">
                           <b>{lesson.title}</b>
                           <span>{lesson.meta}</span>
@@ -181,7 +189,7 @@ export default function CursoPage() {
                         {inner}
                       </Link>
                     ) : (
-                      <div key={index} className="lesson-row">
+                      <div key={index} className={`lesson-row${phaseStatus === "locked" ? " locked" : ""}`}>
                         {inner}
                       </div>
                     );

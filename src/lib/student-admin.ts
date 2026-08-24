@@ -36,10 +36,20 @@ export type StudentAssignment = {
 export type StudentEvent = {
   id: number;
   student_id: string;
-  event_type: "login" | "exercise" | "tutor" | "roleplay" | "pronunciation";
+  event_type: "login" | "exercise" | "tutor" | "roleplay" | "pronunciation" | "course_phase";
   kind: "mc" | "fill" | "translate" | "order" | string | null;
   correct: boolean | null;
   created_at: string;
+};
+
+export type StudentCourseProgress = {
+  student_id: string;
+  level: string;
+  unit_number: number;
+  phase: "learn" | "understand" | "practice" | "speak" | "mission" | "mastery";
+  source: string;
+  evidence_id: string | null;
+  completed_at: string;
 };
 
 export type StudentDetail = {
@@ -54,6 +64,7 @@ export type StudentDetail = {
   notes: TeacherNote[];
   assignments: StudentAssignment[];
   events: StudentEvent[];
+  courseProgress: StudentCourseProgress[];
   payments: StudentPayment[];
   messages: Message[];
   incidents: Incident[];

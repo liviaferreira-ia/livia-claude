@@ -24,13 +24,14 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   const { id } = await context.params;
   const admin = createAdminClient();
 
-  const [authResult, activity, settings, notes, assignments, events, payments, messages, incidents, audits] = await Promise.all([
+  const [authResult, activity, settings, notes, assignments, events, courseProgress, payments, messages, incidents, audits] = await Promise.all([
     admin.auth.admin.getUserById(id),
     admin.from("student_activity").select("*").eq("user_id", id).maybeSingle(),
     admin.from("student_settings").select("*").eq("student_id", id).maybeSingle(),
     admin.from("teacher_notes").select("*").eq("student_id", id).order("created_at", { ascending: false }),
     admin.from("student_assignments").select("*").eq("student_id", id).order("created_at", { ascending: false }),
     admin.from("student_events").select("*").eq("student_id", id).order("created_at", { ascending: false }).limit(100),
+    admin.from("student_course_progress").select("*").eq("student_id", id).order("completed_at", { ascending: false }),
     admin.from("student_payments").select("*").eq("user_id", id).order("due_date", { ascending: false, nullsFirst: false }),
     admin.from("messages").select("*").eq("user_id", id).order("created_at", { ascending: true }),
     admin.from("app_incidents").select("*").eq("user_id", id).order("last_seen_at", { ascending: false }).limit(100),
@@ -40,7 +41,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   if (authResult.error || !authResult.data.user) {
     return NextResponse.json({ error: "Aluno não encontrado." }, { status: 404 });
   }
-  const firstError = [activity.error, settings.error, notes.error, assignments.error, events.error, payments.error, messages.error, incidents.error, audits.error].find(Boolean);
+  const firstError = [activity.error, settings.error, notes.error, assignments.error, events.error, courseProgress.error, payments.error, messages.error, incidents.error, audits.error].find(Boolean);
   if (firstError) {
     const trace = await recordIncident({ userId: id, source: "server", area: "professor/aluno", action: "load_detail", message: firstError.message });
     return NextResponse.json({ error: `Não foi possível carregar o aluno. Código: ${trace}` }, { status: 500 });
@@ -58,6 +59,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     notes: notes.data ?? [],
     assignments: assignments.data ?? [],
     events: events.data ?? [],
+    courseProgress: courseProgress.data ?? [],
     payments: payments.data ?? [],
     messages: messages.data ?? [],
     incidents: incidents.data ?? [],

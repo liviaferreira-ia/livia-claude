@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ROLEPLAYS, resolveRoleplayLevel, type Roleplay } from "@/data/pratica";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
-import { logModuleEvent } from "@/lib/module-events";
+import { completeTrackedModule } from "@/lib/module-events";
 import {
   createRecognition,
   isSTTSupported,
@@ -34,8 +34,11 @@ export default function RoleplayPage() {
   const started = messages.length > 0;
 
   useEffect(() => {
-    setSupported(isSTTSupported());
-    return () => recRef.current?.abort();
+    const timer = window.setTimeout(() => setSupported(isSTTSupported()), 0);
+    return () => {
+      window.clearTimeout(timer);
+      recRef.current?.abort();
+    };
   }, []);
 
   useEffect(() => {
@@ -61,7 +64,9 @@ export default function RoleplayPage() {
       speak(line);
     } else {
       setPhase("done");
-      if (roleplay) void logModuleEvent("roleplay", roleplay.id);
+      if (roleplay) void completeTrackedModule("roleplay", roleplay.id).catch(() => {
+        setError("A missão terminou, mas não foi possível registrar o progresso. Tente novamente.");
+      });
     }
   }
 

@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { categoriesFor, resolveExerciseLevel, type Kind } from "@/data/exercises";
+import { LEARNING_CYCLE, resolveCourseLevel } from "@/data/curso";
 import { parseCefrLevel, totalExercises, useProfile } from "@/lib/profile";
+import { useCourseProgress } from "@/lib/courseProgress";
 import { countMyActiveDaysThisWeek, getMySettings, type StudentSettings } from "@/lib/student-admin";
 
 const LABEL: Record<Kind, string> = { mc: "Múltipla escolha", fill: "Completar", translate: "Tradução", order: "Ordenar frases" };
@@ -13,6 +15,8 @@ export default function ProgressoPage() {
   const [activeDays, setActiveDays] = useState(0);
   const [settings, setSettings] = useState<StudentSettings | null>(null);
   const level = resolveExerciseLevel(parseCefrLevel(profile.level) ?? "A2");
+  const courseLevel = resolveCourseLevel(parseCefrLevel(profile.level) ?? "A2");
+  const courseProgress = useCourseProgress(courseLevel);
   const totals = totalExercises(profile);
 
   useEffect(() => {
@@ -38,6 +42,16 @@ export default function ProgressoPage() {
     </div>
 
     <div className="grid cols-2" style={{ marginTop: 22 }}>
+      <section className="card stat">
+        <div className="eyebrow">Jornada do nível {courseLevel}</div>
+        <h3 style={{ marginTop: 10 }}>{courseProgress.pct}% concluído</h3>
+        <div className="unit-bar" style={{ marginTop: 12 }}><i style={{ width: `${courseProgress.pct}%` }} /></div>
+        <p className="muted">
+          {courseProgress.completedCount} de {courseProgress.total} etapas · Unidade {courseProgress.currentUnit} · {LEARNING_CYCLE.find((phase) => phase.id === courseProgress.currentPhase)?.label}
+        </p>
+        <Link className="btn primary" href="/aluno/curso">Continuar jornada →</Link>
+      </section>
+
       <section className="card stat">
         <div className="eyebrow">Desempenho por atividade</div>
         {categoriesFor(level).map((category) => {

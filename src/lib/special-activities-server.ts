@@ -34,16 +34,30 @@ export async function importClaudeArtifact(sourceUrl: string | null) {
   const match = sourceUrl?.match(CLAUDE_ARTIFACT_URL);
   if (!match) return null;
   const canonicalUrl = `https://claude.ai/public/artifacts/${match[1]}`;
-  const page = await fetch(canonicalUrl, { headers: { "user-agent": BROWSER_USER_AGENT }, signal: AbortSignal.timeout(20_000) });
-  if (!page.ok) throw new Error("Não foi possível acessar o Artifact público. Confira se o link está publicado.");
-  const getSetCookie = (page.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie;
-  const cookies = getSetCookie?.call(page.headers).map((value) => value.split(";", 1)[0]).join("; ") ?? "";
-  const artifact = await fetch(`https://claude.ai/api/published_artifacts/${match[1]}`, {
-    headers: { "user-agent": BROWSER_USER_AGENT, referer: canonicalUrl, accept: "application/json", ...(cookies ? { cookie: cookies } : {}) },
-    signal: AbortSignal.timeout(20_000),
-  });
-  if (!artifact.ok) throw new Error("Não foi possível importar o conteúdo do Artifact. Tente salvar novamente em alguns instantes.");
-  const payload = await artifact.json() as { type?: unknown; content?: unknown };
+  const apiUrl = `https://claude.ai/api/published_artifacts/${match[1]}`;
+  let payload: { type?: unknown; content?: unknown } | null = null;
+  try {
+    const page = await fetch(canonicalUrl, { headers: { "user-agent": BROWSER_USER_AGENT }, signal: AbortSignal.timeout(20_000) });
+    if (!page.ok) throw new Error(`Claude respondeu ${page.status}`);
+    const getSetCookie = (page.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie;
+    const cookies = getSetCookie?.call(page.headers).map((value) => value.split(";", 1)[0]).join("; ") ?? "";
+    const artifact = await fetch(apiUrl, {
+      headers: { "user-agent": BROWSER_USER_AGENT, referer: canonicalUrl, accept: "application/json", ...(cookies ? { cookie: cookies } : {}) },
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!artifact.ok) throw new Error(`Claude respondeu ${artifact.status}`);
+    payload = await artifact.json() as { type?: unknown; content?: unknown };
+  } catch {
+    const fallback = await fetch(`https://r.jina.ai/${apiUrl}`, {
+      headers: { accept: "text/plain" }, signal: AbortSignal.timeout(30_000),
+    });
+    if (!fallback.ok) throw new Error("Não foi possível importar o conteúdo do Artifact. Tente novamente em alguns instantes.");
+    const text = await fallback.text();
+    const marker = "Markdown Content:";
+    const jsonText = text.includes(marker) ? text.slice(text.indexOf(marker) + marker.length).trim() : text.trim();
+    try { payload = JSON.parse(jsonText) as { type?: unknown; content?: unknown }; }
+    catch { throw new Error("O Claude não devolveu um conteúdo válido para esta atividade."); }
+  }
   if (payload.type !== "text/html" || typeof payload.content !== "string" || !payload.content.trim()) {
     throw new Error("Este Artifact não contém uma atividade HTML compatível.");
   }

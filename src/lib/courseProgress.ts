@@ -128,6 +128,22 @@ export async function markCoursePhase(input: {
   if (error) throw new Error(`Não foi possível salvar o progresso: ${error.message}`);
 }
 
+/**
+ * Quando a sessão não veio de um link da trilha (ex.: "Praticar" solto pelo
+ * menu), usa a unidade atual do aluno nesse nível pra ainda assim contar
+ * como progresso — senão praticar fora da trilha nunca avança o nível.
+ */
+export async function resolveCourseContextFallback(level: CefrLevel): Promise<{ level: CefrLevel; unit: number } | null> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("student_course_progress")
+    .select("student_id,level,unit_number,phase,source,evidence_id,completed_at")
+    .eq("level", level);
+  if (error) return null;
+  const summary = summarizeCourseProgress(level, (data ?? []) as CourseProgressRow[]);
+  return { level, unit: summary.currentUnit };
+}
+
 export function courseContextFromLocation(): { level: CefrLevel; unit: number } | null {
   if (typeof window === "undefined") return null;
   const params = new URLSearchParams(window.location.search);

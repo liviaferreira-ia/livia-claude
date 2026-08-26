@@ -29,9 +29,8 @@ export default function RoleplayPage() {
   const recRef = useRef<SpeechRecognitionLike | null>(null);
   const chatRef = useRef<HTMLDivElement>(null);
 
-  const roleplayLevel = resolveRoleplayLevel(
-    courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2",
-  );
+  const studentLevel = courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2";
+  const roleplayLevel = resolveRoleplayLevel(studentLevel);
   const scenarios = ROLEPLAYS[roleplayLevel];
   const roleplay = scenarios.find((r) => r.id === chosenId) ?? null;
   const SCRIPT = roleplay?.steps ?? [];
@@ -68,7 +67,7 @@ export default function RoleplayPage() {
       speak(line);
     } else {
       setPhase("done");
-      if (roleplay) void completeTrackedModule("roleplay", roleplay.id).catch(() => {
+      if (roleplay) void completeTrackedModule("roleplay", roleplay.id, undefined, studentLevel).catch(() => {
         setError("A missão terminou, mas não foi possível registrar o progresso. Tente novamente.");
       });
     }

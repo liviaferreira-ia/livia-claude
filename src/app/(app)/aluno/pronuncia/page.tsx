@@ -30,9 +30,8 @@ export default function PronunciaPage() {
   const [answered, setAnswered] = useState(0);
   const recRef = useRef<SpeechRecognitionLike | null>(null);
 
-  const pronunciationLevel = resolvePronunciationLevel(
-    courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2",
-  );
+  const studentLevel = courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2";
+  const pronunciationLevel = resolvePronunciationLevel(studentLevel);
   const SENTENCES = PRONUNCIATION[pronunciationLevel];
 
   useEffect(() => {
@@ -93,7 +92,7 @@ export default function PronunciaPage() {
     if (index === SENTENCES.length - 1) {
       setIndex(SENTENCES.length); // marca fim
       const finalAvg = answered ? Math.round(scoreSum / answered) : 0;
-      void completeTrackedModule("pronunciation", String(SENTENCES.length), finalAvg >= 70).catch(() => {
+      void completeTrackedModule("pronunciation", String(SENTENCES.length), finalAvg >= 70, studentLevel).catch(() => {
         setError("A prática terminou, mas não foi possível registrar o progresso. Tente novamente.");
       });
       return;

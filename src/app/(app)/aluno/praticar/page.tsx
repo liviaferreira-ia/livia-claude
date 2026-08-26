@@ -16,7 +16,12 @@ import {
 } from "@/data/exercises";
 import { LEVEL_ORDER, type CefrLevel } from "@/data/placement";
 import { markContentValidated } from "@/lib/content-validation";
-import { courseContextFromLocation, markCoursePhase, useCourseContextFromLocation } from "@/lib/courseProgress";
+import {
+  courseContextFromLocation,
+  markCoursePhase,
+  resolveCourseContextFallback,
+  useCourseContextFromLocation,
+} from "@/lib/courseProgress";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
 
 const TINTS: Record<Kind, string> = {
@@ -136,6 +141,7 @@ export default function PraticarPage() {
       bump={reviewMode ? async () => {} : bumpPractice}
       reviewMode={reviewMode}
       level={contentLevel}
+      courseLevel={studentLevel}
       filterIds={smartReviewMode ? reviewIds : EMPTY_IDS}
       returnHref={smartReviewMode ? "/aluno/revisao" : reviewMode ? "/professor/validacao-conteudo" : "/aluno"}
     />
@@ -150,6 +156,7 @@ function Runner({
   bump,
   reviewMode,
   level,
+  courseLevel,
   filterIds,
   returnHref,
 }: {
@@ -160,6 +167,7 @@ function Runner({
   bump: (k: Kind, correct: boolean, exerciseId?: string, level?: CefrLevel, title?: string) => Promise<void>;
   reviewMode: boolean;
   level: CefrLevel;
+  courseLevel: CefrLevel | null;
   filterIds: string[];
   returnHref: string;
 }) {
@@ -216,7 +224,7 @@ function Runner({
     if (answered) {
       // next
       if (i === queue.length - 1) {
-        const context = courseContextFromLocation();
+        const context = courseContextFromLocation() ?? (!reviewMode && courseLevel ? await resolveCourseContextFallback(courseLevel) : null);
         if (!reviewMode && context) {
           setSaving(true);
           setSaveError("");

@@ -1,7 +1,8 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { courseContextFromLocation, markCoursePhase } from "@/lib/courseProgress";
+import { courseContextFromLocation, markCoursePhase, resolveCourseContextFallback } from "@/lib/courseProgress";
+import type { CefrLevel } from "@/data/placement";
 
 export type TrackedModule = "roleplay" | "pronunciation";
 
@@ -20,11 +21,20 @@ export async function logModuleEvent(eventType: TrackedModule, kind?: string, co
   if (error) throw new Error(`Não foi possível registrar o módulo: ${error.message}`);
 }
 
-/** Registra o uso do módulo e, quando ele veio da trilha, conclui a etapa correspondente. */
-export async function completeTrackedModule(eventType: TrackedModule, kind?: string, correct?: boolean): Promise<void> {
+/**
+ * Registra o uso do módulo e conclui a etapa correspondente na trilha. Se a
+ * sessão veio de um link da trilha, usa a unidade daquele link; senão (ex.:
+ * aberto direto pelo menu), cai pra unidade atual do aluno em `fallbackLevel`.
+ */
+export async function completeTrackedModule(
+  eventType: TrackedModule,
+  kind?: string,
+  correct?: boolean,
+  fallbackLevel?: CefrLevel,
+): Promise<void> {
   await logModuleEvent(eventType, kind, correct);
   if (eventType === "pronunciation" && correct !== true) return;
-  const context = courseContextFromLocation();
+  const context = courseContextFromLocation() ?? (fallbackLevel ? await resolveCourseContextFallback(fallbackLevel) : null);
   if (!context) return;
   await markCoursePhase({
     ...context,

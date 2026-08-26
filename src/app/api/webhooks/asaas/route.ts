@@ -3,6 +3,7 @@ import type { AsaasPayment } from "@/lib/asaas";
 import { linkCustomerPayments, refreshStudentPaymentStatus, upsertAsaasPayment, upsertPaymentCandidate } from "@/lib/payments-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { recordIncident } from "@/lib/operational-server";
+import { secureCompare } from "@/lib/secure-compare";
 
 type Admin = ReturnType<typeof createAdminClient>;
 type AsaasCheckoutEvent = {
@@ -24,7 +25,7 @@ const PAID_EVENTS = new Set(["PAYMENT_RECEIVED", "PAYMENT_CONFIRMED"]);
  */
 export async function POST(request: Request) {
   const token = request.headers.get("asaas-access-token");
-  if (!process.env.ASAAS_WEBHOOK_TOKEN || token !== process.env.ASAAS_WEBHOOK_TOKEN) {
+  if (!process.env.ASAAS_WEBHOOK_TOKEN || !token || !secureCompare(token, process.env.ASAAS_WEBHOOK_TOKEN)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

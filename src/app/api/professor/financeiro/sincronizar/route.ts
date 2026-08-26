@@ -2,20 +2,12 @@ import { NextResponse } from "next/server";
 import { listAsaasPayments } from "@/lib/asaas";
 import { isPaidPayment, refreshStudentPaymentStatus, upsertAsaasPayment, upsertPaymentCandidate } from "@/lib/payments-server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { requireStaff } from "@/lib/staff-server";
 
-/** Importa o histórico do Asaas. Só professores autenticados podem executar. */
+/** Importa o histórico do Asaas. Só professores/admins autenticados podem executar. */
 export async function POST() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 });
-
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (profile?.role !== "teacher") {
-    return NextResponse.json({ error: "Só professores podem sincronizar pagamentos." }, { status: 403 });
-  }
+  const session = await requireStaff();
+  if (session.error) return session.error;
 
   const admin = createAdminClient();
   const { data: students, error } = await admin

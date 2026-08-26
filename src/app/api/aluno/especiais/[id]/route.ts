@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { effectiveSpecialStatus, signedSpecialAssets, SPECIAL_BUCKET } from "@/lib/special-activities-server";
+import { recordIncident } from "@/lib/operational-server";
+
+async function dbFail(userId: string, action: string, message: string) {
+  const trace = await recordIncident({ userId, source: "server", area: "aluno/especiais", action, severity: "error", message });
+  return NextResponse.json({ error: `Não foi possível carregar esta atividade agora. Tente de novo em instantes. Código: ${trace}` }, { status: 500 });
+}
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const supabase = await createClient();
@@ -14,7 +20,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     admin.from("special_activities").select("*").eq("id", id).maybeSingle(),
     admin.from("special_activity_submissions").select("*").eq("activity_id", id).eq("student_id", user.id).maybeSingle(),
   ]);
-  if (recipientError || activityError || submissionError) return NextResponse.json({ error: (recipientError || activityError || submissionError)?.message }, { status: 500 });
+  if (recipientError || activityError || submissionError) return dbFail(user.id, "load_activity", (recipientError || activityError || submissionError)!.message);
   if (!recipient || !activity || activity.publication_status !== "published") return NextResponse.json({ error: "Atividade não encontrada." }, { status: 404 });
   const status = effectiveSpecialStatus(activity);
   if (status === "scheduled" || status === "archived") return NextResponse.json({ error: "Esta atividade ainda não está disponível." }, { status: 403 });
@@ -22,13 +28,13 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   const { error: viewError } = await admin.from("special_activity_recipients").update({
     viewed_at: recipient.viewed_at ?? now, last_opened_at: now,
   }).eq("activity_id", id).eq("student_id", user.id);
-  if (viewError) return NextResponse.json({ error: viewError.message }, { status: 500 });
+  if (viewError) return dbFail(user.id, "mark_viewed", viewError.message);
   const { data: assets, error: assetError } = await admin.from("special_activity_assets").select("*").eq("activity_id", id).order("created_at");
-  if (assetError) return NextResponse.json({ error: assetError.message }, { status: 500 });
+  if (assetError) return dbFail(user.id, "load_assets", assetError.message);
   let submissionWithVersions = null;
   if (submission) {
     const { data: versions, error: versionsError } = await admin.from("special_activity_submission_versions").select("*").eq("submission_id", submission.id).order("version_number", { ascending: false });
-    if (versionsError) return NextResponse.json({ error: versionsError.message }, { status: 500 });
+    if (versionsError) return dbFail(user.id, "load_versions", versionsError.message);
     const signedVersions = await Promise.all((versions ?? []).map(async (version) => {
       const signed = await admin.storage.from(SPECIAL_BUCKET).createSignedUrl(version.storage_path, 3600);
       return { ...version, signed_url: signed.data?.signedUrl ?? null };

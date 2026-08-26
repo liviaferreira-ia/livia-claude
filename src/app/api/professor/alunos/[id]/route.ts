@@ -1,23 +1,12 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site";
 import { recordAudit, recordIncident } from "@/lib/operational-server";
+import { requireStaff as teacherSession } from "@/lib/staff-server";
 
 const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-async function teacherSession() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 }) };
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (profile?.role !== "teacher") {
-    return { error: NextResponse.json({ error: "Só professores podem administrar alunos." }, { status: 403 }) };
-  }
-  return { user, supabase };
-}
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const session = await teacherSession();

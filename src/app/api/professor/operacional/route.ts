@@ -1,16 +1,7 @@
 import { NextResponse } from "next/server";
 import { recordAudit } from "@/lib/operational-server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-
-async function teacher() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 }) };
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (profile?.role !== "teacher") return { error: NextResponse.json({ error: "Área exclusiva do professor." }, { status: 403 }) };
-  return { user };
-}
+import { requireStaff as teacher } from "@/lib/staff-server";
 
 export async function GET() {
   const session = await teacher();

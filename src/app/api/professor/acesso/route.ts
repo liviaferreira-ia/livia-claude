@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { recordAudit, recordIncident } from "@/lib/operational-server";
+import { requireStaff } from "@/lib/staff-server";
 
 /**
  * Pausa ou reativa o acesso de um aluno na mão. Só professor(a) pode chamar.
@@ -12,18 +12,9 @@ import { recordAudit, recordIncident } from "@/lib/operational-server";
  * casos em que nunca chega um "vencido" do Asaas.
  */
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 });
-  }
-
-  const { data: prof } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (prof?.role !== "teacher") {
-    return NextResponse.json({ error: "Só professores podem alterar o acesso." }, { status: 403 });
-  }
+  const session = await requireStaff();
+  if (session.error) return session.error;
+  const user = session.user!;
 
   const body = await request.json().catch(() => null);
   const userId = typeof body?.userId === "string" ? body.userId : "";

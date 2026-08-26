@@ -1,20 +1,11 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { linkCustomerPayments, refreshStudentPaymentStatus } from "@/lib/payments-server";
 import { recordAudit } from "@/lib/operational-server";
 import { SITE_URL } from "@/lib/site";
+import { requireStaff as teacherSession } from "@/lib/staff-server";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-async function teacherSession() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 }) };
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (profile?.role !== "teacher") return { error: NextResponse.json({ error: "Só professores podem aprovar pré-cadastros." }, { status: 403 }) };
-  return { user };
-}
 
 export async function POST(request: Request) {
   const session = await teacherSession();

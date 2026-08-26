@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { recordIncident } from "@/lib/operational-server";
+import { secureCompare } from "@/lib/secure-compare";
 
 const DIAS_DE_TOLERANCIA = 5;
 
@@ -11,7 +12,7 @@ const DIAS_DE_TOLERANCIA = 5;
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get("secret") ?? request.headers.get("x-cron-secret");
-  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+  if (!process.env.CRON_SECRET || !secret || !secureCompare(secret, process.env.CRON_SECRET)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

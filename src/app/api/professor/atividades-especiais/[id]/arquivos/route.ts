@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff } from "@/lib/staff-server";
-import { safeSpecialFileName, SPECIAL_BUCKET } from "@/lib/special-activities-server";
+import { safeContentType, safeSpecialFileName, SPECIAL_BUCKET } from "@/lib/special-activities-server";
 
 const MAX_SIZE = 20 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = new Set(["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "png", "jpg", "jpeg", "webp", "mp3", "m4a", "wav", "mp4", "zip"]);
@@ -20,13 +20,14 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
   if (!ALLOWED_EXTENSIONS.has(extension)) return NextResponse.json({ error: "Formato de arquivo não autorizado." }, { status: 400 });
   const storagePath = `activities/${id}/${safeSpecialFileName(file.name)}`;
+  const contentType = safeContentType(extension);
   const upload = await admin.storage.from(SPECIAL_BUCKET).upload(storagePath, new Uint8Array(await file.arrayBuffer()), {
-    contentType: file.type || "application/octet-stream", upsert: false, cacheControl: "3600",
+    contentType, upsert: false, cacheControl: "3600",
   });
   if (upload.error) return NextResponse.json({ error: upload.error.message }, { status: 500 });
   const { data, error } = await admin.from("special_activity_assets").insert({
     activity_id: id, file_name: file.name.slice(0, 240), storage_path: storagePath,
-    mime_type: file.type || null, file_size: file.size, asset_kind: "material", uploaded_by: session.user!.id,
+    mime_type: contentType, file_size: file.size, asset_kind: "material", uploaded_by: session.user!.id,
   }).select("id").single();
   if (error) {
     await admin.storage.from(SPECIAL_BUCKET).remove([storagePath]);

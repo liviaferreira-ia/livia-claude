@@ -81,7 +81,10 @@ export async function proxy(request: NextRequest) {
       .select("role")
       .eq("id", user.id)
       .maybeSingle();
-    if (!error && profile && profile.role !== "teacher" && profile.role !== "admin") {
+    // Falha fechada: só libera quando a checagem confirmar teacher/admin de
+    // verdade. Erro de consulta ou perfil ausente bloqueia, nunca libera.
+    const isStaff = !error && (profile?.role === "teacher" || profile?.role === "admin");
+    if (!isStaff) {
       const url = request.nextUrl.clone();
       url.pathname = "/aluno";
       url.search = "";

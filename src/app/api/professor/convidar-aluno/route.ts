@@ -1,23 +1,14 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site";
 import { recordAudit } from "@/lib/operational-server";
+import { requireStaff } from "@/lib/staff-server";
 
-/** Convida um aluno por e-mail. Só funciona pra quem está logado como professor(a). */
+/** Convida um aluno por e-mail. Só funciona pra quem está logado como professor(a)/admin. */
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 });
-  }
-
-  const { data: prof } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (prof?.role !== "teacher") {
-    return NextResponse.json({ error: "Só professores podem convidar alunos." }, { status: 403 });
-  }
+  const session = await requireStaff();
+  if (session.error) return session.error;
+  const user = session.user!;
 
   const body = await request.json().catch(() => null);
   const name = typeof body?.name === "string" ? body.name.trim() : "";

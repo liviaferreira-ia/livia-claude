@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { initials, useProfile } from "@/lib/profile";
 
-type Msg = { who: "ai" | "me"; text: string; corr?: string };
+type Msg = { who: "ai" | "me"; text: string };
 
 export default function TutorPage() {
   const { profile, ready } = useProfile();
@@ -132,7 +132,6 @@ export default function TutorPage() {
             <span className="who">{m.who === "me" ? initials(profile.name) : "EN"}</span>
             <div className="bubble">
               {m.text}
-              {m.corr && <span className="corr">✎ {m.corr}</span>}
             </div>
           </div>
         ))}

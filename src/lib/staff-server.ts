@@ -11,6 +11,6 @@ export async function requireStaff() {
   if (profile?.role !== "teacher" && profile?.role !== "admin") {
     return { error: NextResponse.json({ error: "Área exclusiva da equipe da escola." }, { status: 403 }) };
   }
-  return { user, role: profile.role };
+  return { user, role: profile.role, supabase };
 }
 

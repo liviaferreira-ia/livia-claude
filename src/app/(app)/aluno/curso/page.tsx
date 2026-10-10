@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LessonVideoEntry } from "@/components/LessonVideoEntry";
 import { COURSES, LEARNING_CYCLE, resolveCourseLevel } from "@/data/curso";
 import { levelBadge } from "@/data/placement";
 import { parseCefrLevel, useProfile } from "@/lib/profile";
@@ -46,6 +47,7 @@ export default function CursoPage() {
 
   return (
     <div className="view" style={{ maxWidth: 760 }}>
+      <LessonVideoEntry />
       <div className="eyebrow" style={{ marginBottom: 8 }}>
         Meu curso
       </div>

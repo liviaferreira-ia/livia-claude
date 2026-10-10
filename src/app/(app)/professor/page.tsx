@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LessonVideoEntry } from "@/components/LessonVideoEntry";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useProfile } from "@/lib/profile";
 import { listThreads, replyToStudent, type Thread } from "@/lib/messages";
@@ -128,6 +129,7 @@ export default function ProfessorInbox() {
 
   return (
     <div className="view">
+      <LessonVideoEntry />
       <div className="eyebrow" style={{ marginBottom: 8 }}>
         Painel do professor
       </div>

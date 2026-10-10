@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LessonVideoEntry } from "@/components/LessonVideoEntry";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { initials, levelDisplay, parseCefrLevel, totalExercises, useProfile } from "@/lib/profile";
@@ -127,6 +128,7 @@ export default function AlunoDashboard() {
 
   return (
     <div className="view student-dashboard-view">
+      <LessonVideoEntry />
       <div className="student-dashboard-header"><div><div className="eyebrow">Meu painel</div><h2>Olá, {first}! 👋</h2><p className="muted">Seu próximo passo está pronto. Continue avançando no seu ritmo.</p></div><Link href="/aluno/conta" className="btn light">Minha conta</Link></div>
       <div className="profile-hero student-profile-modern">
         <div className="profile-hero-banner" />

@@ -129,7 +129,7 @@ export default function ProfessorInbox() {
 
   return (
     <div className="view">
-      <LessonVideoEntry />
+      <LessonVideoEntry review />
       <div className="eyebrow" style={{ marginBottom: 8 }}>
         Painel do professor
       </div>

@@ -1,3 +1,5 @@
+import { LessonVideo } from "@/components/LessonVideo";
+import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LESSONS } from "@/data/lesson";
@@ -17,6 +19,7 @@ export default async function IntroPage({ params }: { params: Promise<{ slug: st
       <div className="card" style={{ padding: 26 }}>
         <p style={{ fontSize: 16, lineHeight: 1.7, margin: 0 }}>{lesson.intro}</p>
       </div>
+      {slug === FIRST_LESSON_MEDIA.slug && <LessonVideo mode="dialogue" />}
       <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
         <ConcluirEtapa slug={slug} id="intro" label="Entendi, vamos lá →" />
         <Link href={`/aluno/licao/${slug}`} className="btn ghost">

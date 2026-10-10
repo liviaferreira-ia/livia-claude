@@ -1,3 +1,5 @@
+import { LessonVideo } from "@/components/LessonVideo";
+import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LESSONS } from "@/data/lesson";
@@ -20,6 +22,7 @@ export default async function ListeningPage({ params }: { params: Promise<{ slug
       <p className="muted" style={{ margin: "0 0 14px" }}>
         {lesson.listening.hint}
       </p>
+      {slug === FIRST_LESSON_MEDIA.slug && <LessonVideo mode="dialogue" />}
       <div style={{ marginBottom: 14 }}>
         <SpeakButton text={fullText} label="▶ Ouvir a conversa toda" />
       </div>
@@ -43,7 +46,9 @@ export default async function ListeningPage({ params }: { params: Promise<{ slug
         </Link>
       </div>
       <p className="muted" style={{ fontSize: 12.5, marginTop: 12 }}>
-        A voz usa o recurso gratuito do navegador. Futuramente entra áudio/vídeo gravado.
+        {slug === FIRST_LESSON_MEDIA.slug
+          ? "Use o vídeo para ouvir as duas vozes e os botões para repetir uma frase."
+          : "Os botões de áudio usam a voz do navegador."}
       </p>
     </div>
   );

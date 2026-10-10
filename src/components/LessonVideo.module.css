@@ -1,0 +1,11 @@
+.lesson { margin-top: 20px; padding: 20px; min-width: 0; }
+.lesson h3 { margin: 0 0 8px; }
+.lesson p { line-height: 1.6; }
+.video { width: 100%; display: block; aspect-ratio: 16 / 9; background: #10243b; border-radius: 10px; }
+.chapters { margin-top: 16px; }
+.chapters summary { cursor: pointer; padding: 8px 0; }
+.line { padding: 10px 0; border-bottom: 1px solid var(--border, #ddd); }
+.line button { white-space: normal; text-align: left; max-width: 100%; height: auto; }
+.line p { margin: 6px 0 0; }
+.note { font-size: 12px; margin-bottom: 0; }
+@media (max-width: 480px) { .lesson { padding: 12px; } }

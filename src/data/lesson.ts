@@ -3,6 +3,7 @@
 // /aluno/licao/<slug>. `LESSONS_BY_LEVEL` diz quais lições existem em cada
 // nível CEFR — nem todo nível tem lição ainda, igual ao banco de exercícios.
 
+import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 import { nearestLevelWithContent, type CefrLevel } from "@/data/placement";
 
 export type Vocab = { en: string; pt: string };
@@ -54,7 +55,7 @@ const APRESENTANDO_SE: Lesson = {
   unit: "Unidade 1 · Primeiros passos",
   title: "Se apresentando",
   intro:
-    "Nesta lição você vai aprender a se apresentar em inglês: dizer seu nome, de onde você é e cumprimentar alguém pela primeira vez. Vamos ver as palavras essenciais, ouvir duas pessoas se conhecendo, treinar as frases mais usadas e praticar no final. Leva uns 6 minutos!",
+    "Nesta lição você vai aprender a se apresentar em inglês: dizer seu nome, de onde você é e cumprimentar alguém pela primeira vez. Vamos ver as palavras essenciais, ouvir duas pessoas se conhecendo, treinar as frases mais usadas e praticar no final. Assista à conversa com Livia e Fabio, estude as frases e participe do vídeo “Sua vez”.",
   vocab: {
     title: "Frases essenciais para se apresentar",
     hint: "Aprenda blocos de fala completos. Ouça e repita — assim você já consegue usá-los em uma conversa.",
@@ -71,18 +72,8 @@ const APRESENTANDO_SE: Lesson = {
   },
   listening: {
     title: "Duas pessoas se conhecendo",
-    hint: "Ana e Tom se encontram pela primeira vez. Ouça cada fala antes de ler a tradução.",
-    lines: [
-      { who: "Ana", en: "Hello! My name is Ana. What's your name?", pt: "Olá! Meu nome é Ana. Qual é o seu nome?" },
-      { who: "Tom", en: "Hi, Ana! I'm Tom. Nice to meet you.", pt: "Oi, Ana! Eu sou o Tom. Prazer em conhecer você." },
-      {
-        who: "Ana",
-        en: "Nice to meet you too! Where are you from?",
-        pt: "Prazer em conhecer você também! De onde você é?",
-      },
-      { who: "Tom", en: "I'm from Canada. And you?", pt: "Eu sou do Canadá. E você?" },
-      { who: "Ana", en: "I'm from Brazil. I'm a student here.", pt: "Eu sou do Brasil. Eu sou aluna aqui." },
-    ],
+    hint: "Livia e Fabio se encontram pela primeira vez. Assista à conversa em inglês e acompanhe a tradução em português.",
+    lines: FIRST_LESSON_MEDIA.lines.map((line) => ({ ...line })),
   },
   expressions: {
     title: "Frases para o primeiro “oi”",

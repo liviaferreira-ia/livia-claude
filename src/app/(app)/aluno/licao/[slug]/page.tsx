@@ -6,6 +6,7 @@ import { use } from "react";
 import { LESSONS, lessonSteps } from "@/data/lesson";
 import { useLessonProgress } from "@/lib/lessonProgress";
 import { SceneArt } from "@/components/SceneArt";
+import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 
 const check = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
@@ -43,6 +44,13 @@ export default function LicaoOverview({ params }: { params: Promise<{ slug: stri
       <div className="two-col top">
         <div>
           <SceneArt />
+          {slug === FIRST_LESSON_MEDIA.slug && (
+            <div className="card" style={{ padding: 20, marginTop: 16 }}>
+              <h3 style={{ marginTop: 0 }}>Aula com Livia e Fabio</h3>
+              <p>Conversa em inglês, legendas em português e um vídeo para você responder em voz alta.</p>
+              <Link href={`/aluno/licao/${slug}/intro`} className="btn ghost">Assistir à aula →</Link>
+            </div>
+          )}
         </div>
         <div className="card" style={{ padding: "6px 20px" }}>
           {steps.map((s) => (

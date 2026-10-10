@@ -1,3 +1,5 @@
+import { LessonVideo } from "@/components/LessonVideo";
+import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LESSONS } from "@/data/lesson";
@@ -36,6 +38,7 @@ export default async function ExpressoesPage({ params }: { params: Promise<{ slu
           </div>
         ))}
       </div>
+      {slug === FIRST_LESSON_MEDIA.slug && <LessonVideo mode="practice" />}
       {slug === "apresentando-se" && <SelfIntroductionPractice />}
       <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
         <ConcluirEtapa slug={slug} id="expressoes" />

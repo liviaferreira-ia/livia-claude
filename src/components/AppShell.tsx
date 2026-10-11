@@ -162,6 +162,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
   const nav = isTeacherArea && hasTeacherAccess ? teacherNav : studentNav;
   const crumb = pathname.startsWith("/professor/alunos/") ? "Detalhes do aluno"
+    : pathname.startsWith("/professor/aulas/") ? "Aulas para revisar"
     : pathname.startsWith("/professor/atividades-especiais/") ? "Atividades Especiais"
       : pathname.startsWith("/aluno/especial/") ? "Especial para você"
         : CRUMBS[pathname] ?? "";

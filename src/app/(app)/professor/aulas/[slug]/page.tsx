@@ -3,9 +3,13 @@ import { notFound } from "next/navigation";
 import { LESSONS } from "@/data/lesson";
 import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 import { LessonVideo } from "@/components/LessonVideo";
+import { A1_DRAFTS } from "@/data/a1Drafts";
+import { DraftLessonReview } from "@/components/DraftLessonReview";
 
 export default async function TeacherLessonReview({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const draft = A1_DRAFTS.find((item) => item.id === slug);
+  if (draft) return <DraftLessonReview lesson={draft} />;
   const lesson = LESSONS[slug];
   if (!lesson) notFound();
   return <div className="view" style={{ maxWidth: 760 }}>

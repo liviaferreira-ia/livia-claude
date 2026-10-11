@@ -1,3 +1,11 @@
+export type LessonMedia = {
+  title?: string;
+  base: string;
+  lines: readonly { who: string; en: string; pt: string }[];
+  dialogueChapters: readonly { title: string; start: number }[];
+  practiceChapters: readonly { title: string; start: number }[];
+};
+
 export const FIRST_LESSON_MEDIA = {
   "slug": "apresentando-se",
   "base": "/lessons/apresentando-se/v1",

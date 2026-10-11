@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
+import { FIRST_LESSON_MEDIA, type LessonMedia } from "@/data/lessonMedia";
 import styles from "./LessonVideo.module.css";
 
-export function LessonVideo({ mode }: { mode: "dialogue" | "practice" }) {
+export function LessonVideo({ mode, media = FIRST_LESSON_MEDIA }: { mode: "dialogue" | "practice"; media?: LessonMedia }) {
   const video = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
   const practice = mode === "practice";
-  const media = FIRST_LESSON_MEDIA;
   const src = `${media.base}/${practice ? "sua-vez" : "conversa"}.mp4`;
   const chapters = practice ? media.practiceChapters : media.dialogueChapters;
 
@@ -24,7 +23,7 @@ export function LessonVideo({ mode }: { mode: "dialogue" | "practice" }) {
 
   return (
     <section className={`card ${styles.lesson}`} aria-label={practice ? "Sua vez de falar" : "Conversa com Livia e Fabio"}>
-      <h3>{practice ? "Sua vez de falar" : "Primeiro encontro: Livia e Fabio"}</h3>
+      <h3>{practice ? "Sua vez de falar" : media.title ?? "Primeiro encontro: Livia e Fabio"}</h3>
       <p>{practice
         ? "Responda em inglês durante cada pausa de 7 segundos. Você pode pausar e tentar novamente."
         : "Assista à conversa em inglês com legendas em português. Depois, repita as falas que quiser."}</p>

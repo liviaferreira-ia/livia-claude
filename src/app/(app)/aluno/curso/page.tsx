@@ -28,7 +28,7 @@ const icons = {
 };
 
 export default function CursoPage() {
-  const { profile, ready } = useProfile();
+  const { profile, ready, isTeacher } = useProfile();
   const studentLevel = parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = resolveCourseLevel(studentLevel);
   const course = COURSES[contentLevel];
@@ -47,7 +47,7 @@ export default function CursoPage() {
 
   return (
     <div className="view" style={{ maxWidth: 760 }}>
-      <LessonVideoEntry />
+      <LessonVideoEntry review={isTeacher} />
       <div className="eyebrow" style={{ marginBottom: 8 }}>
         Meu curso
       </div>

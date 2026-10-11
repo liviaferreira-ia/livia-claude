@@ -208,6 +208,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </Link>
 
+        {hasTeacherAccess && !isTeacherArea && (
+          <div>
+            <div className="navlabel">Professor</div>
+            <Link href="/professor/aulas" className="nav" onClick={() => setMenuOpen(false)}>
+              {I.book} Aulas A1 para revisar <span className="badge">50</span>
+            </Link>
+          </div>
+        )}
+
         {nav.map((group) => (
           <div key={group.section}>
             <div className="navlabel">{group.section}</div>

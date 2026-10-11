@@ -11,7 +11,8 @@ import { markSessionActivity } from "@/lib/sessionActivity";
 function LoginInner() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/aluno";
+  const requestedNext = params.get("next");
+  const next = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : null;
   const reason = params.get("reason");
 
   const [email, setEmail] = useState("");
@@ -35,13 +36,19 @@ function LoginInner() {
     const supabase = createClient();
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       setError(friendlyError(error.message));
       return;
     }
     if (data.user) markSessionActivity(data.user.id);
-    router.push(data.user?.user_metadata?.must_change_password === true ? "/definir-senha?temporary=1" : next);
+    let destination = next || "/aluno";
+    if (!next && data.user && data.user.user_metadata?.must_change_password !== true) {
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+      if (profile?.role === "teacher" || profile?.role === "admin") destination = "/professor/aulas";
+    }
+    setLoading(false);
+    router.push(data.user?.user_metadata?.must_change_password === true ? "/definir-senha?temporary=1" : destination);
     router.refresh();
   }
 

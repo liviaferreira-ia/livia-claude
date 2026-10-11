@@ -21,7 +21,7 @@ import {
 import { listMySpecialActivities, type SpecialActivity } from "@/lib/special-activities";
 
 export default function AlunoDashboard() {
-  const { profile, ready, signOut } = useProfile();
+  const { profile, ready, signOut, isTeacher } = useProfile();
   const router = useRouter();
   const studentLevel = parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = resolveExerciseLevel(studentLevel);
@@ -88,6 +88,7 @@ export default function AlunoDashboard() {
   if (!profile.onboarded) {
     return (
       <div className="view">
+        {isTeacher && <LessonVideoEntry review />}
         <div className="hero" style={{ maxWidth: 620 }}>
           <div className="eyebrow">Bem-vinda</div>
           <h2>Vamos criar o seu perfil 🎓</h2>
@@ -128,7 +129,7 @@ export default function AlunoDashboard() {
 
   return (
     <div className="view student-dashboard-view">
-      <LessonVideoEntry />
+      <LessonVideoEntry review={isTeacher} />
       <div className="student-dashboard-header"><div><div className="eyebrow">Meu painel</div><h2>Olá, {first}! 👋</h2><p className="muted">Seu próximo passo está pronto. Continue avançando no seu ritmo.</p></div><Link href="/aluno/conta" className="btn light">Minha conta</Link></div>
       <div className="profile-hero student-profile-modern">
         <div className="profile-hero-banner" />

@@ -5,11 +5,15 @@ import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 import { LessonVideo } from "@/components/LessonVideo";
 import { A1_DRAFTS } from "@/data/a1Drafts";
 import { DraftLessonReview } from "@/components/DraftLessonReview";
+import { lessonRevision, loadLessonReviews } from "@/lib/lesson-reviews-server";
 
 export default async function TeacherLessonReview({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const draft = A1_DRAFTS.find((item) => item.id === slug);
-  if (draft) return <DraftLessonReview lesson={draft} />;
+  if (draft) {
+    const reviews = await loadLessonReviews();
+    return <DraftLessonReview lesson={draft} revision={lessonRevision(draft)} review={reviews.find((item) => item.lesson_id === slug) ?? null} />;
+  }
   const lesson = LESSONS[slug];
   if (!lesson) notFound();
   return <div className="view" style={{ maxWidth: 760 }}>

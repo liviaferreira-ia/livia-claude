@@ -138,6 +138,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/professor/aulas/midia/:path*",
+    "/aluno/aulas/midia/:path*",
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|svg|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

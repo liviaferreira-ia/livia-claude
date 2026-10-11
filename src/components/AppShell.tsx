@@ -70,6 +70,7 @@ const studentNav: { section: string; items: NavItem[] }[] = [
       { href: "/aluno", label: "Início", icon: I.home },
       { href: "/aluno/especial", label: "Especial para você", icon: I.star, dynamicBadge: "special" },
       { href: "/aluno/curso", label: "Meu curso", icon: I.path },
+      { href: "/aluno/aulas", label: "Aulas em vídeo", icon: I.book },
       { href: "/aluno/praticar", label: "Praticar", icon: I.target },
       { href: "/aluno/jogos", label: "Central Games", icon: I.game },
       { href: "/aluno/licao", label: "Minha lição", icon: I.book },
@@ -131,6 +132,7 @@ const CRUMBS: Record<string, string> = {
   "/aluno/especial": "Especial para você",
   "/professor/alunos": "Painel do Professor · Gestão de Alunos",
   "/professor/aulas": "Aulas para revisar",
+  "/aluno/aulas": "Aulas em vídeo",
   "/professor/atividades-especiais": "Atividades Especiais",
   "/professor/operacional": "Operacional",
   "/professor/validacao-conteudo": "Validação de conteúdo",
@@ -163,6 +165,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const nav = isTeacherArea && hasTeacherAccess ? teacherNav : studentNav;
   const crumb = pathname.startsWith("/professor/alunos/") ? "Detalhes do aluno"
     : pathname.startsWith("/professor/aulas/") ? "Aulas para revisar"
+    : pathname.startsWith("/aluno/aulas/") ? "Aulas em vídeo"
     : pathname.startsWith("/professor/atividades-especiais/") ? "Atividades Especiais"
       : pathname.startsWith("/aluno/especial/") ? "Especial para você"
         : CRUMBS[pathname] ?? "";

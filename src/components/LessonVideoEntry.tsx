@@ -9,8 +9,9 @@ export function LessonVideoEntry({ review = false }: { review?: boolean }) {
       <div style={{ flex: "1 1 220px", minWidth: 0 }}>
         <div className="eyebrow" style={{ color: "var(--gold)" }}>Aulas em vídeo</div>
         <h3 style={{ margin: "6px 0 8px" }}>{review ? "Curso A1 · 50 aulas em 12 unidades" : "A1 · Primeiro encontro"}</h3>
-        <p className="muted" style={{ margin: "0 0 14px" }}>{review ? "Confira todas as aulas com Livia e Fabio: vídeos em inglês, legendas em português, explicações, exercícios e gabaritos. As 49 novas aulas aguardam sua validação antes da liberação aos alunos." : "Assista à conversa com Livia e Fabio em inglês, com legendas em português. Depois, participe do vídeo “Sua vez”."}</p>
+        <p className="muted" style={{ margin: "0 0 14px" }}>{review ? "Confira todas as aulas com Livia e Fabio: vídeos em inglês, legendas em português, explicações, exercícios e gabaritos. Aprove para publicar ou solicite as correções necessárias." : "Assista às conversas com Livia e Fabio em inglês, com legendas em português. Depois, participe dos vídeos “Sua vez”."}</p>
         <Link href={review ? "/professor/aulas" : `/aluno/licao/${FIRST_LESSON_MEDIA.slug}/intro`} className="btn light">{review ? "Abrir as 50 aulas para revisar →" : "Assistir à aula →"}</Link>
+        {!review && <p style={{ margin: "12px 0 0" }}><Link href="/aluno/aulas">Ver todas as aulas em vídeo →</Link></p>}
       </div>
     </section>
   );

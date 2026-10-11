@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { LessonVideo } from "@/components/LessonVideo";
 import type { A1_DRAFTS } from "@/data/a1Drafts";
+import { LessonReviewDecision } from "@/components/LessonReviewDecision";
+import { A1GuidedPractice } from "@/components/A1GuidedPractice";
+import type { LessonReview } from "@/lib/lesson-review-types";
 
 type Draft = (typeof A1_DRAFTS)[number];
-export function DraftLessonReview({ lesson }: { lesson: Draft }) {
+export function DraftLessonReview({ lesson, review = null, revision = "", student = false }: { lesson: Draft; review?: LessonReview | null; revision?: string; student?: boolean }) {
   return <div className="view" style={{ maxWidth: 800 }}>
-    <div className="eyebrow">A1 · Unidade {lesson.unitNumber} · Aula {lesson.number} · Revisão da Livia</div>
+    <div className="eyebrow">A1 · Unidade {lesson.unitNumber} · Aula {lesson.number}{!student && " · Revisão da Livia"}</div>
     <h2>{lesson.title}</h2>
-    <p className="muted">Material produzido, aguardando validação pedagógica. Esta página não altera o progresso dos alunos.</p>
+    {!student && <LessonReviewDecision key={`${revision}:${review?.updated_at ?? "pending"}`} id={lesson.id} revision={revision} initialReview={review} />}
     <section className="card" style={{ padding: 20 }}>
       <h3>Objetivo</h3><p>{lesson.objective}</p><p>{lesson.situation}</p>
       <p>Tempo sugerido: {lesson.minutes} minutos. {lesson.prerequisite}</p>
@@ -19,8 +22,8 @@ export function DraftLessonReview({ lesson }: { lesson: Draft }) {
         <h4>{part.title}</h4>{part.phrases.map((phrase, j) => <p lang="en" key={j}>{phrase}</p>)}<p>{part.text}</p>
       </div>)}
       <p><b>Atenção:</b> {lesson.commonMistake}</p>
-      <h3>Exercícios e gabarito</h3>
-      {lesson.questions.map((question, i) => <div key={i} style={{ marginBottom: 24 }}>
+      {!student && <h3>Exercícios e gabarito</h3>}
+      {!student && lesson.questions.map((question, i) => <div key={i} style={{ marginBottom: 24 }}>
         <p><b>{i + 1}. {question.prompt}</b></p>
         {question.options && <ol type="a">{question.options.map((option, j) => <li key={j}>{option}</li>)}</ol>}
         <details><summary>Ver resposta e orientação</summary>
@@ -29,6 +32,7 @@ export function DraftLessonReview({ lesson }: { lesson: Draft }) {
         </details>
       </div>)}
     </section>
+    {student && <A1GuidedPractice questions={lesson.questions} />}
     <LessonVideo mode="practice" media={lesson.media} />
     <section className="card" style={{ padding: 20, marginTop: 20 }}>
       <h3>Apoio para a prática oral</h3>
@@ -38,6 +42,6 @@ export function DraftLessonReview({ lesson }: { lesson: Draft }) {
       <h3>Autoavaliação</h3><ul>{lesson.checklist.map((item, i) => <li key={i}>{item}</li>)}</ul>
       <h3>Revisão no dia seguinte</h3><p>{lesson.review}</p><p>{lesson.next}</p>
     </section>
-    <Link className="btn ghost" style={{ marginTop: 20 }} href="/professor/aulas">← Todas as aulas</Link>
+    <Link className="btn ghost" style={{ marginTop: 20 }} href={student ? "/aluno/aulas" : "/professor/aulas"}>← Todas as aulas</Link>
   </div>;
 }

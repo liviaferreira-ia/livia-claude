@@ -37,13 +37,19 @@ export function LessonVideo({ mode, media = FIRST_LESSON_MEDIA }: { mode: "dialo
       {failed && <p role="alert">Não foi possível carregar o vídeo. <a href={src}>Abrir o vídeo diretamente</a> ou recarregue a página.</p>}
       <details className={styles.chapters}>
         <summary>{practice ? "Repetir uma pergunta" : "Ler e repetir a conversa"}</summary>
-        {chapters.map((chapter, index) => (
-          <div className={styles.line} key={chapter.start}>
+        {chapters.map((chapter, index) => {
+          const line = practice ? null : media.lines[index];
+          return <div className={styles.line} key={chapter.start}>
             <button type="button" className="btn ghost" onClick={() => seek(chapter.start)}
-              aria-label={`Repetir: ${chapter.title}`}>{chapter.title}</button>
-            {!practice && <p lang="pt-BR">{media.lines[index].pt}</p>}
-          </div>
-        ))}
+              aria-label={`Repetir: ${chapter.title}`}>
+              <span className={styles.transcript}>
+                {line && <b>{line.who}</b>}
+                <span lang="en" translate="no">{line?.en ?? chapter.title}</span>
+              </span>
+            </button>
+            {line && <p lang="pt-BR">{line.pt}</p>}
+          </div>;
+        })}
       </details>
       <p className={`muted ${styles.note}`}>Áudio em inglês com vozes sintéticas. As legendas em português já aparecem no vídeo.</p>
       {practice && <p className={`muted ${styles.note}`}>Este vídeo é um treino de fala. Ele não grava nem avalia sua resposta.</p>}

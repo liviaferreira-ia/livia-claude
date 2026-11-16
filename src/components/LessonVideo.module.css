@@ -4,8 +4,11 @@
 .video { width: 100%; display: block; aspect-ratio: 16 / 9; background: #10243b; border-radius: 10px; }
 .chapters { margin-top: 16px; }
 .chapters summary { cursor: pointer; padding: 8px 0; }
-.line { padding: 10px 0; border-bottom: 1px solid var(--border, #ddd); }
-.line button { white-space: normal; text-align: left; max-width: 100%; height: auto; }
+.line { padding: 16px 0; border-bottom: 1px solid var(--line); }
+.line button { display: block; white-space: normal; text-align: left; width: 100%; height: auto; }
+.transcript { display: block; white-space: pre-wrap; word-spacing: normal; line-height: 1.65; }
+.transcript b { display: block; color: var(--gold); font-size: 12px; margin-bottom: 4px; }
+.transcript span { display: block; font-weight: 500; }
 .line p { margin: 6px 0 0; }
 .note { font-size: 12px; margin-bottom: 0; }
 @media (max-width: 480px) { .lesson { padding: 12px; } }

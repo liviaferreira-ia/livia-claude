@@ -541,9 +541,9 @@
     "unit": "Primeiras conversas",
     "unitNumber": 1,
     "number": 4,
-    "situation": "Conversa didática encenada entre Livia e Fabio sobre conversando sobre a origem. As informações são fictícias e não descrevem a vida real dos personagens.",
+    "situation": "Antes da primeira aula de inglês, Livia e Fabio conversam sobre o país e a cidade de onde são. As informações desta encenação são fictícias.",
     "objective": "Perguntar e informar país e cidade de origem.",
-    "prerequisite": "Retome as frases da aula anterior se precisar de apoio.",
+    "prerequisite": "Retome os cumprimentos, a apresentação pelo nome e a expressão Nice to meet you! das aulas anteriores.",
     "minutes": "10–15",
     "voices": {
       "Livia": "en-US-AriaNeural",
@@ -558,18 +558,38 @@
       },
       {
         "speaker": "Fabio",
-        "en": "I'm from Brazil.",
-        "pt": "Eu sou do Brasil."
+        "en": "I'm from Brazil. And you?",
+        "pt": "Eu sou do Brasil. E você?"
       },
       {
         "speaker": "Livia",
+        "en": "I'm from Brazil too.",
+        "pt": "Eu também sou do Brasil."
+      },
+      {
+        "speaker": "Fabio",
         "en": "Which city are you from?",
         "pt": "De qual cidade você é?"
       },
       {
+        "speaker": "Livia",
+        "en": "I'm from Recife. And you?",
+        "pt": "Eu sou de Recife. E você?"
+      },
+      {
         "speaker": "Fabio",
-        "en": "I'm from São Paulo. And you?",
-        "pt": "Eu sou de São Paulo. E você?"
+        "en": "I'm from São Paulo.",
+        "pt": "Eu sou de São Paulo."
+      },
+      {
+        "speaker": "Livia",
+        "en": "Nice to meet you, Fabio!",
+        "pt": "Prazer em conhecer você, Fabio!"
+      },
+      {
+        "speaker": "Fabio",
+        "en": "Nice to meet you too, Livia!",
+        "pt": "Prazer em conhecer você também, Livia!"
       }
     ],
     "practice": [
@@ -577,101 +597,124 @@
         "speaker": "Livia",
         "en": "Where are you from?",
         "pt": "De onde você é?",
-        "hint": "Uma resposta possível no contexto é: I'm from Brazil. — Eu sou do Brasil. Adapte a informação à sua situação ou represente o papel do diálogo."
+        "hint": "Responda com I'm from + país. Exemplo: I'm from Brazil. — Eu sou do Brasil."
       },
       {
         "speaker": "Livia",
         "en": "Which city are you from?",
         "pt": "De qual cidade você é?",
-        "hint": "Uma resposta possível no contexto é: I'm from São Paulo. And you? — Eu sou de São Paulo. E você? Adapte a informação à sua situação ou represente o papel do diálogo."
+        "hint": "Responda com I'm from + cidade. Exemplo: I'm from São Paulo. — Eu sou de São Paulo."
+      },
+      {
+        "speaker": "Livia",
+        "en": "I'm from Recife. And you?",
+        "pt": "Eu sou de Recife. E você?",
+        "hint": "Agora diga sua cidade, porque And you? retoma a pergunta sobre a cidade. Exemplo: I'm from São Paulo."
+      },
+      {
+        "speaker": "Livia",
+        "en": "Nice to meet you!",
+        "pt": "Prazer em conhecer você!",
+        "hint": "Encerre a apresentação com Nice to meet you too! — Prazer em conhecer você também!"
       }
     ],
     "explanation": [
       {
-        "title": "Entenda a abertura",
+        "title": "Pergunte e diga de onde você é",
         "phrases": [
           "Where are you from?",
           "I'm from Brazil."
         ],
-        "text": "Where are you from? significa “De onde você é?”. A resposta da cena é “I'm from Brazil.” (Eu sou do Brasil.). Ouça a pergunta ou oferta e identifique o tipo de informação esperado antes de responder."
+        "text": "Where are you from? significa De onde você é? Use I'm from + lugar para responder. I'm é a forma curta de I am. Brazil é o nome do país em inglês. Compare: I'm from Brazil. = I am from Brazil. = Eu sou do Brasil."
       },
       {
-        "title": "Como construir as frases",
-        "phrases": [
-          "I'm from Brazil.",
-          "I'm from Brazil."
-        ],
-        "text": "Use from para indicar origem: I'm from Brazil. Country é país; city é cidade. Você pode perguntar Where are you from? e depois especificar a cidade com Which city are you from?."
-      },
-      {
-        "title": "Continue a conversa",
+        "title": "Diferencie país e cidade",
         "phrases": [
           "Which city are you from?",
-          "I'm from São Paulo. And you?"
+          "I'm from Recife.",
+          "I'm from São Paulo."
         ],
-        "text": "Which city are you from? significa “De qual cidade você é?”. Para responder no contexto, Fabio diz “I'm from São Paulo. And you?” (Eu sou de São Paulo. E você?). Pratique as duas partes, trocando os papéis e repetindo devagar."
-      }
-    ],
-    "commonMistake": "Compare “Where are you from?” com a forma incorreta “Where you from?”. Use from para indicar origem: I'm from Brazil. Country é país; city é cidade. Você pode perguntar Where are you from? e depois especificar a cidade com Which city are you from?.",
-    "questions": [
-      {
-        "prompt": "Na conversa, o que significa “I'm from Brazil.”?",
-        "options": [
-          "Eu sou do Brasil.",
-          "De onde você é?",
-          "De qual cidade você é?"
-        ],
-        "answer": "0",
-        "feedback": "Fabio diz “I'm from Brazil.”: Eu sou do Brasil."
+        "text": "Country significa país; city significa cidade. Brazil é um país, e Recife e São Paulo são cidades. Which city are you from? pede especificamente a cidade. A resposta mantém a estrutura I'm from + lugar. Na encenação, Livia é de Recife e Fabio é de São Paulo."
       },
       {
-        "prompt": "Qual informação Fabio apresenta na última fala?",
-        "options": [
-          "Eu sou do Brasil.",
-          "De onde você é?",
-          "Eu sou de São Paulo. E você?"
+        "title": "Devolva a pergunta e escute a resposta",
+        "phrases": [
+          "I'm from Brazil. And you?",
+          "I'm from Brazil too.",
+          "I'm from Recife. And you?"
         ],
-        "answer": "2",
-        "feedback": "A última fala é “I'm from São Paulo. And you?”. Significa: Eu sou de São Paulo. E você?"
+        "text": "And you? significa E você? e retoma a pergunta anterior. Quando Fabio informa o país e diz And you?, Livia responde com o país dela. Quando Livia informa a cidade e diz And you?, Fabio responde com a cidade dele. Too, no final de uma frase afirmativa, significa também."
+      },
+      {
+        "title": "Encerre a apresentação",
+        "phrases": [
+          "Nice to meet you, Fabio!",
+          "Nice to meet you too, Livia!"
+        ],
+        "text": "Depois de trocar as informações, Livia diz Prazer em conhecer você, Fabio! Fabio responde com too: Prazer em conhecer você também, Livia! Assim a conversa chega ao fim, com todas as perguntas respondidas."
+      }
+    ],
+    "commonMistake": "Na forma completa ensinada aqui, mantenha are na pergunta Where are you from? e am na resposta I am from Brazil. A contração I'm já inclui am. Para perguntar especificamente a cidade, use Which city are you from?.",
+    "questions": [
+      {
+        "prompt": "Na encenação, de qual país Fabio é?",
+        "options": [
+          "Brasil.",
+          "Canadá.",
+          "Portugal."
+        ],
+        "answer": "0",
+        "feedback": "Fabio diz I'm from Brazil. Brazil é Brasil em inglês; a informação é o país de origem."
+      },
+      {
+        "prompt": "De qual cidade Livia é na conversa?",
+        "options": [
+          "São Paulo.",
+          "Recife.",
+          "Brasil."
+        ],
+        "answer": "1",
+        "feedback": "Livia diz I'm from Recife. Recife é a cidade dela nesta encenação. Brasil é um país, não uma cidade."
       },
       {
         "prompt": "Complete em inglês: I'm ___ Brazil.",
         "answer": "from",
-        "hint": "Use uma palavra ou expressão da conversa.",
-        "feedback": "A forma esperada é “from”. Use from para indicar origem: I'm from Brazil. Country é país; city é cidade. Você pode perguntar Where are you from? e depois especificar a cidade com Which city are you from?."
+        "hint": "A palavra indica origem e aparece entre a pessoa e o lugar.",
+        "feedback": "A frase completa é I'm from Brazil. Use from antes do país ou da cidade para indicar origem."
       },
       {
-        "prompt": "De acordo com o diálogo, qual foi a resposta à primeira fala de Livia: “Where are you from?”?",
+        "prompt": "Qual pergunta pede especificamente a cidade de origem?",
         "options": [
-          "I'm from Brazil.",
-          "Which city are you from?",
-          "Where are you from?"
-        ],
-        "answer": "0",
-        "feedback": "A resposta foi “I'm from Brazil.”. Eu sou do Brasil."
-      },
-      {
-        "prompt": "Qual frase segue a forma ensinada nesta aula?",
-        "options": [
-          "De onde você é?",
           "Where are you from?",
-          "Where you from?"
+          "Which city are you from?",
+          "What's your name?"
         ],
         "answer": "1",
-        "feedback": "Use “Where are you from?”. Evite “Where you from?”. Use from para indicar origem: I'm from Brazil. Country é país; city é cidade. Você pode perguntar Where are you from? e depois especificar a cidade com Which city are you from?."
+        "feedback": "Which city are you from? significa De qual cidade você é? Where are you from? pergunta a origem de maneira mais geral. What's your name? pergunta o nome."
+      },
+      {
+        "prompt": "Livia diz: I'm from Recife. And you? Você está representando alguém de São Paulo. Qual resposta continua a conversa?",
+        "options": [
+          "I'm from São Paulo.",
+          "Nice to meet you!",
+          "I'm fine, thanks."
+        ],
+        "answer": "0",
+        "feedback": "And you? retoma a pergunta sobre a cidade. Responda I'm from São Paulo. Nice to meet you! serve para a apresentação; I'm fine, thanks. responde como você está."
       }
     ],
-    "application": "Seu desafio: Perguntar e informar país e cidade de origem. Escreva uma conversa de quatro falas usando as construções desta aula. Troque pelo menos uma informação por uma escolha sua ou um dado fictício. Leia em voz alta e depois tente sem olhar.",
-    "model": "A: Where are you from?\nB: I'm from Brazil.\nA: Which city are you from?\nB: I'm from São Paulo. And you?",
+    "application": "Monte uma conversa de oito falas entre duas pessoas: pergunte o país, responda e devolva a pergunta; pergunte a cidade, responda e devolva a pergunta; termine a apresentação com Nice to meet you! e Nice to meet you too! Use sua origem ou lugares fictícios. Leia os dois papéis em voz alta e depois tente sem olhar o modelo.",
+    "model": "A: Where are you from?\nB: I'm from Brazil. And you?\nA: I'm from Brazil too.\nB: Which city are you from?\nA: I'm from Recife. And you?\nB: I'm from São Paulo.\nA: Nice to meet you!\nB: Nice to meet you too!",
     "checklist": [
-      "Perguntar e informar país e cidade de origem.",
-      "Compreender as duas respostas da conversa.",
-      "Responder às duas falas do vídeo com apoio mínimo.",
-      "Adaptar a conversa com pelo menos uma informação diferente."
+      "Perguntar e informar o país de origem com Where are you from? e I'm from…",
+      "Perguntar e informar a cidade com Which city are you from? e I'm from…",
+      "Entender And you? e responder com o mesmo tipo de informação.",
+      "Responder às quatro falas da prática oral, usando as pausas.",
+      "Concluir a apresentação com Nice to meet you! e responder com too."
     ],
-    "review": "Amanhã, ouça só as falas de Livia e responda sem consultar o modelo. Depois confira uma frase que teve dificuldade e tente novamente.",
-    "next": "Continue com a próxima aula da unidade; ao concluir a unidade, revise uma conversa completa.",
-    "status": "produzida-pendente-validacao-pedagogica",
+    "review": "Amanhã, responda sem consultar: Where are you from? e Which city are you from? Depois represente os dois papéis, devolvendo cada pergunta com And you? e encerrando com Nice to meet you too! Confira o modelo apenas depois da tentativa.",
+    "next": "Na aula 5, Pedindo ajuda na aula, você vai praticar como pedir repetição e ajuda para entender uma palavra.",
+    "status": "corrigida-pendente-nova-validacao-pedagogica",
     "media": {
       "title": "Conversando sobre a origem",
       "base": "/professor/aulas/midia/a1-u01-l04-conversando-sobre-a-origem",
@@ -683,18 +726,38 @@
         },
         {
           "who": "Fabio",
-          "en": "I'm from Brazil.",
-          "pt": "Eu sou do Brasil."
+          "en": "I'm from Brazil. And you?",
+          "pt": "Eu sou do Brasil. E você?"
         },
         {
           "who": "Livia",
+          "en": "I'm from Brazil too.",
+          "pt": "Eu também sou do Brasil."
+        },
+        {
+          "who": "Fabio",
           "en": "Which city are you from?",
           "pt": "De qual cidade você é?"
         },
         {
+          "who": "Livia",
+          "en": "I'm from Recife. And you?",
+          "pt": "Eu sou de Recife. E você?"
+        },
+        {
           "who": "Fabio",
-          "en": "I'm from São Paulo. And you?",
-          "pt": "Eu sou de São Paulo. E você?"
+          "en": "I'm from São Paulo.",
+          "pt": "Eu sou de São Paulo."
+        },
+        {
+          "who": "Livia",
+          "en": "Nice to meet you, Fabio!",
+          "pt": "Prazer em conhecer você, Fabio!"
+        },
+        {
+          "who": "Fabio",
+          "en": "Nice to meet you too, Livia!",
+          "pt": "Prazer em conhecer você também, Livia!"
         }
       ],
       "dialogueChapters": [
@@ -703,16 +766,32 @@
           "start": 0
         },
         {
-          "title": "Fabio: I'm from Brazil.",
+          "title": "Fabio: I'm from Brazil. And you?",
           "start": 3.0416666666666665
         },
         {
-          "title": "Livia: Which city are you from?",
-          "start": 6.291666666666666
+          "title": "Livia: I'm from Brazil too.",
+          "start": 7.958333333333334
         },
         {
-          "title": "Fabio: I'm from São Paulo. And you?",
-          "start": 9.666666666666666
+          "title": "Fabio: Which city are you from?",
+          "start": 11.333333333333334
+        },
+        {
+          "title": "Livia: I'm from Recife. And you?",
+          "start": 14.75
+        },
+        {
+          "title": "Fabio: I'm from São Paulo.",
+          "start": 19.666666666666668
+        },
+        {
+          "title": "Livia: Nice to meet you, Fabio!",
+          "start": 23.125
+        },
+        {
+          "title": "Fabio: Nice to meet you too, Livia!",
+          "start": 26.958333333333332
         }
       ],
       "practiceChapters": [
@@ -723,6 +802,14 @@
         {
           "title": "Livia: Which city are you from?",
           "start": 10.041666666666666
+        },
+        {
+          "title": "Livia: I'm from Recife. And you?",
+          "start": 20.416666666666664
+        },
+        {
+          "title": "Livia: Nice to meet you!",
+          "start": 32.33333333333333
         }
       ]
     }

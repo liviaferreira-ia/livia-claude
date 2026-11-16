@@ -4,6 +4,7 @@ import type { A1_DRAFTS } from "@/data/a1Drafts";
 import { LessonReviewDecision } from "@/components/LessonReviewDecision";
 import { A1GuidedPractice } from "@/components/A1GuidedPractice";
 import type { LessonReview } from "@/lib/lesson-review-types";
+import { PendingReviewsLink } from "@/components/PendingReviewsLink";
 
 type Draft = (typeof A1_DRAFTS)[number];
 export function DraftLessonReview({ lesson, review = null, revision = "", student = false }: { lesson: Draft; review?: LessonReview | null; revision?: string; student?: boolean }) {
@@ -42,6 +43,8 @@ export function DraftLessonReview({ lesson, review = null, revision = "", studen
       <h3>Autoavaliação</h3><ul>{lesson.checklist.map((item, i) => <li key={i}>{item}</li>)}</ul>
       <h3>Revisão no dia seguinte</h3><p>{lesson.review}</p><p>{lesson.next}</p>
     </section>
-    <Link className="btn ghost" style={{ marginTop: 20 }} href={student ? "/aluno/aulas" : "/professor/aulas"}>← Todas as aulas</Link>
+    {student
+      ? <Link className="btn ghost" style={{ marginTop: 20 }} href="/aluno/aulas">← Todas as aulas</Link>
+      : <PendingReviewsLink className="btn ghost" style={{ marginTop: 20 }}>← Aulas pendentes</PendingReviewsLink>}
   </div>;
 }

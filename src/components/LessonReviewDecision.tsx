@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { PendingReviewsLink } from "@/components/PendingReviewsLink";
 import { REVIEW_LABELS, reviewStatus, type LessonReview } from "@/lib/lesson-review-types";
 
 export function LessonReviewDecision({ id, revision, initialReview }: { id: string; revision: string; initialReview: LessonReview | null }) {
@@ -43,6 +44,9 @@ export function LessonReviewDecision({ id, revision, initialReview }: { id: stri
       <button className="btn ghost" disabled={saving} type="button" onClick={() => setEditing(false)}>Cancelar</button>
     </form>}
     {saving && <p role="status">Salvando decisão…</p>}{message && <p role="status">{message}</p>}{error && <p role="alert">{error}</p>}
-    {status === "approved" && <p><Link href={`/aluno/aulas/${id}`}>Ver aula publicada →</Link></p>}
+    {status === "approved" && <p style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+      <PendingReviewsLink>Continuar revisão das pendentes →</PendingReviewsLink>
+      <Link href={`/aluno/aulas/${id}`}>Ver aula publicada →</Link>
+    </p>}
   </section>;
 }

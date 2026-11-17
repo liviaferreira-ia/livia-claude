@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Crest } from "./Crest";
 import { ThemeToggle, getInitialTheme } from "./ThemeToggle";
 import { SidebarFootV2, SidebarNavV2, StudentTabBar } from "./ShellNavV2";
-import { DESIGN_STORAGE_KEY, DESIGN_V2_PARA_TODOS, designV2Ativo } from "@/lib/design";
+import { DESIGN_STORAGE_KEY, designV2Ativo } from "@/lib/design";
+import { useDesignV2 } from "@/lib/useDesignV2";
 import { initials, useProfile } from "@/lib/profile";
 import { OperationalMonitor } from "@/components/OperationalMonitor";
 import { useIdleLogout } from "@/hooks/useIdleLogout";
@@ -141,14 +142,6 @@ const CRUMBS: Record<string, string> = {
   "/professor": "Conversas",
 };
 
-function subscribeDesign(onChange: () => void) {
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-design"] });
-  return () => observer.disconnect();
-}
-const readDesign = () => document.documentElement.getAttribute("data-design") === "v2";
-const readDesignOnServer = () => DESIGN_V2_PARA_TODOS;
-
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -196,7 +189,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   // Design v2: liga para a equipe (ou para todos, quando liberado) assim que o perfil carrega.
-  const v2 = useSyncExternalStore(subscribeDesign, readDesign, readDesignOnServer);
+  const v2 = useDesignV2();
   useEffect(() => {
     if (!ready) return;
     const root = document.documentElement;

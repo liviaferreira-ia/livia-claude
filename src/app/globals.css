@@ -3266,7 +3266,8 @@ img.avatar {
 :where(:root[data-design="v2"]) .view > h2 { font-size: 32px; margin: 6px 0 10px; }
 
 /* Estrutura */
-:root[data-design="v2"] .app-shell { grid-template-columns: 240px 1fr; }
+:root[data-design="v2"] .app-shell { grid-template-columns: 240px minmax(0, 1fr); }
+:root[data-design="v2"] .app-shell > main { min-width: 0; }
 :root[data-design="v2"] .sidebar { padding: 22px 14px 16px; overflow-y: auto; }
 :root[data-design="v2"] .brand { padding: 2px 8px 22px; gap: 10px; }
 :root[data-design="v2"] .brand b { font-family: var(--font-title); font-weight: 500; font-size: 17px; }
@@ -3334,7 +3335,7 @@ img.avatar {
 /* Barra de abas do aluno no celular */
 .v2-tabbar { display: none; }
 @media (max-width: 860px) {
-  :root[data-design="v2"] .app-shell { grid-template-columns: 1fr; }
+  :root[data-design="v2"] .app-shell { grid-template-columns: minmax(0, 1fr); }
   :root[data-design="v2"] .app-shell.has-tabbar main { padding-bottom: 76px; }
   .v2-tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
   .v2-tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 44px; font-size: 11px; font-weight: 600; color: var(--ink-faint); text-decoration: none; }

@@ -7,11 +7,14 @@ import { LEARNING_CYCLE, resolveCourseLevel } from "@/data/curso";
 import { parseCefrLevel, totalExercises, useProfile } from "@/lib/profile";
 import { useCourseProgress } from "@/lib/courseProgress";
 import { countMyActiveDaysThisWeek, getMySettings, type StudentSettings } from "@/lib/student-admin";
+import { useDesignV2 } from "@/lib/useDesignV2";
+import { StudentBadges } from "@/components/StudentBadges";
 
 const LABEL: Record<Kind, string> = { mc: "Múltipla escolha", fill: "Completar", translate: "Tradução", order: "Ordenar frases" };
 
 export default function ProgressoPage() {
   const { profile, ready } = useProfile();
+  const v2 = useDesignV2();
   const [activeDays, setActiveDays] = useState(0);
   const [settings, setSettings] = useState<StudentSettings | null>(null);
   const level = resolveExerciseLevel(parseCefrLevel(profile.level) ?? "A2");
@@ -78,5 +81,6 @@ export default function ProgressoPage() {
         </div>
       </section>
     </div>
+    {v2 && <StudentBadges totals={totals} stats={profile.stats} />}
   </div>;
 }

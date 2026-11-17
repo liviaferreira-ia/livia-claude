@@ -19,10 +19,14 @@ import {
   type StudentSettings,
 } from "@/lib/student-admin";
 import { listMySpecialActivities, type SpecialActivity } from "@/lib/special-activities";
+import { useDesignV2 } from "@/lib/useDesignV2";
+import { StudentHomeV2 } from "@/components/StudentHomeV2";
+import { FIRST_LESSON_MEDIA } from "@/data/lessonMedia";
 
 export default function AlunoDashboard() {
   const { profile, ready, signOut, isTeacher } = useProfile();
   const router = useRouter();
+  const v2 = useDesignV2();
   const studentLevel = parseCefrLevel(profile.level) ?? "A2";
   const contentLevel = resolveExerciseLevel(studentLevel);
   const categories = categoriesFor(contentLevel);
@@ -126,6 +130,26 @@ export default function AlunoDashboard() {
     { emoji: "🏅", label: "Dedicado", got: totals.done >= 30, hint: "Faça 30 exercícios" },
     { emoji: "🎓", label: "Primeira lição", got: profile.stats.lessonsCompleted >= 1, hint: "Conclua 1 lição" },
   ];
+
+  // Design v2 (equipe durante a validação; todos depois da liberação).
+  if (v2) {
+    const lastTeacher = [...messages].reverse().find((m) => m.sender === "tutor") ?? null;
+    return <StudentHomeV2
+      firstName={first}
+      levelLabel={profile.level ? levelDisplay(profile.level) : null}
+      streak={profile.stats.streak}
+      mission={mission}
+      poster={`${FIRST_LESSON_MEDIA.base}/poster.png`}
+      dailyDone={dailyDone}
+      dailyGoal={DAILY_GOAL}
+      weekly={settings ? { goal: settings.weekly_goal, activeDays, focus: settings.focus } : null}
+      specials={specialActivities.map((s) => ({ id: s.id, title: s.title, description: s.description }))}
+      assignments={assignments}
+      onFinishAssignment={(id) => void finishAssignment(id)}
+      lastTeacherMessage={lastTeacher ? { body: lastTeacher.body, created_at: lastTeacher.created_at } : null}
+      error={msgErr}
+    />;
+  }
 
   return (
     <div className="view student-dashboard-view">

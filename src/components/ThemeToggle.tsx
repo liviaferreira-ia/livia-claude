@@ -1,23 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DESIGN_STORAGE_KEY } from "@/lib/design";
 
 type Theme = "light" | "dark";
 
-/** Azul-marinho é a cor primária da marca: tema escuro é o padrão pra quem nunca escolheu, independente do sistema. */
-function getInitial(): Theme {
+/**
+ * Tema de quem nunca escolheu: no visual antigo, escuro (azul-marinho);
+ * no design v2, claro (aprovado em 16/11/2026). A escolha salva sempre vence.
+ */
+export function getInitialTheme(): Theme {
   if (typeof window === "undefined") return "dark";
   try {
     const stored = window.localStorage.getItem("central_theme");
     if (stored === "light" || stored === "dark") return stored;
   } catch {}
-  return "dark";
+  return document.documentElement.getAttribute("data-design") === "v2" ? "light" : "dark";
 }
 
-/** Aplica o tema salvo assim que o app monta (sem alterar o HTML do servidor). */
+/** Aplica o visual e o tema salvos assim que o app monta (sem alterar o HTML do servidor). */
 export function ThemeInit() {
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", getInitial());
+    try {
+      // Contas da equipe já marcadas como v2 recebem o visual novo antes do perfil carregar.
+      if (window.localStorage.getItem(DESIGN_STORAGE_KEY) === "v2") document.documentElement.setAttribute("data-design", "v2");
+    } catch {}
+    document.documentElement.setAttribute("data-theme", getInitialTheme());
   }, []);
   return null;
 }
@@ -27,13 +35,17 @@ export function ThemeToggle() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const t = getInitial();
-      setTheme(t);
-      document.documentElement.setAttribute("data-theme", t);
+    const root = document.documentElement;
+    const sync = () => {
+      const current = root.getAttribute("data-theme");
+      setTheme(current === "light" || current === "dark" ? current : getInitialTheme());
       setReady(true);
-    }, 0);
-    return () => window.clearTimeout(timer);
+    };
+    const timer = window.setTimeout(sync, 0);
+    // O tema pode mudar depois (ex.: o design v2 é ligado quando o perfil carrega).
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => { window.clearTimeout(timer); observer.disconnect(); };
   }, []);
 
   function toggle() {

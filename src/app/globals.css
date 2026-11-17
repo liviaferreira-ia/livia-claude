@@ -3218,3 +3218,134 @@ img.avatar {
   .student-focus-grid { grid-template-columns: 1fr; }
   .student-profile-modern .profile-stats { grid-template-columns: 1fr 1fr; }
 }
+
+/* =====================================================================
+   Design v2 — redesign aprovado por Fabio em 16 e 17/11/2026
+   Só vale com <html data-design="v2"> (equipe durante a validação da
+   Livia; todos quando DESIGN_V2_PARA_TODOS = true em src/lib/design.ts).
+   Cores da bandeira americana em versão clean: azul = ação e progresso,
+   vermelho = só detalhe, branco dominante. Playfair Display nos títulos,
+   DM Sans no resto. Tema claro é o padrão.
+   ===================================================================== */
+:root[data-design="v2"],
+:root[data-design="v2"][data-theme="light"] {
+  --bg: #f5f7fa; --panel: #ffffff; --panel-2: #f8f9fb;
+  --ink: #0b1b33; --ink-soft: #4b5568; --ink-faint: #7b8494; --line: #e3e7ee;
+  --navy: #1c4a85; --navy-deep: #07234a; --navy-soft: #e9eef6;
+  --gold: #b31942; --gold-soft: #fbe8ed;
+  --good: #17784f; --good-soft: #e3f3ea;
+  --warn: #9a5b0b; --warn-soft: #fbf0dc;
+  --bad: #b31942; --bad-soft: #fbe8ed;
+  --primary: #0a3161; --primary-2: #1c4a85; --on-primary: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(11, 27, 51, 0.04), 0 4px 16px rgba(11, 27, 51, 0.04);
+  --shadow: 0 2px 4px rgba(11, 27, 51, 0.05), 0 12px 32px rgba(11, 27, 51, 0.08);
+  --r: 16px; --r-sm: 10px;
+  --font-ui: var(--font-dm-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-title: var(--font-playfair), Georgia, "Times New Roman", serif;
+}
+:root[data-design="v2"][data-theme="dark"] {
+  --bg: #0b1626; --panel: #111f35; --panel-2: #16263f;
+  --ink: #eef2f8; --ink-soft: #a9b5c6; --ink-faint: #7a889c; --line: #22344f;
+  --navy: #9dbbe6; --navy-deep: #0f3a73; --navy-soft: #182c4a;
+  --gold: #e0445f; --gold-soft: #3a1620;
+  --good: #4cc48f; --good-soft: #12321f;
+  --warn: #e0af52; --warn-soft: #33280f;
+  --bad: #e0445f; --bad-soft: #3a1620;
+  --primary: #1c4f94; --primary-2: #2a63b0; --on-primary: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Tipografia: base com especificidade baixa (:where) para não atropelar componentes. */
+:root[data-design="v2"] body { font-family: var(--font-ui); font-size: 15px; line-height: 1.55; }
+:where(:root[data-design="v2"]) :is(h1, h2, h3) { font-family: var(--font-title); font-weight: 500; letter-spacing: -0.01em; }
+:where(:root[data-design="v2"]) h1 { font-size: 34px; line-height: 1.15; }
+:where(:root[data-design="v2"]) h2 { font-size: 26px; line-height: 1.2; }
+:where(:root[data-design="v2"]) h3 { font-size: 19px; line-height: 1.3; }
+:where(:root[data-design="v2"]) h4 { font-size: 16px; line-height: 1.4; font-weight: 700; margin: 0; }
+:where(:root[data-design="v2"]) .view > h2 { font-size: 32px; margin: 6px 0 10px; }
+
+/* Estrutura */
+:root[data-design="v2"] .app-shell { grid-template-columns: 240px 1fr; }
+:root[data-design="v2"] .sidebar { padding: 22px 14px 16px; overflow-y: auto; }
+:root[data-design="v2"] .brand { padding: 2px 8px 22px; gap: 10px; }
+:root[data-design="v2"] .brand b { font-family: var(--font-title); font-weight: 500; font-size: 17px; }
+:root[data-design="v2"] .brand span { color: var(--gold); font-size: 9px; }
+:root[data-design="v2"] .brand > :first-child { width: 44px; height: auto; flex: none; }
+:root[data-design="v2"] .brand span { white-space: nowrap; letter-spacing: 0.12em; }
+:root[data-design="v2"] .navlabel { font-size: 11px; padding: 16px 12px 6px; }
+:root[data-design="v2"] .nav { gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 14.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; }
+:root[data-design="v2"] .nav svg { width: 20px; height: 20px; }
+:root[data-design="v2"] .nav:hover { background: var(--panel-2); color: var(--ink); }
+:root[data-design="v2"] .nav.on { background: var(--navy-soft); color: var(--ink); }
+:root[data-design="v2"] .nav.in { color: var(--ink); }
+:root[data-design="v2"] .nav.on svg,
+:root[data-design="v2"] .nav.in svg { color: var(--navy); }
+:root[data-design="v2"] .nav .badge { background: var(--gold); color: #fff; }
+:root[data-design="v2"] .nav.sub { padding: 8px 12px 8px 44px; font-size: 14px; font-weight: 500; }
+:root[data-design="v2"] .nav.sub.on { font-weight: 700; }
+.v2-sub { display: flex; flex-direction: column; gap: 1px; margin: 2px 0 6px; }
+.v2-sub[hidden] { display: none; }
+.v2-chev { margin-left: auto; display: grid; color: var(--ink-faint); transition: transform 0.2s; }
+.v2-chev svg { width: 16px !important; height: 16px !important; }
+.v2-group.open .v2-chev { transform: rotate(180deg); }
+.v2-group .nav .badge ~ .v2-chev { margin-left: 8px; }
+
+.v2-foot { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+.v2-switch { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px; border-radius: 10px; border: 1px solid var(--line); font-size: 13.5px; font-weight: 600; color: var(--ink-soft); text-decoration: none; }
+.v2-switch:hover { background: var(--panel-2); color: var(--ink); }
+.v2-switch svg { width: 16px; height: 16px; }
+.v2-me { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; color: inherit; text-decoration: none; }
+.v2-me:hover { background: var(--panel-2); }
+.v2-me b { display: block; font-size: 14px; }
+.v2-me small { display: block; font-size: 12.5px; color: var(--ink-faint); }
+.v2-foot-links { display: flex; gap: 16px; padding: 0 8px; font-size: 13px; }
+.v2-foot-links a,
+.v2-foot-links button { padding: 0; border: 0; background: none; font: inherit; color: var(--ink-faint); text-decoration: none; cursor: pointer; }
+.v2-foot-links a:hover,
+.v2-foot-links button:hover { color: var(--ink); }
+
+:root[data-design="v2"] .avatar { background: var(--gold-soft); color: var(--gold); font-weight: 700; font-size: 13px; }
+:root[data-design="v2"] .topbar { padding: 14px 44px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+:root[data-design="v2"] .topbar .chip { display: none; }
+:root[data-design="v2"] .crumb { font-size: 13.5px; }
+
+/* Conteúdo */
+:root[data-design="v2"] .view { padding: 32px 44px 72px; max-width: 1120px; }
+:root[data-design="v2"] .eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-faint); }
+:root[data-design="v2"] .card { border-radius: 16px; box-shadow: var(--shadow-sm); }
+:root[data-design="v2"] .sec-h h3 { font-size: 20px; }
+:root[data-design="v2"] .hero { background: linear-gradient(135deg, var(--primary), var(--primary-2)); border-radius: 18px; box-shadow: 0 8px 28px rgba(10, 49, 97, 0.18); }
+:root[data-design="v2"] .hero::after { display: none; }
+:root[data-design="v2"] .hero .bar > i { background: #ef5a73; }
+:root[data-design="v2"] .chip.gold { color: var(--gold); }
+
+/* Botões */
+:root[data-design="v2"] .btn { border-radius: 10px; font-weight: 700; transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s; }
+:root[data-design="v2"] .btn.primary { background: var(--primary); color: var(--on-primary); }
+:root[data-design="v2"] .btn.primary:hover { background: var(--primary-2); filter: none; }
+:root[data-design="v2"] .btn.gold { background: var(--gold); color: #fff; }
+:root[data-design="v2"] .btn.light { background: #fff; color: #0a3161; border-color: rgba(10, 49, 97, 0.12); }
+:root[data-design="v2"] .btn.ghost { background: var(--panel); color: var(--ink); border: 1px solid var(--line); }
+:root[data-design="v2"] .btn.ghost:hover { background: var(--panel-2); border-color: var(--ink-faint); color: var(--ink); }
+:root[data-design="v2"] .icon-btn:hover { color: var(--navy); border-color: var(--line); background: var(--panel-2); }
+:root[data-design="v2"] :is(.btn, .nav, .icon-btn, .v2-switch, .v2-me, .v2-tabbar a):focus-visible { outline: 2px solid var(--primary-2); outline-offset: 2px; }
+
+/* Barra de abas do aluno no celular */
+.v2-tabbar { display: none; }
+@media (max-width: 860px) {
+  :root[data-design="v2"] .app-shell { grid-template-columns: 1fr; }
+  :root[data-design="v2"] .app-shell.has-tabbar main { padding-bottom: 76px; }
+  .v2-tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+  .v2-tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 44px; font-size: 11px; font-weight: 600; color: var(--ink-faint); text-decoration: none; }
+  .v2-tabbar svg { width: 22px; height: 22px; }
+  .v2-tabbar a.on { color: var(--ink); }
+  .v2-tabbar a.on svg { color: var(--navy); }
+  :root[data-design="v2"] .view { padding: 22px 18px 40px; }
+  :root[data-design="v2"] .topbar { padding: 10px 16px; }
+  :where(:root[data-design="v2"]) h1 { font-size: 28px; }
+  :where(:root[data-design="v2"]) .view > h2 { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v2-chev, :root[data-design="v2"] .btn { transition: none; }
+}

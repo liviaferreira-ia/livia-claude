@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Crest } from "./Crest";
-import { ThemeToggle } from "./ThemeToggle";
+import { ThemeToggle, getInitialTheme } from "./ThemeToggle";
+import { SidebarFootV2, SidebarNavV2, StudentTabBar } from "./ShellNavV2";
+import { DESIGN_STORAGE_KEY, DESIGN_V2_PARA_TODOS, designV2Ativo } from "@/lib/design";
 import { initials, useProfile } from "@/lib/profile";
 import { OperationalMonitor } from "@/components/OperationalMonitor";
 import { useIdleLogout } from "@/hooks/useIdleLogout";
@@ -139,6 +141,14 @@ const CRUMBS: Record<string, string> = {
   "/professor": "Conversas",
 };
 
+function subscribeDesign(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-design"] });
+  return () => observer.disconnect();
+}
+const readDesign = () => document.documentElement.getAttribute("data-design") === "v2";
+const readDesignOnServer = () => DESIGN_V2_PARA_TODOS;
+
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -185,6 +195,26 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [pathname]);
 
+  // Design v2: liga para a equipe (ou para todos, quando liberado) assim que o perfil carrega.
+  const v2 = useSyncExternalStore(subscribeDesign, readDesign, readDesignOnServer);
+  useEffect(() => {
+    if (!ready) return;
+    const root = document.documentElement;
+    const on = designV2Ativo(hasTeacherAccess);
+    try {
+      if (on) window.localStorage.setItem(DESIGN_STORAGE_KEY, "v2");
+      else window.localStorage.removeItem(DESIGN_STORAGE_KEY);
+    } catch {}
+    if (on) root.setAttribute("data-design", "v2");
+    else root.removeAttribute("data-design");
+    root.setAttribute("data-theme", getInitialTheme());
+  }, [ready, hasTeacherAccess]);
+  const area = isTeacherArea && hasTeacherAccess ? "teacher" : "student";
+  const avatarNode = profile.avatarUrl
+    // eslint-disable-next-line @next/next/no-img-element
+    ? <img className="avatar" src={profile.avatarUrl} alt="Foto de perfil" />
+    : <span className="avatar">{initials(profile.name)}</span>;
+
   // Evita que uma conta de aluno permaneça em uma URL da área da escola.
   // O middleware também aplica essa regra no servidor; este redirecionamento
   // cobre navegações client-side e mudanças de sessão.
@@ -195,7 +225,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [hasTeacherAccess, isTeacherArea, ready, router]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${v2 && area === "student" ? " has-tabbar" : ""}`}>
       <OperationalMonitor />
       <aside className={`sidebar${menuOpen ? " open" : ""}`}>
         <Link
@@ -211,6 +241,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </Link>
 
+        {v2 ? (
+          <SidebarNavV2 area={area} pathname={pathname} specialCount={specialCount} onNavigate={() => setMenuOpen(false)} />
+        ) : <>
         {hasTeacherAccess && !isTeacherArea && (
           <div>
             <div className="navlabel">Professor</div>
@@ -241,6 +274,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         ))}
 
+        </>}
+
+        {v2 ? (
+          <SidebarFootV2 area={area} hasTeacherAccess={hasTeacherAccess} name={profile.name} avatar={avatarNode}
+            onNavigate={() => setMenuOpen(false)} onSignOut={() => { setMenuOpen(false); void handleSignOut(); }} />
+        ) : (
         <div className="side-foot">
           {!isTeacherArea && (
             <Link
@@ -274,6 +313,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ↩ Sair
           </button>
         </div>
+        )}
       </aside>
 
       <div
@@ -323,6 +363,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         {children}
+        {v2 && area === "student" && <StudentTabBar pathname={pathname} />}
       </main>
     </div>
   );

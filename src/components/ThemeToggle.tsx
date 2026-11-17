@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DESIGN_STORAGE_KEY } from "@/lib/design";
+import { DESIGN_STORAGE_KEY, DESIGN_TEST_KEY } from "@/lib/design";
 
 type Theme = "light" | "dark";
 
@@ -23,7 +23,12 @@ export function ThemeInit() {
   useEffect(() => {
     try {
       // Contas da equipe já marcadas como v2 recebem o visual novo antes do perfil carregar.
-      if (window.localStorage.getItem(DESIGN_STORAGE_KEY) === "v2") document.documentElement.setAttribute("data-design", "v2");
+      // Modo de teste: ?visual=novo liga o visual novo neste navegador; ?visual=atual desliga.
+      const visual = new URLSearchParams(window.location.search).get("visual");
+      if (visual === "novo") window.localStorage.setItem(DESIGN_TEST_KEY, "v2");
+      if (visual === "atual") { window.localStorage.removeItem(DESIGN_TEST_KEY); window.localStorage.removeItem(DESIGN_STORAGE_KEY); }
+      const teste = window.localStorage.getItem(DESIGN_TEST_KEY) === "v2";
+      if (teste || window.localStorage.getItem(DESIGN_STORAGE_KEY) === "v2") document.documentElement.setAttribute("data-design", "v2");
     } catch {}
     document.documentElement.setAttribute("data-theme", getInitialTheme());
   }, []);

@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Crest } from "./Crest";
 import { ThemeToggle, getInitialTheme } from "./ThemeToggle";
 import { SidebarFootV2, SidebarNavV2, StudentTabBar } from "./ShellNavV2";
-import { DESIGN_STORAGE_KEY, designV2Ativo } from "@/lib/design";
+import { DESIGN_STORAGE_KEY, DESIGN_TEST_KEY, designV2Ativo } from "@/lib/design";
 import { useDesignV2 } from "@/lib/useDesignV2";
 import { listMyReviewTargets } from "@/lib/activity";
 import { initials, useProfile } from "@/lib/profile";
@@ -196,7 +196,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     const root = document.documentElement;
-    const on = designV2Ativo(hasTeacherAccess);
+    let teste = false;
+    try { teste = window.localStorage.getItem(DESIGN_TEST_KEY) === "v2"; } catch {}
+    const on = designV2Ativo(hasTeacherAccess) || teste;
     try {
       if (on) window.localStorage.setItem(DESIGN_STORAGE_KEY, "v2");
       else window.localStorage.removeItem(DESIGN_STORAGE_KEY);

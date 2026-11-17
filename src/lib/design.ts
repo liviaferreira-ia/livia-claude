@@ -19,6 +19,13 @@ export const SITE_DESIGN_V2 = true;
 /** Chave local que lembra que esta conta usa o visual novo, para aplicar antes do perfil carregar. */
 export const DESIGN_STORAGE_KEY = "central_design";
 
+/**
+ * Modo de teste (17/11/2026): liga o visual novo só neste navegador, para testar o lado do aluno
+ * (cadeados e conclusão de aula) com uma conta de aluno de teste durante a validação da Livia.
+ * Ligar: abrir qualquer página com ?visual=novo. Desligar: ?visual=atual.
+ */
+export const DESIGN_TEST_KEY = "central_design_teste";
+
 export function designV2Ativo(isStaff: boolean): boolean {
   return DESIGN_V2_PARA_TODOS || isStaff;
 }

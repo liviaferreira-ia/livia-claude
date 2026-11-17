@@ -3498,3 +3498,14 @@ img.avatar {
 .v2-review-chip:hover { border-color: var(--ink-faint); }
 .v2-review-chip:focus-visible { outline: 2px solid var(--primary-2); outline-offset: 2px; }
 @media (max-width: 560px) { .v2-review-chip span { display: none; } .v2-review-chip { padding: 8px; } }
+
+/* Recados da professora (ajuste do Fabio em 17/11/2026): margem interna no painel da conversa e texto maior. */
+:root[data-design="v2"] .inbox-thread { padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+:root[data-design="v2"] .inbox-thread-head { font-size: 18px; padding-bottom: 14px; }
+:root[data-design="v2"] .inbox-thread-head .muted { font-size: 14px !important; }
+:root[data-design="v2"] .inbox-list { padding: 8px; }
+:root[data-design="v2"] .inbox-item { padding: 12px 14px; }
+:root[data-design="v2"] .inbox-item-body b { font-size: 15.5px; }
+:root[data-design="v2"] .inbox-item-body span { font-size: 13.5px; }
+:root[data-design="v2"] .conversation-student-select { font-size: 16px; padding: 12px 14px; }
+:root[data-design="v2"] .inbox-thread .muted { font-size: 13.5px; }

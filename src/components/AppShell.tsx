@@ -8,6 +8,7 @@ import { ThemeToggle, getInitialTheme } from "./ThemeToggle";
 import { SidebarFootV2, SidebarNavV2, StudentTabBar } from "./ShellNavV2";
 import { DESIGN_STORAGE_KEY, designV2Ativo } from "@/lib/design";
 import { useDesignV2 } from "@/lib/useDesignV2";
+import { listMyReviewTargets } from "@/lib/activity";
 import { initials, useProfile } from "@/lib/profile";
 import { OperationalMonitor } from "@/components/OperationalMonitor";
 import { useIdleLogout } from "@/hooks/useIdleLogout";
@@ -175,6 +176,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [specialCount, setSpecialCount] = useState(0);
   const [pendingReviews, setPendingReviews] = useState<number | null>(null);
+  const [reviewsDue, setReviewsDue] = useState<number | null>(null);
 
   useEffect(() => {
     if (!ready || !user || role !== "student") return;
@@ -211,6 +213,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       if (typeof body?.pending === "number") setPendingReviews(body.pending);
     }).catch(() => {});
   }, [v2, pathname, ready, hasTeacherAccess, isTeacherArea]);
+
+  // Design v2: aviso de revisões no topo da área do aluno (inspiração mostrada pelo Fabio em 17/11/2026).
+  useEffect(() => {
+    if (!v2 || !ready || !user || isTeacherArea) return;
+    listMyReviewTargets().then((targets) => setReviewsDue(targets.length)).catch(() => {});
+  }, [v2, pathname, ready, user, isTeacherArea]);
   const area = isTeacherArea && hasTeacherAccess ? "teacher" : "student";
   const avatarNode = profile.avatarUrl
     // eslint-disable-next-line @next/next/no-img-element
@@ -360,6 +368,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                 )}
                 <span className="chip">{profile.name ? profile.name.split(" ")[0] : "Visitante"}</span>
               </>
+            )}
+            {v2 && !isTeacherArea && reviewsDue !== null && (
+              <Link href="/aluno/revisao" className={`v2-review-chip${reviewsDue > 0 ? " due" : ""}`}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>{reviewsDue > 0 ? <><path d="M3 2v6h6" /><path d="M3 8a9 9 0 1 0 3-6.7L3 8" /></> : <path d="M5 12.5 10 17l9-10" />}</svg>
+                <span>{reviewsDue > 0 ? `${reviewsDue} ${reviewsDue === 1 ? "revisão pendente" : "revisões pendentes"}` : "Revisões em dia"}</span>
+              </Link>
             )}
             <ThemeToggle />
             {profile.avatarUrl ? (

@@ -1,0 +1,14 @@
+/* Conclusão da aula — design v2. */
+.box { display: flex; align-items: center; gap: 18px; padding: 18px 20px; flex-wrap: wrap; }
+.text { flex: 1; min-width: 240px; }
+.text b, .done b { display: block; font-size: 17px; }
+.text p, .done p { margin: 4px 0 0; font-size: 14.5px; color: var(--ink-soft); }
+.checks { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--ink-soft); }
+.checks li { display: flex; align-items: center; gap: 8px; }
+.checks span { width: 18px; text-align: center; font-weight: 700; color: var(--ink-faint); }
+.ok { color: var(--ink); }
+.ok span { color: var(--good); }
+.error { color: var(--bad); }
+.done { background: var(--good-soft); border-color: transparent; }
+.done > div { flex: 1; min-width: 200px; }
+.big { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--good); color: #fff; font-size: 22px; font-weight: 700; flex: none; }

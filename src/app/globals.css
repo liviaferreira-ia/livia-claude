@@ -3489,3 +3489,12 @@ img.avatar {
 .v2-special-txt small.novo { color: var(--gold); font-weight: 700; }
 .v2-special:focus-visible { outline: 2px solid var(--primary-2); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .v2-special { transition: none; } }
+
+/* Aviso de revisões no topo (design v2, 17/11/2026) */
+.v2-review-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-soft); font-size: 13.5px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.v2-review-chip svg { width: 15px; height: 15px; color: var(--good); }
+.v2-review-chip.due { border-color: color-mix(in srgb, var(--gold) 35%, transparent); background: var(--gold-soft); color: var(--ink); }
+.v2-review-chip.due svg { color: var(--gold); }
+.v2-review-chip:hover { border-color: var(--ink-faint); }
+.v2-review-chip:focus-visible { outline: 2px solid var(--primary-2); outline-offset: 2px; }
+@media (max-width: 560px) { .v2-review-chip span { display: none; } .v2-review-chip { padding: 8px; } }

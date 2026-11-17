@@ -14,6 +14,10 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import type { A1Draft } from "@/data/a1Drafts";
 import { PendingReviewsLink } from "@/components/PendingReviewsLink";
 import { REVIEW_LABELS, reviewStatus, type LessonReview } from "@/lib/lesson-review-types";
+import { LessonOutlinePanel, neighbors } from "@/components/LessonOutlinePanel";
+import { LessonComplete } from "@/components/LessonComplete";
+import type { LessonOutline } from "@/lib/video-course-types";
+import { createClient } from "@/lib/supabase/client";
 import styles from "./LessonPlayerV2.module.css";
 
 const STEPS = ["Contexto", "Conversa", "Entenda", "Pratique", "Sua vez", "Revisão"] as const;
@@ -45,9 +49,16 @@ type Props = {
   mode: "student" | "teacher";
   review?: LessonReview | null;
   revision?: string;
+  /** Painel lateral com as aulas (progresso, unidades, Anterior/Próxima). */
+  outline?: LessonOutline | null;
 };
 
-export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: Props) {
+/** Quanto do vídeo já foi assistido (fração 0–1), guardado neste aparelho. */
+function readWatched(key: string): number {
+  try { const raw = window.localStorage.getItem(key); return raw ? Number((JSON.parse(raw) as { f?: number }).f) || 0 : 0; } catch { return 0; }
+}
+
+export function LessonPlayerV2({ lesson, mode, review = null, revision = "", outline = null }: Props) {
   const teacher = mode === "teacher";
   const storageKey = `central_aula_etapa:${mode}:${lesson.id}`;
   const [step, setStep] = useState(1);
@@ -55,6 +66,26 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
   const dialogueRef = useRef<HTMLVideoElement>(null);
   const practiceRef = useRef<HTMLVideoElement>(null);
   const media = lesson.media;
+  const watchKey = (kind: "conversa" | "pratica") => `central_assistido:${mode}:${lesson.id}:${kind}`;
+  const [watched, setWatched] = useState({ conversa: 0, pratica: 0 });
+  const [completed, setCompleted] = useState(() => Boolean(outline?.items.find((item) => item.id === lesson.id)?.done));
+  const [panelOpen, setPanelOpen] = useState(false);
+  const nextLesson = outline ? neighbors(outline, completed).next : null;
+
+  // Recupera o quanto dos vídeos já foi assistido neste aparelho (para concluir mesmo depois de recarregar).
+  useEffect(() => {
+    const timer = window.setTimeout(() => setWatched({
+      conversa: readWatched(`central_assistido:${mode}:${lesson.id}:conversa`),
+      pratica: readWatched(`central_assistido:${mode}:${lesson.id}:pratica`),
+    }), 0);
+    return () => window.clearTimeout(timer);
+  }, [mode, lesson.id]);
+
+  // Aluno: "Continue de onde parou" da tela inicial passa a levar para esta aula.
+  useEffect(() => {
+    if (teacher || !outline) return;
+    createClient().rpc("record_learning_position", { p_path: `/aluno/aulas/${lesson.id}`, p_title: lesson.title, p_activity_type: "lesson" }).then(() => {}, () => {});
+  }, [teacher, outline, lesson.id, lesson.title]);
 
   // Volta para a etapa em que a pessoa estava (se recarregar a página).
   useEffect(() => {
@@ -88,12 +119,20 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
     : <Link href="/aluno/aulas" className={styles.iconBtn} aria-label="Sair da aula">{I.x}</Link>;
   const unitLabel = `A1 · Unidade ${lesson.unitNumber} · Aula ${lesson.number}`;
 
-  return <div className={styles.player}>
+  return <div className={`${styles.player}${outline ? ` ${styles.hasOutline}` : ""}${teacher ? ` ${styles.isTeacher}` : ""}`}>
     <header className={styles.top}>
       <div className={styles.topInner}>
         {exit}
-        <div className={styles.topTitle}><span className={styles.eyebrow}>{unitLabel}{teacher && " · Revisão"}</span><b>{lesson.title}</b></div>
-        <span className={styles.count}>{step}/6</span>
+        <div className={styles.topTitle}>
+          {outline
+            ? <nav className={styles.crumbs} aria-label="Caminho">{outline.breadcrumb.map((crumb, i) => <span key={i}>{i > 0 && <i aria-hidden>/</i>}{crumb.href ? <Link href={crumb.href} prefetch={false}>{crumb.label}</Link> : crumb.label}</span>)}</nav>
+            : <span className={styles.eyebrow}>{unitLabel}{teacher && " · Revisão"}</span>}
+          <b>{lesson.title}</b>
+        </div>
+        <div className={styles.topRight}>
+          <span className={styles.count}>{step}/6</span>
+          {outline && <button type="button" className={styles.outlineBtn} onClick={() => setPanelOpen(true)}>Aulas</button>}
+        </div>
         <ol className={styles.stepper}>
           {STEPS.map((name, i) => {
             const n = i + 1;
@@ -107,6 +146,7 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
       {teacher && <ReviewBar id={lesson.id} revision={revision} initialReview={review} />}
     </header>
 
+    <div className={outline ? styles.withPanel : undefined}>
     <main className={styles.stage}>
       {step === 1 && <section className={styles.step}>
         <div className={styles.head}>
@@ -134,7 +174,8 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
           <h2>Assista à conversa</h2>
           <p className={styles.lead}>Em inglês, com legendas em português. Toque numa fala para ouvir de novo.</p>
         </div>
-        <LessonVideoV2 refEl={dialogueRef} src={`${media.base}/conversa.mp4`} poster={`${media.base}/poster.png`} track={`${media.base}/dialogue.vtt`} />
+        <LessonVideoV2 refEl={dialogueRef} src={`${media.base}/conversa.mp4`} poster={`${media.base}/poster.png`} track={`${media.base}/dialogue.vtt`}
+          watchKey={watchKey("conversa")} onProgress={(f) => setWatched((w) => ({ ...w, conversa: Math.max(w.conversa, f) }))} />
         <Transcript media={media} onSeek={(start) => seek(dialogueRef, start)} />
         <p className={styles.small}>Áudio em inglês com vozes sintéticas. As legendas em português já aparecem no vídeo.</p>
       </section>}
@@ -172,7 +213,8 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
           <h2>Sua vez de falar</h2>
           <p className={styles.lead}>Responda em inglês durante cada pausa de 7 segundos. O vídeo não grava nem avalia sua voz.</p>
         </div>
-        <LessonVideoV2 refEl={practiceRef} src={`${media.base}/sua-vez.mp4`} poster={`${media.base}/poster.png`} track={`${media.base}/practice.vtt`} />
+        <LessonVideoV2 refEl={practiceRef} src={`${media.base}/sua-vez.mp4`} poster={`${media.base}/poster.png`} track={`${media.base}/practice.vtt`}
+          watchKey={watchKey("pratica")} onProgress={(f) => setWatched((w) => ({ ...w, pratica: Math.max(w.pratica, f) }))} />
         <div className={styles.sectionHead}><h3>Perguntas da Livia</h3></div>
         <div className={styles.prompts}>
           {lesson.practice.map((line, i) => {
@@ -194,12 +236,19 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
           <p className={styles.lead}>Marque o que você já consegue fazer.</p>
         </div>
         <div className={styles.stack}>
+          {!teacher && outline && <LessonComplete lessonId={lesson.id} watched={watched} done={completed} onDone={() => setCompleted(true)} nextHref={nextLesson?.href ?? null} />}
           <Checklist items={lesson.checklist} />
           <div className={`card ${styles.pad} ${styles.rowIc}`}><span className={styles.ic}>{I.cal}</span><div><h3>Revisão de amanhã</h3><p className={styles.muted}>{lesson.review}</p></div></div>
           {lesson.next && <div className={`card ${styles.pad} ${styles.nextLesson}`}><span className={styles.eyebrowLight}>Próxima aula</span><p>{lesson.next}</p></div>}
         </div>
       </section>}
     </main>
+    {outline && <aside className={`${styles.side}${panelOpen ? ` ${styles.sideOpen}` : ""}`} aria-label="Aulas do curso">
+      <div className={styles.sideHead}><b>Aulas do curso</b><button type="button" className={styles.iconBtn} onClick={() => setPanelOpen(false)} aria-label="Fechar">{I.x}</button></div>
+      <LessonOutlinePanel outline={outline} completedNow={completed} onNavigate={() => setPanelOpen(false)} />
+    </aside>}
+    {outline && panelOpen && <div className={styles.scrim} onClick={() => setPanelOpen(false)} aria-hidden />}
+    </div>
 
     <nav className={styles.bottom} aria-label="Navegação da aula">
       <div className={styles.bottomInner}>
@@ -209,21 +258,53 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
           ? <button type="button" className={`btn primary ${styles.next}`} onClick={() => go(step + 1)}>{step === 1 ? "Começar aula" : "Continuar"}{I.arrow}</button>
           : teacher
             ? <PendingReviewsLink className={`btn primary ${styles.next}`}>Voltar às pendentes</PendingReviewsLink>
-            : <Link href="/aluno/aulas" className={`btn primary ${styles.next}`}>Voltar às aulas</Link>}
+            : completed && nextLesson
+              ? <Link href={nextLesson.href} prefetch={false} className={`btn primary ${styles.next}`}>Próxima aula{I.arrow}</Link>
+              : <Link href="/aluno/aulas" className={`btn primary ${styles.next}`}>Voltar às aulas</Link>}
       </div>
     </nav>
   </div>;
 }
 
-function LessonVideoV2({ refEl, src, poster, track }: { refEl: RefObject<HTMLVideoElement | null>; src: string; poster: string; track: string }) {
+function LessonVideoV2({ refEl, src, poster, track, watchKey, onProgress }: {
+  refEl: RefObject<HTMLVideoElement | null>; src: string; poster: string; track: string;
+  watchKey?: string; onProgress?: (fraction: number) => void;
+}) {
   const [failed, setFailed] = useState(false);
+  const [fraction, setFraction] = useState(0);
+  const seen = useRef<Set<number>>(new Set());
   useEffect(() => { refEl.current?.load(); }, [refEl, src]);
+  useEffect(() => {
+    if (!watchKey) return;
+    try {
+      const raw = window.localStorage.getItem(watchKey);
+      if (raw) seen.current = new Set((JSON.parse(raw) as { s?: number[] }).s ?? []);
+    } catch {}
+  }, [watchKey]);
+
+  // Conta os segundos realmente assistidos (pular para frente não conta).
+  function measure() {
+    const video = refEl.current;
+    if (!video || !watchKey || !Number.isFinite(video.duration) || video.duration <= 0) return;
+    const f = Math.min(1, seen.current.size / Math.max(1, Math.floor(video.duration)));
+    setFraction(f); onProgress?.(f);
+    try { window.localStorage.setItem(watchKey, JSON.stringify({ s: [...seen.current], f })); } catch {}
+  }
+  function onTime() {
+    const video = refEl.current;
+    if (!video || video.paused || video.seeking) return;
+    const second = Math.floor(video.currentTime);
+    if (!seen.current.has(second)) { seen.current.add(second); measure(); }
+  }
+
   return <div>
-    <video ref={refEl} key={src} controls playsInline preload="metadata" poster={poster} className={styles.video} onError={() => setFailed(true)}>
+    <video ref={refEl} key={src} controls playsInline preload="metadata" poster={poster} className={styles.video}
+      onError={() => setFailed(true)} onTimeUpdate={onTime} onLoadedMetadata={measure}>
       <source src={src} type="video/mp4" onError={() => setFailed(true)} />
       <track kind="subtitles" src={track} srcLang="pt-BR" label="Português" />
       Seu navegador não conseguiu reproduzir o vídeo.
     </video>
+    {watchKey && <div className={styles.watch}><div className={styles.watchBar}><i style={{ width: `${Math.round(fraction * 100)}%` }} /></div><span>Assistido {Math.round(fraction * 100)}%</span></div>}
     {failed && <p role="alert" className={styles.small}>Não foi possível carregar o vídeo. <a href={src}>Abrir o vídeo diretamente</a> ou recarregue a página.</p>}
   </div>;
 }

@@ -21,3 +21,22 @@
 .body b { font-size: 16.5px; font-weight: 700; line-height: 1.3; }
 .body span { font-size: 14.5px; color: var(--ink-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .thumb img, .play { transition: none; } }
+
+/* Progresso, cadeado e concluída (desbloqueio em sequência, 17/11/2026) */
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.progress { width: 300px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.progressTop { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; }
+.progressTop span { color: var(--ink-faint); font-weight: 600; }
+.progress small { font-size: 13px; color: var(--ink-faint); }
+.bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--primary-2); }
+.staffNote { margin: -6px 0 24px; padding: 10px 14px; border-radius: 10px; background: var(--navy-soft); font-size: 14px; color: var(--ink-soft); }
+.unitTitle small { margin-left: auto; font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--ink-faint); }
+.locked img { filter: grayscale(1) brightness(0.85); opacity: 0.55; }
+.cardLocked { cursor: not-allowed; }
+.cardLocked .body b { color: var(--ink-soft); }
+.doneTag, .lockTag { position: absolute; left: 8px; top: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.doneTag { background: var(--good); color: #fff; }
+.lockTag { background: rgba(11, 22, 38, 0.82); color: #fff; }
+.doneTag svg, .lockTag svg { width: 13px; height: 13px; }
+@media (max-width: 700px) { .progress { width: 100%; } }

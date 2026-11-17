@@ -8,8 +8,8 @@ import { DESIGN_V2_PARA_TODOS } from "@/lib/design";
 // Fontes do design v2, servidas pelo próprio site (sem requisição ao Google no navegador).
 // Enquanto o visual novo é só da equipe, não pré-carrega para não pesar a página dos alunos.
 // Ao liberar para todos (DESIGN_V2_PARA_TODOS = true), trocar preload para true. O Next exige valor literal aqui.
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap", preload: false });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", display: "swap", preload: false });
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans", display: "swap", preload: true });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", display: "swap", preload: true });
 
 export const metadata: Metadata = {
   title: "Central School — Inglês para usar todos os dias",

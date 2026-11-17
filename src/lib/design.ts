@@ -7,14 +7,14 @@
  * (professora e admin). Depois da aprovação dela, trocar para `true` libera o
  * visual novo para todos os alunos, já no HTML do servidor (sem piscar).
  */
-export const DESIGN_V2_PARA_TODOS = false;
+export const DESIGN_V2_PARA_TODOS = true; // Liberado para todos por decisão do Fabio em 17/11/2026, antes da validação da Livia.
 
 /**
  * Site de vendas (página inicial) no design v2: versão clean preparada em 17/11/2026.
  * Fabio gostou; quem decide é a Livia. Se ela não aprovar, trocar para `false`:
  * o site volta ao visual atual mesmo com o resto da plataforma no v2.
  */
-export const SITE_DESIGN_V2 = true;
+export const SITE_DESIGN_V2 = true; // Publicado para o público por decisão do Fabio em 17/11/2026.
 
 /** Chave local que lembra que esta conta usa o visual novo, para aplicar antes do perfil carregar. */
 export const DESIGN_STORAGE_KEY = "central_design";

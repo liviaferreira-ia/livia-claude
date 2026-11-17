@@ -3451,3 +3451,6 @@ img.avatar {
 /* Planos: destaque em azul, selo vermelho (detalhe) */
 :root[data-design="v2"] .lp-page .lp-plan.featured { border: 2px solid var(--primary-2); box-shadow: 0 22px 45px rgba(10, 49, 97, 0.12); }
 :root[data-design="v2"] .lp-plan-badge { background: var(--gold); color: #fff; }
+
+/* Conquistas (Meu progresso, design v2): os 6 selos numa linha em tela larga. */
+:root[data-design="v2"] .badges { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }

@@ -9,6 +9,7 @@ import { useCourseProgress } from "@/lib/courseProgress";
 import { countMyActiveDaysThisWeek, getMySettings, type StudentSettings } from "@/lib/student-admin";
 import { useDesignV2 } from "@/lib/useDesignV2";
 import { StudentBadges } from "@/components/StudentBadges";
+import styles from "./progresso.module.css";
 
 const LABEL: Record<Kind, string> = { mc: "Múltipla escolha", fill: "Completar", translate: "Tradução", order: "Ordenar frases" };
 
@@ -31,6 +32,66 @@ export default function ProgressoPage() {
   }, [ready]);
 
   if (!ready) return <div className="view"><p className="muted">Carregando…</p></div>;
+
+  // Design v2: mesma informação, distribuída sem cartões esticados nem coluna vazia (ajuste de 17/11/2026).
+  if (v2) {
+    const goal = settings?.weekly_goal ?? 3;
+    const phase = LEARNING_CYCLE.find((item) => item.id === courseProgress.currentPhase)?.label;
+    const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+    return <div className={`view ${styles.page}`}>
+      <header className={styles.head}>
+        <div className="eyebrow">Sua evolução</div>
+        <h1>Meu progresso</h1>
+        <p className="muted">Veja sua constância, o que já concluiu e onde vale concentrar a próxima prática.</p>
+      </header>
+
+      <div className={`card ${styles.stats}`}>
+        <div><b>{totals.done}</b><span>exercícios</span></div>
+        <div><b>{totals.done ? `${totals.pct}%` : "—"}</b><span>de acerto</span></div>
+        <div><b>{profile.stats.lessonsCompleted}</b><span>{profile.stats.lessonsCompleted === 1 ? "lição" : "lições"}</span></div>
+        <div><b>{profile.stats.bestStreak}</b><span>melhor sequência</span></div>
+      </div>
+
+      <div className={styles.row}>
+        <section className={`card ${styles.card}`}>
+          <div className="eyebrow">Jornada do nível {courseLevel}</div>
+          <h3>{courseProgress.pct}% concluído</h3>
+          <div className={styles.bar}><i style={{ width: `${courseProgress.pct}%` }} /></div>
+          <p>{courseProgress.completedCount} de {courseProgress.total} etapas · Unidade {courseProgress.currentUnit}{phase ? ` · ${phase}` : ""}</p>
+          <div className={styles.actions}><Link className="btn primary" href="/aluno/curso">Continuar jornada →</Link></div>
+        </section>
+        <section className={`card ${styles.card}`}>
+          <div className="eyebrow">Ritmo de estudo</div>
+          <h3>{activeDays} de {plural(goal, "dia", "dias")} nesta semana</h3>
+          <div className={styles.bar}><i style={{ width: `${Math.min(100, Math.round((activeDays / goal) * 100))}%` }} /></div>
+          <p>Sequência atual: {plural(profile.stats.streak, "dia", "dias")}. Seu progresso acompanha sua conta em qualquer aparelho.</p>
+          {settings?.focus && <p className={styles.focus}><b>Foco combinado:</b> {settings.focus}</p>}
+          <div className={styles.actions}>
+            <Link className="btn primary" href="/aluno/revisao">Fazer revisão</Link>
+            <Link className="btn ghost" href="/aluno/curso">Ver meu curso</Link>
+          </div>
+        </section>
+      </div>
+
+      <section className={`card ${styles.card} ${styles.full}`}>
+        <div className="eyebrow">Desempenho por atividade</div>
+        <div className={styles.activities}>
+          {categoriesFor(level).map((category) => {
+            const stat = profile.stats.practice[category.kind];
+            const pct = stat.done ? Math.round((stat.correct / stat.done) * 100) : 0;
+            return <div key={category.kind} className={`${styles.activity}${stat.done ? "" : ` ${styles.empty}`}`}>
+              <b>{LABEL[category.kind]}</b>
+              <strong>{stat.done ? `${pct}%` : "—"}</strong>
+              <small>{stat.done ? `de acerto · ${plural(stat.done, "feita", "feitas")}` : "Ainda sem dados"}</small>
+              <div className={styles.bar}><i style={{ width: `${pct}%` }} /></div>
+            </div>;
+          })}
+        </div>
+      </section>
+
+      <StudentBadges totals={totals} stats={profile.stats} />
+    </div>;
+  }
 
   return <div className="view" style={{ maxWidth: 900 }}>
     <div className="eyebrow">Sua evolução</div>

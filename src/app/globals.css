@@ -3268,6 +3268,7 @@ img.avatar {
 /* Estrutura */
 :root[data-design="v2"] .app-shell { grid-template-columns: 240px minmax(0, 1fr); }
 :root[data-design="v2"] .app-shell > main { min-width: 0; }
+:root[data-design="v2"] .app-shell.focus-mode { display: block; }
 :root[data-design="v2"] .sidebar { padding: 22px 14px 16px; overflow-y: auto; }
 :root[data-design="v2"] .brand { padding: 2px 8px 22px; gap: 10px; }
 :root[data-design="v2"] .brand b { font-family: var(--font-title); font-weight: 500; font-size: 17px; }

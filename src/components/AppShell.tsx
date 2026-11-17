@@ -217,6 +217,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
   }, [hasTeacherAccess, isTeacherArea, ready, router]);
 
+  // Design v2: "modo aula" nas aulas A1 (aluno e revisão da professora) — sem menu lateral nem topo.
+  const focusMode = v2 && (/^\/aluno\/aulas\/[^/]+$/.test(pathname) || /^\/professor\/aulas\/a1-[^/]+$/.test(pathname));
+  if (focusMode) {
+    return <div className="app-shell focus-mode"><OperationalMonitor /><main>{children}</main></div>;
+  }
+
   return (
     <div className={`app-shell${v2 && area === "student" ? " has-tabbar" : ""}`}>
       <OperationalMonitor />

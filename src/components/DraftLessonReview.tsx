@@ -5,10 +5,12 @@ import { LessonReviewDecision } from "@/components/LessonReviewDecision";
 import { A1GuidedPractice } from "@/components/A1GuidedPractice";
 import type { LessonReview } from "@/lib/lesson-review-types";
 import { PendingReviewsLink } from "@/components/PendingReviewsLink";
+import { DesignSwitch } from "@/components/DesignSwitch";
+import { LessonPlayerV2 } from "@/components/LessonPlayerV2";
 
 type Draft = (typeof A1_DRAFTS)[number];
 export function DraftLessonReview({ lesson, review = null, revision = "", student = false }: { lesson: Draft; review?: LessonReview | null; revision?: string; student?: boolean }) {
-  return <div className="view" style={{ maxWidth: 800 }}>
+  const v1 = <div className="view" style={{ maxWidth: 800 }}>
     <div className="eyebrow">A1 · Unidade {lesson.unitNumber} · Aula {lesson.number}{!student && " · Revisão da Livia"}</div>
     <h2>{lesson.title}</h2>
     {!student && <LessonReviewDecision key={`${revision}:${review?.updated_at ?? "pending"}`} id={lesson.id} revision={revision} initialReview={review} />}
@@ -47,4 +49,6 @@ export function DraftLessonReview({ lesson, review = null, revision = "", studen
       ? <Link className="btn ghost" style={{ marginTop: 20 }} href="/aluno/aulas">← Todas as aulas</Link>
       : <PendingReviewsLink className="btn ghost" style={{ marginTop: 20 }}>← Aulas pendentes</PendingReviewsLink>}
   </div>;
+  // Design v2: "modo aula" com 6 etapas (equipe durante a validação; todos depois da liberação).
+  return <DesignSwitch v1={v1} v2={<LessonPlayerV2 lesson={lesson} mode={student ? "student" : "teacher"} review={review} revision={revision} />} />;
 }

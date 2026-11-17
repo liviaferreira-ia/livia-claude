@@ -203,7 +203,7 @@ export default function MinhaContaPage() {
         {/* Dados */}
         <div className="card" style={{ marginTop: 18, padding: 22 }}>
           <div className="eyebrow">Seus dados</div>
-          <div className={v2 ? v2s.fields : undefined} style={{ marginTop: 12 }}>
+          <div className={v2 ? v2s.stack : undefined} style={{ marginTop: 12 }}>
             <div className="field">
               <label htmlFor="nome">Nome</label>
               <input id="nome" value={nameValue} onChange={(e) => setName(e.target.value)} />

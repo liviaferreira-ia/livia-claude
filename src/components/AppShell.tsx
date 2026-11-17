@@ -174,6 +174,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         : CRUMBS[pathname] ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
   const [specialCount, setSpecialCount] = useState(0);
+  const [pendingReviews, setPendingReviews] = useState<number | null>(null);
 
   useEffect(() => {
     if (!ready || !user || role !== "student") return;
@@ -202,6 +203,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     else root.removeAttribute("data-design");
     root.setAttribute("data-theme", getInitialTheme());
   }, [ready, hasTeacherAccess]);
+
+  // Design v2: contador real de aulas A1 esperando decisão no menu da professora.
+  useEffect(() => {
+    if (!v2 || !ready || !hasTeacherAccess || !isTeacherArea) return;
+    fetch("/api/professor/aulas/pendentes", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((body) => {
+      if (typeof body?.pending === "number") setPendingReviews(body.pending);
+    }).catch(() => {});
+  }, [v2, pathname, ready, hasTeacherAccess, isTeacherArea]);
   const area = isTeacherArea && hasTeacherAccess ? "teacher" : "student";
   const avatarNode = profile.avatarUrl
     // eslint-disable-next-line @next/next/no-img-element
@@ -241,7 +250,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
 
         {v2 ? (
-          <SidebarNavV2 area={area} pathname={pathname} specialCount={specialCount} onNavigate={() => setMenuOpen(false)} />
+          <SidebarNavV2 area={area} pathname={pathname} specialCount={specialCount} pendingReviews={pendingReviews} onNavigate={() => setMenuOpen(false)} />
         ) : <>
         {hasTeacherAccess && !isTeacherArea && (
           <div>

@@ -77,10 +77,12 @@ type NavProps = {
   area: "student" | "teacher";
   pathname: string;
   specialCount: number;
+  /** Aulas A1 esperando decisão (só professora); null enquanto carrega. */
+  pendingReviews?: number | null;
   onNavigate: () => void;
 };
 
-export function SidebarNavV2({ area, pathname, specialCount, onNavigate }: NavProps) {
+export function SidebarNavV2({ area, pathname, specialCount, pendingReviews = null, onNavigate }: NavProps) {
   // Grupo aberto: escolha manual da pessoa; sem escolha, abre o grupo da tela atual.
   const [manual, setManual] = useState<Record<string, boolean>>({});
   const badge = (kind?: "special") => kind === "special" && specialCount > 0 ? <span className="badge">{specialCount}</span> : null;
@@ -92,6 +94,7 @@ export function SidebarNavV2({ area, pathname, specialCount, onNavigate }: NavPr
         {group.items.map((item) => <Link key={item.href} href={item.href!} onClick={onNavigate}
           className={`nav${isActive(pathname, item.href!) ? " on" : ""}`} aria-current={isActive(pathname, item.href!) ? "page" : undefined}>
           {ICONS[item.icon]}{item.label}
+          {item.href === "/professor/aulas" && pendingReviews ? <span className="badge" aria-label={`${pendingReviews} pendentes`}>{pendingReviews}</span> : null}
         </Link>)}
       </div>)}
     </nav>;

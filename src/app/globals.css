@@ -3276,7 +3276,7 @@ img.avatar {
 :root[data-design="v2"] .brand > :first-child { width: 44px; height: auto; flex: none; }
 :root[data-design="v2"] .brand span { white-space: nowrap; letter-spacing: 0.12em; }
 :root[data-design="v2"] .navlabel { font-size: 11px; padding: 16px 12px 6px; }
-:root[data-design="v2"] .nav { gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 14.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; }
+:root[data-design="v2"] .nav { gap: 11px; padding: 10px 11px; border-radius: 10px; font-size: 14.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; white-space: nowrap; }
 :root[data-design="v2"] .nav svg { width: 20px; height: 20px; }
 :root[data-design="v2"] .nav:hover { background: var(--panel-2); color: var(--ink); }
 :root[data-design="v2"] .nav.on { background: var(--navy-soft); color: var(--ink); }

@@ -3,6 +3,8 @@ import { LESSONS } from "@/data/lesson";
 import { A1_DRAFTS } from "@/data/a1Drafts";
 import { lessonRevision, loadLessonReviews } from "@/lib/lesson-reviews-server";
 import { REVIEW_LABELS, reviewStatus } from "@/lib/lesson-review-types";
+import { DesignSwitch } from "@/components/DesignSwitch";
+import { LessonQueueV2, type QueueRow } from "@/components/LessonQueueV2";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,7 @@ export default async function TeacherLessonsPage({ searchParams }: { searchParam
   const pending = A1_DRAFTS.length - approved;
   const visibleLessons = A1_DRAFTS.filter((lesson) => (statuses.get(lesson.id) === "approved") === showApproved);
   const units = [...new Set([...(showApproved ? [1] : []), ...visibleLessons.map((lesson) => lesson.unitNumber)])].sort((a, b) => a - b);
-  return <div className="view" style={{ maxWidth: 760 }}>
+  const v1 = <div className="view" style={{ maxWidth: 760 }}>
     <div className="eyebrow">Validação pedagógica</div>
     <h2>{showApproved ? "Aulas aprovadas" : "Aulas para revisar"}</h2>
     <p className="muted">{showApproved
@@ -54,4 +56,16 @@ export default async function TeacherLessonsPage({ searchParams }: { searchParam
       </section>)}
     </details>
   </div>;
+
+  // Design v2: mesma fila, com "Próxima da fila", progresso, filtros e unidades recolhíveis.
+  const rows: QueueRow[] = [
+    { id: "apresentando-se", unitNumber: 1, unit: A1_DRAFTS.find((item) => item.unitNumber === 1)?.unit ?? "", number: 1, title: "Primeiro encontro",
+      objective: "Aula piloto, publicada antes da fila de revisão.", status: "approved", note: null },
+    ...[...A1_DRAFTS].sort((a, b) => a.unitNumber - b.unitNumber || a.number - b.number).map((lesson) => ({
+      id: lesson.id, unitNumber: lesson.unitNumber, unit: lesson.unit, number: lesson.number, title: lesson.title,
+      objective: lesson.objective, status: statuses.get(lesson.id) ?? "pending", note: reviewsById.get(lesson.id)?.note ?? null,
+    })),
+  ];
+  const legacy = Object.values(LESSONS).filter((lesson) => lesson.slug !== "apresentando-se").map((lesson) => ({ slug: lesson.slug, title: lesson.title, level: lesson.level }));
+  return <DesignSwitch v1={v1} v2={<LessonQueueV2 tab={showApproved ? "approved" : "pending"} rows={rows} legacy={legacy} />} />;
 }

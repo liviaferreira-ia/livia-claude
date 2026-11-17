@@ -31,7 +31,7 @@ export default function LicaoOverview({ params }: { params: Promise<{ slug: stri
   const pct = Math.round((completed / steps.length) * 100);
 
   return (
-    <div className="view" style={{ maxWidth: 920 }}>
+    <div className="view v2-wide" style={{ maxWidth: 920 }}>
       <div className="eyebrow">{lesson.unit}</div>
       <h2 style={{ fontSize: 26, margin: "6px 0 4px" }}>{lesson.title}</h2>
       <p className="muted" style={{ margin: 0 }}>

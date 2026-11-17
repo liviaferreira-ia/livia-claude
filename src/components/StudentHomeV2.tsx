@@ -104,15 +104,7 @@ export function StudentHomeV2(p: Props) {
           {p.error && <p role="alert" className={styles.err}>{p.error}</p>}
         </section>}
 
-        <section className={styles.tilesSec}>
-          <div className={styles.secHead}><h3>Praticar agora</h3></div>
-          <div className={styles.tiles}>
-            {TILES.map((t) => <Link key={t.href} href={t.href} className={`card ${styles.tile}`}>
-              <span className={`${styles.ic} ${t.accent ? styles.icAccent : ""}`}>{t.icon}</span>
-              <span><b>{t.label}</b><small>{t.hint}</small></span>
-            </Link>)}
-          </div>
-        </section>
+
       </div>
 
       <aside className={styles.side}>
@@ -148,5 +140,16 @@ export function StudentHomeV2(p: Props) {
         </section>
       </aside>
     </div>
+
+    {/* Ajuste do Fabio (17/11/2026): atalhos na largura toda, sem coluna vazia ao lado. */}
+    <section className={styles.tilesSec}>
+      <div className={styles.secHead}><h3>Praticar agora</h3></div>
+      <div className={styles.tiles}>
+        {TILES.map((t) => <Link key={t.href} href={t.href} className={`card ${styles.tile}`}>
+          <span className={`${styles.ic} ${t.accent ? styles.icAccent : ""}`}>{t.icon}</span>
+          <span><b>{t.label}</b><small>{t.hint}</small></span>
+        </Link>)}
+      </div>
+    </section>
   </div>;
 }

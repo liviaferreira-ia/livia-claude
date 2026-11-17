@@ -50,7 +50,7 @@ export default function MinhasPalavrasPage() {
 
   if (!loaded) {
     return (
-      <div className="view">
+      <div className="view v2-wide">
         <p className="muted">Carregando…</p>
       </div>
     );
@@ -58,7 +58,7 @@ export default function MinhasPalavrasPage() {
 
   if (words.length === 0) {
     return (
-      <div className="view" style={{ maxWidth: 620 }}>
+      <div className="view v2-wide" style={{ maxWidth: 620 }}>
         <div className="eyebrow" style={{ marginBottom: 8 }}>
           Minhas palavras
         </div>
@@ -83,7 +83,7 @@ export default function MinhasPalavrasPage() {
   if (mode === "quiz") {
     if (finished) {
       return (
-        <div className="view" style={{ maxWidth: 620 }}>
+        <div className="view v2-wide" style={{ maxWidth: 620 }}>
           <div className="card done" style={{ padding: 28 }}>
             <div className="big">
               {known}/{words.length}
@@ -106,7 +106,7 @@ export default function MinhasPalavrasPage() {
 
     const card = words[index];
     return (
-      <div className="view" style={{ maxWidth: 620 }}>
+      <div className="view v2-wide" style={{ maxWidth: 620 }}>
         <div className="lesson-head">
           <div className="eyebrow">Minhas palavras</div>
           <div className="dots">
@@ -154,7 +154,7 @@ export default function MinhasPalavrasPage() {
 
   // ----- Lista -----
   return (
-    <div className="view" style={{ maxWidth: 720 }}>
+    <div className="view v2-wide" style={{ maxWidth: 720 }}>
       <div className="eyebrow" style={{ marginBottom: 8 }}>
         Minhas palavras
       </div>

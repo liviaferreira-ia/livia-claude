@@ -64,7 +64,7 @@ export default function TutorPage() {
 
   if (ended) {
     return (
-      <div className="view" style={{ maxWidth: 700 }}>
+      <div className="view v2-wide" style={{ maxWidth: 700 }}>
         <div className="eyebrow">Prática concluída</div>
         <h2 style={{ fontSize: 22, margin: "6px 0 4px" }}>
           Você escreveu {written} {written === 1 ? "frase" : "frases"} em inglês 🎉
@@ -109,7 +109,7 @@ export default function TutorPage() {
   }
 
   return (
-    <div className="view" style={{ maxWidth: 700 }}>
+    <div className="view v2-wide" style={{ maxWidth: 700 }}>
       <div className="objbar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
           <circle cx="12" cy="12" r="10" />

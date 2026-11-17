@@ -107,7 +107,7 @@ export default function RoleplayPage() {
   // Tela inicial do cenário
   if (!ready || !courseQuery.ready) {
     return (
-      <div className="view">
+      <div className="view v2-wide">
         <p className="muted">Carregando…</p>
       </div>
     );
@@ -116,7 +116,7 @@ export default function RoleplayPage() {
   // Escolha do cenário
   if (!started || !roleplay) {
     return (
-      <div className="view" style={{ maxWidth: 700 }}>
+      <div className="view v2-wide" style={{ maxWidth: 700 }}>
         <div className="eyebrow" style={{ color: "var(--gold)" }}>
           Roleplay por voz · {levelBadge(roleplayLevel)}
         </div>
@@ -152,7 +152,7 @@ export default function RoleplayPage() {
   // Tela final
   if (phase === "done") {
     return (
-      <div className="view" style={{ maxWidth: 640 }}>
+      <div className="view v2-wide" style={{ maxWidth: 640 }}>
         <div className="card done" style={{ padding: 28 }}>
           <div style={{ fontSize: 46 }}>🎉</div>
           <h2 style={{ fontSize: 22, margin: "6px 0 6px" }}>Você completou: {roleplay.title}!</h2>
@@ -178,7 +178,7 @@ export default function RoleplayPage() {
   const lastAi = [...messages].reverse().find((m) => m.who === "ai");
 
   return (
-    <div className="view" style={{ maxWidth: 640 }}>
+    <div className="view v2-wide" style={{ maxWidth: 640 }}>
       <div className="objbar">
         <span>{roleplay.emoji}</span>
         <div>

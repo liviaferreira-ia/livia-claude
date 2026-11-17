@@ -3454,3 +3454,38 @@ img.avatar {
 
 /* Conquistas (Meu progresso, design v2): os 6 selos numa linha em tela larga. */
 :root[data-design="v2"] .badges { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+
+/* Design v2 — ajustes do Fabio vendo a plataforma no ar (17/11/2026):
+   menos espaço vazio, texto maior, listas em grade, "Especial para você" em destaque. */
+:root[data-design="v2"] .view { font-size: 16px; }
+:root[data-design="v2"] .v2-wide { max-width: 1120px !important; }
+:root[data-design="v2"] .v2-wide > p.muted,
+:root[data-design="v2"] .v2-wide > .muted { font-size: 16.5px; }
+:root[data-design="v2"] .m-item { padding: 15px 16px; }
+:root[data-design="v2"] .m-body b { font-size: 16px; }
+:root[data-design="v2"] .m-body span { font-size: 14px; }
+:root[data-design="v2"] .m-state { font-size: 13px; }
+:root[data-design="v2"] :is(.tutor-msg, .bubble) { font-size: 16px; }
+:root[data-design="v2"] .tutor-msg time { font-size: 12px; }
+:root[data-design="v2"] :is(.tutor-input, .composer input) { font-size: 16px; }
+:root[data-design="v2"] .sec-title { font-size: 17px; }
+:root[data-design="v2"] .sec-eyebrow { font-size: 11.5px; }
+@media (min-width: 900px) {
+  /* Listas de itens viram grade de duas colunas nas telas largas. */
+  :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 12px; }
+  /* Trilha do curso: unidades em duas colunas. */
+  :root[data-design="v2"] .v2-wide .trilha { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+}
+
+/* Menu do aluno: "Especial para você" no topo, em destaque */
+.v2-special { display: flex; align-items: center; gap: 11px; margin: 0 0 10px; padding: 11px 12px; border-radius: 12px; text-decoration: none; color: var(--ink); background: var(--gold-soft); border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent); transition: transform 0.15s, box-shadow 0.15s; }
+.v2-special:hover { transform: translateY(-1px); box-shadow: 0 6px 16px color-mix(in srgb, var(--gold) 18%, transparent); }
+.v2-special.on { border-color: var(--gold); }
+.v2-special-ic { width: 32px; height: 32px; flex: none; border-radius: 9px; display: grid; place-items: center; background: var(--gold); color: #fff; }
+.v2-special-ic svg { width: 17px; height: 17px; }
+.v2-special-txt { min-width: 0; flex: 1; }
+.v2-special-txt b { display: block; font-size: 14px; line-height: 1.2; }
+.v2-special-txt small { display: block; font-size: 12px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v2-special-txt small.novo { color: var(--gold); font-weight: 700; }
+.v2-special:focus-visible { outline: 2px solid var(--primary-2); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .v2-special { transition: none; } }

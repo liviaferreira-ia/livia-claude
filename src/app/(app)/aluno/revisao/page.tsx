@@ -46,7 +46,7 @@ export default function RevisaoPage() {
 
   if (!ready) {
     return (
-      <div className="view">
+      <div className="view v2-wide">
         <p className="muted">Carregando…</p>
       </div>
     );
@@ -54,7 +54,7 @@ export default function RevisaoPage() {
 
   if (!started) {
     return (
-      <div className="view" style={{ maxWidth: 620 }}>
+      <div className="view v2-wide" style={{ maxWidth: 620 }}>
         <div className="eyebrow" style={{ marginBottom: 8 }}>Revisão espaçada · {levelBadge(cardLevel)}</div>
         <h2 style={{ fontSize: 22, marginBottom: 4 }}>{CARDS.length} itens para revisar hoje</h2>
         <p className="muted" style={{ margin: "0 0 20px" }}>
@@ -91,7 +91,7 @@ export default function RevisaoPage() {
 
   if (done) {
     return (
-      <div className="view" style={{ maxWidth: 620 }}>
+      <div className="view v2-wide" style={{ maxWidth: 620 }}>
         <div className="card done" style={{ padding: 28 }}>
           <div className="big">{known}/{CARDS.length}</div>
           <p className="muted" style={{ margin: "6px 0 20px" }}>
@@ -108,7 +108,7 @@ export default function RevisaoPage() {
 
   const card = CARDS[index];
   return (
-    <div className="view" style={{ maxWidth: 620 }}>
+    <div className="view v2-wide" style={{ maxWidth: 620 }}>
       <div className="lesson-head">
         <div className="eyebrow">Revisão</div>
         <div className="dots">

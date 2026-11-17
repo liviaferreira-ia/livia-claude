@@ -114,7 +114,7 @@ export default function PronunciaPage() {
 
   if (!ready || !courseQuery.ready) {
     return (
-      <div className="view">
+      <div className="view v2-wide">
         <p className="muted">Carregando…</p>
       </div>
     );
@@ -124,7 +124,7 @@ export default function PronunciaPage() {
   if (index >= SENTENCES.length) {
     const avg = answered ? Math.round(scoreSum / answered) : 0;
     return (
-      <div className="view" style={{ maxWidth: 640 }}>
+      <div className="view v2-wide" style={{ maxWidth: 640 }}>
         <div className="card done" style={{ padding: 28 }}>
           <div className="big">{avg}%</div>
           <p className="muted" style={{ margin: "6px 0 20px" }}>
@@ -144,7 +144,7 @@ export default function PronunciaPage() {
   }
 
   return (
-    <div className="view" style={{ maxWidth: 640 }}>
+    <div className="view v2-wide" style={{ maxWidth: 640 }}>
       <div className="lesson-head">
         <div>
           <div className="eyebrow" style={{ color: "var(--gold)" }}>

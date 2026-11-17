@@ -48,10 +48,7 @@ const STUDENT: Item[] = [
     { href: "/aluno/pronuncia", label: "Pronúncia" },
   ] },
   { label: "Progresso", icon: "chart", href: "/aluno/progresso" },
-  { label: "Professora", icon: "chat", badge: "special", items: [
-    { href: "/aluno/professor", label: "Recados" },
-    { href: "/aluno/especial", label: "Especial para você", badge: "special" },
-  ] },
+  { label: "Professora", icon: "chat", href: "/aluno/professor" },
 ];
 
 const TEACHER: { section?: string; items: Item[] }[] = [
@@ -101,6 +98,13 @@ export function SidebarNavV2({ area, pathname, specialCount, pendingReviews = nu
   }
 
   return <nav className="v2-nav" aria-label="Menu do aluno">
+    {/* Pedido do Fabio (17/11/2026): "Especial para você" no topo do menu, em destaque. */}
+    <Link href="/aluno/especial" onClick={onNavigate} className={`v2-special${isActive(pathname, "/aluno/especial") ? " on" : ""}`}
+      aria-current={isActive(pathname, "/aluno/especial") ? "page" : undefined}>
+      <span className="v2-special-ic">{ICONS.star}</span>
+      <span className="v2-special-txt"><b>Especial para você</b>
+        <small className={specialCount > 0 ? "novo" : undefined}>{specialCount > 0 ? `${specialCount} ${specialCount === 1 ? "novidade" : "novidades"}` : "Preparado pela professora"}</small></span>
+    </Link>
     {STUDENT.map((item) => {
       if (item.href) {
         const on = isActive(pathname, item.href);

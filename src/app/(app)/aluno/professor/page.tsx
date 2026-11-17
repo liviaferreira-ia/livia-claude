@@ -69,11 +69,11 @@ export default function StudentProfessorConversation() {
   }
 
   if (!ready || loading) {
-    return <div className="view"><p className="muted">Carregando conversa…</p></div>;
+    return <div className="view v2-wide"><p className="muted">Carregando conversa…</p></div>;
   }
 
   return (
-    <div className="view" style={{ maxWidth: 780 }}>
+    <div className="view v2-wide" style={{ maxWidth: 780 }}>
       <div className="eyebrow" style={{ marginBottom: 8 }}>Acompanhamento humano</div>
       <h2 style={{ fontSize: 24, marginBottom: 5 }}>Fale com seu professor</h2>
       <p className="muted" style={{ margin: "0 0 20px" }}>

@@ -6,10 +6,14 @@ import { useEffect, useRef, useState } from "react";
 import { getMyContactInfo, updateContactInfo } from "@/lib/activity";
 import { initials, levelDisplay, useProfile } from "@/lib/profile";
 import { AvatarCropper } from "@/components/AvatarCropper";
+import { useDesignV2 } from "@/lib/useDesignV2";
+import v2s from "./conta-v2.module.css";
 
 export default function MinhaContaPage() {
   const { profile, email, ready, updateIdentity, uploadAvatar, signOut } = useProfile();
   const router = useRouter();
+  // Design v2: página larga, com os cartões em duas colunas (ajuste do Fabio em 17/11/2026).
+  const v2 = useDesignV2();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState<string | null>(null);
@@ -119,8 +123,8 @@ export default function MinhaContaPage() {
           onConfirm={handleCropped}
         />
       )}
-      <div style={{ maxWidth: 680 }}>
-        <h2 style={{ fontSize: 26, marginBottom: 4 }}>Minha conta</h2>
+      <div className={v2 ? v2s.page : undefined} style={v2 ? undefined : { maxWidth: 680 }}>
+        {v2 ? <h1>Minha conta</h1> : <h2 style={{ fontSize: 26, marginBottom: 4 }}>Minha conta</h2>}
         <p className="muted" style={{ marginBottom: 22 }}>
           Seus dados ficam salvos na sua conta e acompanham você em qualquer aparelho.
         </p>
@@ -178,6 +182,8 @@ export default function MinhaContaPage() {
           </p>
         )}
 
+        <div className={v2 ? v2s.grid : undefined}>
+        <div className={v2 ? v2s.col : undefined}>
         {/* Dados */}
         <div className="card" style={{ marginTop: 18, padding: 22 }}>
           <div className="eyebrow">Seus dados</div>
@@ -207,6 +213,7 @@ export default function MinhaContaPage() {
             </p>
           ) : (
             <>
+              <div className={v2 ? v2s.fields : undefined}>
               <div className="field">
                 <label htmlFor="whatsapp">WhatsApp</label>
                 <input
@@ -226,6 +233,7 @@ export default function MinhaContaPage() {
                   onChange={(e) => setBirthdate(e.target.value)}
                 />
               </div>
+              </div>
               {contactMsg && (
                 <p className={`auth-msg ${contactMsg.includes("✅") ? "ok" : "err"}`} style={{ maxWidth: "none" }}>
                   {contactMsg}
@@ -243,6 +251,8 @@ export default function MinhaContaPage() {
           )}
         </div>
 
+        </div>
+        <div className={v2 ? v2s.col : undefined}>
         {/* Objetivo e nível */}
         <div className="card" style={{ marginTop: 18, padding: 22 }}>
           <div className="sec-h" style={{ marginBottom: 2 }}>
@@ -283,6 +293,8 @@ export default function MinhaContaPage() {
           <button className="btn primary" style={{ width: "100%" }} onClick={handleSignOut}>
             ↩ Sair da conta
           </button>
+        </div>
+        </div>
         </div>
       </div>
     </div>

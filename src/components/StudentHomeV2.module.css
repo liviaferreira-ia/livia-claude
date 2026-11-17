@@ -1,5 +1,5 @@
 /* Tela inicial do aluno — design v2. Usa os tokens v2 do globals.css. */
-.home { max-width: 1120px; }
+.home { max-width: 1440px; }
 .head { margin-bottom: 26px; }
 .head h1 { font-size: 34px; line-height: 1.15; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -83,6 +83,9 @@
 .link svg { width: 16px; height: 16px; transition: transform 0.15s; }
 .link:hover svg { transform: translateX(3px); }
 
+@media (min-width: 1500px) {
+  .grid { grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; }
+}
 @media (max-width: 1080px) {
   .grid { grid-template-columns: minmax(0, 1fr) 280px; gap: 22px; }
   .tiles { grid-template-columns: 1fr 1fr; }

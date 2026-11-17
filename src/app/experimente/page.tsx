@@ -83,11 +83,9 @@ export default function ExperimentePage() {
                 <div className="auth-divider"><span>ou</span></div>
                 <GoogleSignIn
                   label="Começar com o Google"
-                  beforeStart={() => {
-                    if (accepted) return true;
-                    setError("Confirme as condições do período gratuito para continuar.");
-                    return false;
-                  }}
+                  mode="signup"
+                  enabled={accepted}
+                  onBlocked={() => setError("Confirme as condições do período gratuito para continuar.")}
                 />
               </>
             )}

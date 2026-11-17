@@ -15,6 +15,8 @@ import {
   speak,
   type SpeechRecognitionLike,
 } from "@/lib/speech";
+import { useDesignV2 } from "@/lib/useDesignV2";
+import v2s from "./pronuncia-v2.module.css";
 
 type Phase = "idle" | "listening" | "result";
 
@@ -29,6 +31,7 @@ export default function PronunciaPage() {
   const [scoreSum, setScoreSum] = useState(0);
   const [answered, setAnswered] = useState(0);
   const recRef = useRef<SpeechRecognitionLike | null>(null);
+  const v2 = useDesignV2();
 
   const studentLevel = courseQuery.context?.level ?? parseCefrLevel(profile.level) ?? "A2";
   const pronunciationLevel = resolvePronunciationLevel(studentLevel);
@@ -139,6 +142,95 @@ export default function PronunciaPage() {
             </Link>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // Design v2: frase de um lado (ouça e leia) e microfone/resultado do outro (fale)
+  // (ajuste do Fabio em 17/11/2026: melhorar a disposição das informações).
+  if (v2) {
+    const micIcon = (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8" />
+      </svg>
+    );
+    return (
+      <div className={`view ${v2s.page}`}>
+        <header className={v2s.head}>
+          <div className={v2s.headText}>
+            <div className="eyebrow">Pronúncia · nível {pronunciationLevel}</div>
+            <h1>Fale em inglês</h1>
+            <p>Ouça a frase, repita em voz alta e veja quais palavras ficaram claras.</p>
+          </div>
+          <div className={v2s.headSide}>
+            <div className={v2s.count}>
+              <span><b>Frase {index + 1}</b> de {SENTENCES.length}</span>
+              <div className={v2s.bar}><i style={{ width: `${Math.round((index / SENTENCES.length) * 100)}%` }} /></div>
+            </div>
+            <Link href="/aluno" className="btn ghost">Sair</Link>
+          </div>
+        </header>
+
+        <section className={`card ${v2s.stage}`}>
+          <div className={v2s.col}>
+            <span className={v2s.label}><i>1</i> Ouça e leia</span>
+            {phase === "result" ? (
+              <div className={v2s.words}>
+                {targetWords.map((w, i) => (
+                  <span key={i} className={`pw ${heardWords.includes(w) ? "ok" : "no"}`}>
+                    {target.split(" ")[i] ?? w}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className={v2s.sentence} lang="en">{target}</p>
+            )}
+            <SpeakButton text={target} label="Ouvir de novo" className={v2s.listen} />
+          </div>
+
+          <div className={`${v2s.col} ${v2s.speakCol}`}>
+            <span className={v2s.label}><i>2</i> Fale em voz alta</span>
+            {!supported ? (
+              <div className={`fb no ${v2s.error}`}>
+                <strong>Microfone não disponível neste navegador. </strong>
+                O reconhecimento de fala funciona no <b>Chrome</b> ou <b>Edge</b>. Você ainda pode ouvir a frase e repetir.
+              </div>
+            ) : phase === "result" ? (
+              <div className={`${v2s.result} ${pct >= 70 ? v2s.ok : v2s.no}`}>
+                <div className={v2s.score}>
+                  <b>{pct}%</b>
+                  <span>{pct >= 85 ? "Muito claro!" : pct >= 60 ? "Quase lá!" : "Vamos praticar mais."}</span>
+                </div>
+                <p className={v2s.heard}>Das palavras da frase, {matched} de {targetWords.length} foram reconhecidas. Eu ouvi: <i>“{transcript}”</i></p>
+                <div className={v2s.actions}>
+                  <button className="btn ghost" onClick={listen}>↺ Tentar de novo</button>
+                  <button className="btn primary" onClick={next}>
+                    {index === SENTENCES.length - 1 ? "Ver resultado" : "Próxima →"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <button
+                  className={`mic-big${phase === "listening" ? " rec" : ""}`}
+                  onClick={listen}
+                  disabled={phase === "listening"}
+                  aria-label="Falar"
+                >
+                  {micIcon}
+                </button>
+                <p className={v2s.hint}>{phase === "listening" ? "Ouvindo… fale agora" : "Toque no microfone e leia a frase"}</p>
+                {error && <div className={`fb no ${v2s.error}`}>{error}</div>}
+              </>
+            )}
+          </div>
+        </section>
+
+        <p className={v2s.tip}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
+          Dica: fale perto do microfone, num lugar silencioso. O reconhecimento de voz funciona melhor no Chrome ou no Edge.
+        </p>
       </div>
     );
   }

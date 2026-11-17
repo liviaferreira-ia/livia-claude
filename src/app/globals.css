@@ -3472,9 +3472,22 @@ img.avatar {
 :root[data-design="v2"] .sec-eyebrow { font-size: 11.5px; }
 @media (min-width: 900px) {
   /* Listas de itens viram grade de duas colunas nas telas largas. */
-  :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 12px; }
+  :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   /* Trilha do curso: unidades em duas colunas. */
   :root[data-design="v2"] .v2-wide .trilha { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+}
+
+/* Listas de itens (Roleplay, Revisão...): cada item vira um cartão próprio, com espaço entre eles
+   e texto maior (ajuste do Fabio em 17/11/2026). */
+:root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) { display: grid; gap: 14px; padding: 0 !important; background: none; border: 0; box-shadow: none; }
+:root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item { align-items: center; gap: 16px; padding: 20px 22px; border-radius: 16px; background: var(--panel) !important; border: 1px solid var(--line) !important; box-shadow: var(--shadow-sm); transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
+:root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item:hover { border-color: var(--primary-2) !important; box-shadow: 0 6px 18px rgba(10, 49, 97, 0.08); transform: translateY(-1px); }
+:root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item .m-ic { width: 46px; height: 46px; border-radius: 13px; font-size: 21px !important; }
+:root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item .m-body b { font-size: 18px; margin-bottom: 4px; }
+:root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item .m-body span { font-size: 15.5px; line-height: 1.5; }
+:root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item .m-state { font-size: 14px; padding: 5px 12px; }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item:hover { transform: none; }
 }
 
 /* Menu do aluno: "Especial para você" no topo, em destaque */

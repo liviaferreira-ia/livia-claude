@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { listMyMessages, MAX_MESSAGE_LENGTH, sendMessage, type Message } from "@/lib/messages";
 import { useProfile } from "@/lib/profile";
+import { useDesignV2 } from "@/lib/useDesignV2";
+import v2s from "./professor-v2.module.css";
 
 function messageTime(value: string) {
   return new Date(value).toLocaleString("pt-BR", {
@@ -23,6 +25,7 @@ export default function StudentProfessorConversation() {
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const threadRef = useRef<HTMLDivElement>(null);
+  const v2 = useDesignV2();
 
   const refresh = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -70,6 +73,88 @@ export default function StudentProfessorConversation() {
 
   if (!ready || loading) {
     return <div className="view v2-wide"><p className="muted">Carregando conversa…</p></div>;
+  }
+
+  // Design v2: conversa com margens internas e texto maior, dicas ao lado
+  // (ajuste do Fabio em 17/11/2026: a versão antiga ficava colada na borda e com espaço sobrando).
+  if (v2) {
+    return (
+      <div className={`view ${v2s.page}`}>
+        <header className={v2s.head}>
+          <div className="eyebrow">Acompanhamento humano</div>
+          <h1>Fale com seu professor</h1>
+          <p>Envie dúvidas sobre as aulas, peça orientação ou conte onde está com dificuldade.</p>
+        </header>
+
+        <div className={v2s.layout}>
+          <section className={`card ${v2s.chat}`} aria-label="Conversa com a Central School">
+            <div className={v2s.chatHead}>
+              <span className={v2s.avatar} aria-hidden>CS</span>
+              <div className={v2s.chatTitle}>
+                <b>Conversa com a Central School</b>
+                <span>As respostas aparecem aqui automaticamente.</span>
+              </div>
+              <button className="btn ghost" type="button" onClick={() => void refresh(true)} disabled={sending}>Atualizar</button>
+            </div>
+
+            <div className={v2s.thread} ref={threadRef} aria-live="polite">
+              {messages.length === 0 ? (
+                <div className={v2s.empty}>
+                  <b>A conversa começa por você.</b>
+                  <span>Escreva sua primeira mensagem abaixo.</span>
+                </div>
+              ) : messages.map((message) => (
+                <div key={message.id} className={`${v2s.msg} ${message.sender === "student" ? v2s.student : v2s.teacher}`}>
+                  <div className={v2s.meta}>
+                    <b>{message.sender === "student" ? "Você" : "Professor"}</b>
+                    <time>{messageTime(message.created_at)}</time>
+                  </div>
+                  <p>{message.body}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className={v2s.composer}>
+              <label htmlFor="student-professor-message">Sua mensagem</label>
+              <textarea
+                id="student-professor-message"
+                value={draft}
+                onChange={(event) => { setDraft(event.target.value); setSent(false); }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+                    event.preventDefault();
+                    void handleSend();
+                  }
+                }}
+                placeholder="Ex.: Professor, pode me ajudar a entender esta atividade?"
+                rows={4}
+                maxLength={MAX_MESSAGE_LENGTH}
+              />
+              <div className={v2s.composerFoot}>
+                <span>{draft.length}/{MAX_MESSAGE_LENGTH} · Ctrl + Enter para enviar</span>
+                <button className="btn primary" type="button" onClick={() => void handleSend()} disabled={sending || !draft.trim()}>
+                  {sending ? "Enviando…" : "Enviar ao professor"}
+                </button>
+              </div>
+              {error && <p className="auth-msg err" role="alert">{error}</p>}
+              {sent && <p className="auth-msg ok" role="status">Mensagem enviada ao professor.</p>}
+            </div>
+          </section>
+
+          <aside className={v2s.side}>
+            <div className={`card ${v2s.tips}`}>
+              <h2>Para uma resposta mais rápida</h2>
+              <ul>
+                <li>Diga em qual aula ou atividade está a dúvida.</li>
+                <li>Copie a frase em inglês que deixou você em dúvida.</li>
+                <li>Conte o que você já tentou ou entendeu.</li>
+              </ul>
+            </div>
+            <Link href="/aluno" className="btn ghost">← Voltar ao início</Link>
+          </aside>
+        </div>
+      </div>
+    );
   }
 
   return (

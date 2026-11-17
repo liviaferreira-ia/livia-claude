@@ -1,0 +1,48 @@
+/* Pronúncia — design v2 (ajuste do Fabio em 17/11/2026: melhorar a disposição das informações). */
+.page { max-width: 1120px; }
+
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 28px; margin-bottom: 22px; }
+.headText { flex: 1; min-width: 280px; }
+.headText h1 { margin-top: 4px; }
+.headText p { margin: 8px 0 0; font-size: 18px; line-height: 1.6; color: var(--ink-soft); max-width: 60ch; }
+.headSide { display: flex; align-items: center; gap: 16px; }
+.count { min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+.count span { font-size: 16px; color: var(--ink-soft); }
+.count b { color: var(--ink); }
+.bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--primary-2); transition: width 0.3s; }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); padding: 0; overflow: hidden; }
+.col { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 36px 32px; text-align: center; min-height: 360px; }
+.speakCol { background: var(--panel-2); border-left: 1px solid var(--line); }
+.label { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+.label i { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 14px; letter-spacing: 0; background: var(--navy-soft); color: var(--navy); }
+.sentence { margin: 0; font-family: var(--font-title); font-size: clamp(28px, 3.2vw, 40px); font-weight: 600; line-height: 1.25; color: var(--ink); }
+.words { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.words :global(.pw) { font-size: 26px; }
+.listen:global(.speak-btn) { font-size: 16px; padding: 11px 20px; gap: 10px; white-space: nowrap; }
+.listen:global(.speak-btn) svg { width: 22px; height: 22px; }
+.hint { margin: 0; font-size: 16.5px; color: var(--ink-soft); }
+.result { width: 100%; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.score { display: flex; align-items: baseline; gap: 12px; }
+.score b { font-size: 44px; line-height: 1; color: var(--navy); }
+.score span { font-size: 17px; font-weight: 700; }
+.ok .score span { color: var(--good); }
+.no .score span { color: var(--warn); }
+.heard { margin: 0; font-size: 16.5px; color: var(--ink-soft); }
+.heard i { color: var(--ink); }
+.actions { display: flex; gap: 12px; }
+.actions :global(.btn) { flex: 1; justify-content: center; }
+.error { width: 100%; text-align: left; }
+
+.tip { display: flex; align-items: center; gap: 10px; margin: 16px 0 0; font-size: 15.5px; color: var(--ink-soft); }
+.tip svg { width: 18px; height: 18px; flex: none; color: var(--navy); }
+
+@media (max-width: 860px) {
+  .headSide { width: 100%; }
+  .count { flex: 1; min-width: 0; }
+  .stage { grid-template-columns: 1fr; }
+  .col { min-height: 0; padding: 26px 20px; }
+  .speakCol { border-left: 0; border-top: 1px solid var(--line); }
+}
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }

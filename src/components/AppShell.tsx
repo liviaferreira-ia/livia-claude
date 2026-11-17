@@ -170,6 +170,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const crumb = pathname.startsWith("/professor/alunos/") ? "Detalhes do aluno"
     : pathname.startsWith("/professor/aulas/") ? "Aulas para revisar"
     : pathname.startsWith("/aluno/aulas/") ? "Aulas em vídeo"
+    : pathname.startsWith("/aluno/licao/") ? "Meu curso"
     : pathname.startsWith("/professor/atividades-especiais/") ? "Atividades Especiais"
       : pathname.startsWith("/aluno/especial/") ? "Especial para você"
         : CRUMBS[pathname] ?? "";

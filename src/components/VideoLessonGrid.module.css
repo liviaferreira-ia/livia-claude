@@ -40,3 +40,10 @@
 .lockTag { background: rgba(11, 22, 38, 0.82); color: #fff; }
 .doneTag svg, .lockTag svg { width: 13px; height: 13px; }
 @media (max-width: 700px) { .progress { width: 100%; } }
+
+/* Celular: "Unidade 1", o nome da unidade e a duração em linhas próprias (antes quebravam em pedaços). */
+@media (max-width: 600px) {
+  .unitTitle { flex-wrap: wrap; row-gap: 2px; }
+  .unitTitle span { flex-basis: 100%; white-space: nowrap; }
+  .unitTitle small { flex-basis: 100%; margin-left: 0; }
+}

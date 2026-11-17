@@ -45,5 +45,7 @@
 }
 @media (max-width: 600px) {
   .chatHead, .composer { padding-left: 16px; padding-right: 16px; }
+  .avatar, .chatTitle span { display: none; } /* o título da conversa cabe numa linha ao lado do Atualizar */
+  .chatTitle b { font-size: 16.5px; }
   .thread { padding: 18px 14px; }
 }

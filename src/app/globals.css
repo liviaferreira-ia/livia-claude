@@ -3346,7 +3346,7 @@ img.avatar {
 @media (max-width: 860px) {
   :root[data-design="v2"] .app-shell { grid-template-columns: minmax(0, 1fr); }
   :root[data-design="v2"] .app-shell.has-tabbar main { padding-bottom: 76px; }
-  .v2-tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+  .v2-tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); background: var(--panel); border-top: 1px solid var(--line); box-shadow: 0 -6px 18px rgba(10, 49, 97, 0.07); } /* fundo sólido: o texto da página aparecia por trás (Fabio, 17/11/2026) */
   .v2-tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 44px; font-size: 11px; font-weight: 600; color: var(--ink-faint); text-decoration: none; }
   .v2-tabbar svg { width: 22px; height: 22px; }
   .v2-tabbar a.on { color: var(--ink); }
@@ -3495,6 +3495,12 @@ img.avatar {
 :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item .m-state { font-size: 14px; padding: 5px 12px; }
 @media (prefers-reduced-motion: reduce) {
   :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item:hover { transform: none; }
+}
+
+/* Celular: nas listas em cartões, o selo (ex.: "5 turnos") desce para baixo do texto, que ganha a largura toda. */
+@media (max-width: 600px) {
+  :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item { display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: start; column-gap: 14px; row-gap: 8px; padding: 16px 18px; }
+  :root[data-design="v2"] .v2-wide .card:has(> .m-item ~ .m-item) > .m-item .m-state { grid-column: 2; justify-self: start; }
 }
 
 /* Menu do aluno: "Especial para você" no topo, em destaque */

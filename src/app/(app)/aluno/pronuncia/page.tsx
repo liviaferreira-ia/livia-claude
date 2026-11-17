@@ -229,7 +229,7 @@ export default function PronunciaPage() {
                 Use o Chrome, o Edge ou o Safari atualizados. Você ainda pode ouvir a frase e repetir.
               </div>
             ) : phase === "result" ? (
-              <div className={`${v2s.result} ${pct >= 70 ? v2s.ok : v2s.no}`}>
+              <div className={`${v2s.result} ${pct >= 85 ? v2s.ok : pct >= 60 ? v2s.mid : v2s.no}`}>
                 <div className={v2s.score}>
                   <b>{pct}%</b>
                   <span>{pct >= 85 ? "Muito claro!" : pct >= 60 ? "Quase lá!" : "Vamos praticar mais."}</span>

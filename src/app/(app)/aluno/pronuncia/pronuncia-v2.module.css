@@ -32,7 +32,8 @@
 .score b { font-size: 44px; line-height: 1; color: var(--navy); }
 .score span { font-size: 17px; font-weight: 700; }
 .ok .score span { color: var(--good); }
-.no .score span { color: var(--warn); }
+.mid .score span { color: var(--warn); }
+.no .score span { color: var(--bad); }
 .heard { margin: 0; font-size: 16.5px; color: var(--ink-soft); }
 .heard i { color: var(--ink); }
 .actions { display: flex; gap: 12px; }

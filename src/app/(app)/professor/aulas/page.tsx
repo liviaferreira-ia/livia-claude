@@ -64,6 +64,7 @@ export default async function TeacherLessonsPage({ searchParams }: { searchParam
     ...[...A1_DRAFTS].sort((a, b) => a.unitNumber - b.unitNumber || a.number - b.number).map((lesson) => ({
       id: lesson.id, unitNumber: lesson.unitNumber, unit: lesson.unit, number: lesson.number, title: lesson.title,
       objective: lesson.objective, status: statuses.get(lesson.id) ?? "pending", note: reviewsById.get(lesson.id)?.note ?? null,
+      poster: `${lesson.media.base}/poster.png`,
     })),
   ];
   const legacy = Object.values(LESSONS).filter((lesson) => lesson.slug !== "apresentando-se").map((lesson) => ({ slug: lesson.slug, title: lesson.title, level: lesson.level }));

@@ -5,6 +5,7 @@
  * Mesma fila da versão atual (decisões do banco + revisão atual do conteúdo), com:
  * "Próxima da fila", progresso do curso, abas, filtros e unidades recolhíveis.
  */
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import type { ReviewStatus } from "@/lib/lesson-review-types";
@@ -13,6 +14,8 @@ import styles from "./LessonQueueV2.module.css";
 export type QueueRow = {
   id: string; unitNumber: number; unit: string; number: number;
   title: string; objective: string; status: ReviewStatus; note: string | null;
+  /** Capa do vídeo da aula (usada no cartão "Próxima da fila"). */
+  poster?: string;
 };
 type Filter = "all" | ReviewStatus;
 
@@ -76,16 +79,18 @@ export function LessonQueueV2({ tab, rows, legacy }: Props) {
     <section className={styles.summary}>
       {next
         ? <div className={styles.next}>
-          <div>
+          {next.poster && <Link href={`/professor/aulas/${next.id}`} prefetch={false} className={styles.thumb} tabIndex={-1} aria-hidden>
+            <Image src={next.poster} alt="" width={320} height={180} unoptimized /></Link>}
+          <div className={styles.nextText}>
             <span className={styles.eyebrowLight}>Próxima da fila</span>
             <h2>{next.title}</h2>
             <p>Unidade {next.unitNumber} · Aula {next.number} · {next.objective}</p>
-            {next.status === "outdated" && <span className={styles.tag}>Conteúdo alterado depois da última decisão</span>}
+            {next.status === "outdated" && <span className={styles.tag}>Conteúdo alterado</span>}
           </div>
           <Link className={styles.btnLight} href={`/professor/aulas/${next.id}`} prefetch={false}>Revisar agora{I.arrow}</Link>
         </div>
         : <div className={styles.next}>
-          <div>
+          <div className={styles.nextText}>
             <span className={styles.eyebrowLight}>{counts.rejected ? "Aguardando correções" : "Fila vazia"}</span>
             <h2>{counts.rejected ? `${counts.rejected} ${counts.rejected === 1 ? "aula espera" : "aulas esperam"} a nova versão` : "Todas as aulas foram aprovadas"}</h2>
             <p>{counts.rejected ? "Quando o conteúdo corrigido chegar, a aula volta para esta fila." : "Você pode consultar as aulas publicadas em Aprovadas."}</p>
@@ -97,8 +102,8 @@ export function LessonQueueV2({ tab, rows, legacy }: Props) {
         <div className={styles.bar}><i style={{ width: `${total ? (counts.approved / total) * 100 : 0}%` }} /></div>
         <ul className={styles.legend}>
           <li><i className={styles.dotOk} />{counts.approved} aprovadas</li>
-          {counts.outdated > 0 && <li><i className={styles.dotWarn} />{counts.outdated} para revisar de novo</li>}
-          {counts.rejected > 0 && <li><i className={styles.dotWarn} />{counts.rejected} com correção pedida</li>}
+          {counts.outdated > 0 && <li><i className={styles.dotWarn} />{counts.outdated} revisar de novo</li>}
+          {counts.rejected > 0 && <li><i className={styles.dotWarn} />{counts.rejected} correção pedida</li>}
           <li><i className={styles.dotIdle} />{counts.pending} nunca revisadas</li>
         </ul>
       </div>

@@ -316,6 +316,24 @@ function Runner({
     );
   }
 
+  // Lista vazia (ex.: revisão filtrada sem questões deste tipo): mensagem em vez de quebrar a tela
+  // (erro CS-C41796 em 17/11/2026: "Cannot read properties of undefined (reading 'prompt')").
+  if (!item) {
+    return (
+      <div className="view" style={{ maxWidth: 640 }}>
+        <div className="card" style={{ padding: 28, textAlign: "center" }}>
+          <h2 style={{ fontSize: 22, margin: "0 0 8px" }}>Nada para praticar aqui agora</h2>
+          <p className="muted" style={{ margin: "0 0 18px" }}>
+            {filterIds.length
+              ? "As questões da sua revisão não são deste tipo de exercício. Escolha outro tipo."
+              : "Ainda não há exercícios deste tipo no seu nível. Escolha outro tipo."}
+          </p>
+          <button className="btn primary" onClick={onExit}>Escolher outro tipo</button>
+        </div>
+      </div>
+    );
+  }
+
   const fb = answered ? evaluate() : null;
 
   return (

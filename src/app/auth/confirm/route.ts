@@ -14,7 +14,13 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    let error: unknown = null;
+    try {
+      ({ error } = await supabase.auth.exchangeCodeForSession(code));
+    } catch (err) {
+      error = err; // nunca virar erro 500: volta para o login com aviso
+    }
+    if (error) console.error(JSON.stringify({ event: "auth_confirm_failed", via: viaGoogle ? "google" : "email", message: error instanceof Error ? error.message : String((error as { message?: string })?.message ?? error) }));
     if (!error) {
       // Google: a página /auth/entrar marca a sessão e escolhe o destino (equipe, conta nova ou aluno).
       return NextResponse.redirect(viaGoogle ? `${SITE_URL}/auth/entrar` : `${SITE_URL}${next}`);

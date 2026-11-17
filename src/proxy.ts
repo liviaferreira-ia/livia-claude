@@ -19,6 +19,11 @@ function redirectWithSession(url: URL, response: NextResponse) {
 }
 
 export async function proxy(request: NextRequest) {
+  // Retorno de login (Google, convite, confirmação): só a rota /auth/confirm grava a sessão nova.
+  // Se o proxy também renovasse a sessão antiga aqui, os pedaços dos dois cookies se misturavam
+  // ("chunked cookie decoded to invalid JSON") e o login com Google falhava (17/11/2026).
+  if (request.nextUrl.pathname.startsWith("/auth/")) return NextResponse.next({ request });
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

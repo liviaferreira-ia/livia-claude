@@ -1,0 +1,76 @@
+/* Meu curso — design v2 (ajuste do Fabio em 17/11/2026: trilha harmoniosa, uma coluna com caminho). */
+.page { max-width: 1120px; }
+.head { display: flex; flex-wrap: wrap; align-items: stretch; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+.headText { flex: 1; min-width: 280px; display: flex; flex-direction: column; justify-content: center; }
+.headText h1 { margin-top: 4px; }
+.headText p { margin: 8px 0 0; max-width: 62ch; }
+.note { font-size: 14px; color: var(--ink-faint); }
+.progress { width: 300px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.big { font-size: 32px; font-weight: 700; line-height: 1; color: var(--navy); }
+.progress small { font-size: 13.5px; color: var(--ink-faint); }
+.bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: inherit; background: var(--primary-2); }
+
+.cycle { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; padding: 18px 22px; margin: 18px 0 30px; }
+.cycleText { min-width: 220px; }
+.cycleText h3 { font-size: 18px; margin-top: 4px; }
+.cycleSteps { flex: 1; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); position: relative; }
+.cycleSteps::before { content: ""; position: absolute; left: 8%; right: 8%; top: 15px; height: 2px; background: var(--line); }
+.cycleSteps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-align: center; }
+.cycleSteps li span { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); border: 2px solid var(--primary-2); color: var(--navy); font-size: 13px; font-weight: 700; }
+
+.trail { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.step { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; }
+.step::before { content: ""; position: absolute; left: 21px; top: 44px; bottom: -14px; width: 2px; background: var(--line); }
+.step:last-child::before { display: none; }
+.done::before { background: var(--good); }
+.node { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 15px; background: var(--panel); border: 2px solid var(--line); color: var(--ink-faint); z-index: 1; }
+.node svg { width: 18px; height: 18px; }
+.done .node { background: var(--good); border-color: var(--good); color: #fff; }
+.current .node { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 6px var(--navy-soft); }
+
+.unit { overflow: hidden; }
+.unit summary { list-style: none; }
+.unit summary::-webkit-details-marker { display: none; }
+.summary { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; }
+.summary:hover { background: var(--panel-2); }
+.sumText { flex: 1; min-width: 0; }
+.sumText small { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+.sumText h3 { font-size: 20px; margin: 2px 0 2px; }
+.sumText p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+.locked .sumText h3, .locked .sumText p { color: var(--ink-faint); }
+.status { flex: none; padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 700; background: var(--navy-soft); color: var(--navy); }
+.done .status { background: var(--good-soft); color: var(--good); }
+.locked .status { background: var(--panel-2); color: var(--ink-faint); border: 1px solid var(--line); }
+.chev { flex: none; display: grid; color: var(--ink-faint); transition: transform 0.2s; }
+.chev svg { width: 18px; height: 18px; }
+.unit[open] .chev { transform: rotate(180deg); }
+
+.body { display: flex; flex-direction: column; gap: 16px; padding: 4px 20px 20px; border-top: 1px solid var(--line); }
+.body > .bar { margin-top: 14px; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.box { padding: 16px 18px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); }
+.box h4 { margin: 0 0 8px; font-size: 15px; }
+.box ul { list-style: disc; margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; color: var(--ink-soft); }
+.side { display: flex; flex-direction: column; gap: 12px; }
+.mission { padding: 14px 16px; border-radius: 12px; background: var(--navy-soft); }
+.mission span { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--navy); }
+.mission p { margin: 4px 0 0; font-size: 14.5px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { padding: 4px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.support { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.support b { display: block; font-size: 12.5px; color: var(--ink); }
+.lessons { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+.lessons :global(.lesson-row) { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+
+@media (max-width: 860px) {
+  .progress { width: 100%; }
+  .cycleSteps li { font-size: 11.5px; }
+  .cols { grid-template-columns: 1fr; }
+  .step { grid-template-columns: 34px minmax(0, 1fr); gap: 10px; }
+  .step::before { left: 16px; top: 34px; }
+  .node { width: 34px; height: 34px; font-size: 13px; }
+  .summary { padding: 14px 16px; }
+  .body { padding: 4px 16px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .chev { transition: none; } }

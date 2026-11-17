@@ -9,6 +9,13 @@
  */
 export const DESIGN_V2_PARA_TODOS = false;
 
+/**
+ * Site de vendas (página inicial) no design v2: versão clean preparada em 17/11/2026.
+ * Fabio gostou; quem decide é a Livia. Se ela não aprovar, trocar para `false`:
+ * o site volta ao visual atual mesmo com o resto da plataforma no v2.
+ */
+export const SITE_DESIGN_V2 = true;
+
 /** Chave local que lembra que esta conta usa o visual novo, para aplicar antes do perfil carregar. */
 export const DESIGN_STORAGE_KEY = "central_design";
 

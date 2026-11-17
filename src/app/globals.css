@@ -3378,3 +3378,76 @@ img.avatar {
 /* Áreas que usavam o dourado como cor de destaque (Central Games, Meu curso, Especial para você):
    no v2 o destaque delas é o azul, para não virarem blocos grandes vermelhos. */
 :root[data-design="v2"] :is(.v2-accent-navy, .special-student-hero, .special-detail-hero, .special-coming-soon) { --gold: var(--navy); --gold-soft: var(--navy-soft); }
+
+/* =====================================================================
+   Design v2 — site de vendas (página inicial), versão clean (17/11/2026).
+   Fabio gostou; a decisão final é da Livia. Para voltar ao site atual
+   mesmo com o v2 ligado: SITE_DESIGN_V2 = false em src/lib/design.ts.
+   Regras: fundo branco/cinza claro, azul nos chamados para ação, vermelho
+   só em detalhe (rótulos pequenos, selo do plano). A prévia do produto
+   mostra a plataforma nova (clara).
+   ===================================================================== */
+:root[data-design="v2"] .lp-page { background: var(--panel); }
+:root[data-design="v2"] .lp-h1 em { color: var(--navy); }
+:root[data-design="v2"] .lp-faq summary::after { color: var(--navy); }
+:root[data-design="v2"] .lp-step .n { color: var(--navy); }
+
+/* Prévia do produto: plataforma nova, clara */
+:root[data-design="v2"] .lp-product-preview { border: 1px solid var(--line); background: var(--panel); color: var(--ink); box-shadow: 0 24px 60px rgba(11, 27, 51, 0.12); }
+:root[data-design="v2"] .lp-product-preview::before { border-color: var(--line); }
+:root[data-design="v2"] .lp-preview-top { color: var(--ink-faint); }
+:root[data-design="v2"] .lp-preview-brand { color: var(--ink); }
+:root[data-design="v2"] .lp-preview-sidebar i { background: var(--line); }
+:root[data-design="v2"] .lp-preview-sidebar i.active { background: var(--primary-2); box-shadow: 0 0 0 8px var(--navy-soft); }
+:root[data-design="v2"] .lp-preview-welcome { border: 0; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; }
+:root[data-design="v2"] .lp-preview-welcome small { color: rgba(255, 255, 255, 0.7); }
+:root[data-design="v2"] .lp-preview-welcome span { color: rgba(255, 255, 255, 0.82); }
+:root[data-design="v2"] .lp-preview-welcome > b { border-color: #ef5a73; color: #fff; }
+:root[data-design="v2"] .lp-preview-actions small { color: var(--ink-faint); }
+:root[data-design="v2"] .lp-preview-metrics > div { border: 1px solid var(--line); background: var(--bg); }
+:root[data-design="v2"] .lp-preview-metrics span { color: var(--ink-faint); }
+:root[data-design="v2"] .lp-preview-metrics small { color: var(--good); }
+:root[data-design="v2"] .lp-preview-metrics i { background: var(--line); }
+:root[data-design="v2"] .lp-preview-metrics i b { background: var(--primary-2); }
+:root[data-design="v2"] .lp-preview-actions .tutor { background: var(--navy-soft); color: var(--ink); }
+:root[data-design="v2"] .lp-preview-actions .tutor > span { background: var(--primary-2); color: #fff; }
+:root[data-design="v2"] .lp-preview-actions .games { background: var(--good-soft); color: var(--ink); }
+:root[data-design="v2"] .lp-preview-actions .games > span { background: var(--good); color: #fff; }
+:root[data-design="v2"] .lp-preview-float { border-color: var(--line); background: var(--panel); color: var(--ink); box-shadow: 0 14px 32px rgba(11, 27, 51, 0.14); }
+:root[data-design="v2"] .lp-preview-float > span { background: var(--good-soft); color: var(--good); }
+:root[data-design="v2"] .lp-preview-float small { color: var(--ink-faint); }
+
+/* Faixas e seções: claras */
+:root[data-design="v2"] .lp-proof-strip { background: var(--line); }
+:root[data-design="v2"] .lp-problem-grid article { border-top-color: var(--primary-2); }
+:root[data-design="v2"] .lp-product-section { background: var(--bg); color: var(--ink); }
+:root[data-design="v2"] .lp-section-heading.light .lp-h2 { color: var(--ink); }
+:root[data-design="v2"] .lp-section-heading.light > p { color: var(--ink-soft); }
+:root[data-design="v2"] .lp-feature-card { border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow-sm); }
+:root[data-design="v2"] .lp-feature-card:hover { border-color: var(--primary-2); background: var(--panel); }
+:root[data-design="v2"] .lp-feature-symbol.navy { color: var(--navy); background: var(--navy-soft); }
+:root[data-design="v2"] .lp-feature-symbol.gold { color: var(--gold); background: var(--gold-soft); }
+:root[data-design="v2"] .lp-feature-symbol.green { color: var(--good); background: var(--good-soft); }
+:root[data-design="v2"] .lp-feature-card small { color: var(--gold); }
+:root[data-design="v2"] .lp-feature-card h3 { color: var(--ink); }
+:root[data-design="v2"] .lp-feature-card p { color: var(--ink-soft); }
+:root[data-design="v2"] .lp-journey article > span { background: var(--primary); }
+:root[data-design="v2"] .lp-senior-callout { background: var(--panel); border: 1px solid var(--line); }
+:root[data-design="v2"] .lp-senior-mark { border-color: var(--line); color: var(--navy); }
+:root[data-design="v2"] .lp-philosophy { background: var(--bg); }
+
+/* Chamados para ação: azul forte, botão branco */
+:root[data-design="v2"] .lp-trial-offer,
+:root[data-design="v2"] .lp-final-cta { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; box-shadow: 0 18px 44px rgba(10, 49, 97, 0.22); }
+:root[data-design="v2"] .lp-final-cta { box-shadow: none; }
+:root[data-design="v2"] .lp-trial-offer p,
+:root[data-design="v2"] .lp-final-cta p,
+:root[data-design="v2"] .lp-trial-offer-action > small { color: rgba(255, 255, 255, 0.8); }
+:root[data-design="v2"] .lp-trial-offer-action > span { color: rgba(255, 255, 255, 0.88); }
+:root[data-design="v2"] :is(.lp-trial-offer, .lp-final-cta) .lp-eyebrow { color: rgba(255, 255, 255, 0.75); }
+:root[data-design="v2"] :is(.lp-trial-offer, .lp-final-cta) .btn.primary { background: #fff; color: #0a3161; }
+:root[data-design="v2"] :is(.lp-trial-offer, .lp-final-cta) .btn.primary:hover { background: #eef2f8; }
+
+/* Planos: destaque em azul, selo vermelho (detalhe) */
+:root[data-design="v2"] .lp-page .lp-plan.featured { border: 2px solid var(--primary-2); box-shadow: 0 22px 45px rgba(10, 49, 97, 0.12); }
+:root[data-design="v2"] .lp-plan-badge { background: var(--gold); color: #fff; }

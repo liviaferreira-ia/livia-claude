@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Crest } from "@/components/Crest";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PrivacyConsent, PrivacyPreferencesButton } from "@/components/PrivacyConsent";
+import { SiteKeepV1 } from "@/components/SiteKeepV1";
+import { SITE_DESIGN_V2 } from "@/lib/design";
 
 // Provisório (número pessoal da Livia, sinalizado desde 2026-08-12) — trocar pelo WhatsApp definitivo da Central School assim que houver um.
 const WHATSAPP = "5511933779408";
@@ -51,6 +53,7 @@ const faq = [
 export default function LandingPage() {
   return (
     <div className="lp-page">
+      {!SITE_DESIGN_V2 && <SiteKeepV1 />}
       <header className="lp-header">
         <Link href="/" className="lp-brand" aria-label="Central School — página inicial">
           <Crest size={36} />

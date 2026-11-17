@@ -5,4 +5,4 @@
  *
  * Só ligar (true) depois de configurar o provedor Google no Supabase; com false o botão some.
  */
-export const GOOGLE_LOGIN_ATIVO = false;
+export const GOOGLE_LOGIN_ATIVO = true; // Ligado em 17/11/2026, depois de configurar o Google no Supabase.

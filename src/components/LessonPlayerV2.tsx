@@ -8,6 +8,7 @@
  * (DraftLessonReview + LessonReviewDecision + A1GuidedPractice).
  */
 import Image from "next/image";
+import { SpeakCheck } from "@/components/SpeakCheck";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
@@ -211,7 +212,7 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "", out
         <div className={styles.head}>
           <span className={styles.eyebrow}>Etapa 5 de 6 · Sua vez</span>
           <h2>Sua vez de falar</h2>
-          <p className={styles.lead}>Responda em inglês durante cada pausa de 7 segundos. O vídeo não grava nem avalia sua voz.</p>
+          <p className={styles.lead}>Responda em inglês durante cada pausa do vídeo. Depois, use o microfone em cada pergunta: a IA diz se entendeu sua resposta e sugere como melhorar. A Central School não grava sua voz.</p>
         </div>
         <LessonVideoV2 refEl={practiceRef} src={`${media.base}/sua-vez.mp4`} poster={`${media.base}/poster.png`} track={`${media.base}/practice.vtt`}
           watchKey={watchKey("pratica")} onProgress={(f) => setWatched((w) => ({ ...w, pratica: Math.max(w.pratica, f) }))} />
@@ -222,7 +223,8 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "", out
             return <div key={i} className={`card ${styles.promptCard}`}>
               <button type="button" className={styles.playBtn} disabled={start === undefined} onClick={() => start !== undefined && seek(practiceRef, start)} aria-label={`Tocar: ${line.en}`}>{I.play}</button>
               <div><span className={styles.en} lang="en" translate="no">{line.en}</span><span className={styles.pt}>{line.pt}</span>
-                <span className={styles.tip}>{I.bulb}<span>{line.hint}</span></span></div>
+                <span className={styles.tip}>{I.bulb}<span>{line.hint}</span></span>
+                <SpeakCheck lessonId={lesson.id} index={i} /></div>
             </div>;
           })}
         </div>

@@ -4,15 +4,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getMyContactInfo, updateContactInfo } from "@/lib/activity";
+import { createClient } from "@/lib/supabase/client";
 import { initials, levelDisplay, useProfile } from "@/lib/profile";
 import { AvatarCropper } from "@/components/AvatarCropper";
 import { useDesignV2 } from "@/lib/useDesignV2";
 import v2s from "./conta-v2.module.css";
 
 export default function MinhaContaPage() {
-  const { profile, email, ready, updateIdentity, uploadAvatar, signOut } = useProfile();
+  const { profile, email, user, ready, updateIdentity, uploadAvatar, signOut } = useProfile();
   const router = useRouter();
-  // Design v2: página larga, com os cartões em duas colunas (ajuste do Fabio em 17/11/2026).
+  // Design v2: página larga, cartões em duas colunas e resumo "Minha matrícula" à direita
+  // (modelo aprovado pelo Fabio em 17/11/2026, sem o bloco financeiro por enquanto).
   const v2 = useDesignV2();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -28,6 +30,7 @@ export default function MinhaContaPage() {
   const [contactLoaded, setContactLoaded] = useState(false);
   const [savingContact, setSavingContact] = useState(false);
   const [contactMsg, setContactMsg] = useState("");
+  const [trialEnds, setTrialEnds] = useState<string | null>(null);
 
   useEffect(() => {
     if (!ready) return;
@@ -37,6 +40,16 @@ export default function MinhaContaPage() {
       setContactLoaded(true);
     });
   }, [ready]);
+
+  // Período gratuito em andamento (só leitura da própria linha; não ativa nada).
+  useEffect(() => {
+    if (!ready || !user || !v2) return;
+    createClient().from("student_trials").select("status,ends_at").eq("student_id", user.id).maybeSingle()
+      .then(({ data }) => {
+        const active = data?.status === "active" && data.ends_at && new Date(data.ends_at).getTime() > Date.now();
+        setTrialEnds(active ? data.ends_at : null);
+      });
+  }, [ready, user, v2]);
 
   async function saveContact() {
     setSavingContact(true);
@@ -129,6 +142,9 @@ export default function MinhaContaPage() {
           Seus dados ficam salvos na sua conta e acompanham você em qualquer aparelho.
         </p>
 
+        <div className={v2 ? v2s.layout : undefined}>
+        <div className={v2 ? v2s.main : undefined}>
+
         {/* Cabeçalho com foto */}
         <div className="profile-hero">
           <div className="profile-hero-banner" />
@@ -187,9 +203,17 @@ export default function MinhaContaPage() {
         {/* Dados */}
         <div className="card" style={{ marginTop: 18, padding: 22 }}>
           <div className="eyebrow">Seus dados</div>
-          <div className="field" style={{ marginTop: 12 }}>
-            <label htmlFor="nome">Nome</label>
-            <input id="nome" value={nameValue} onChange={(e) => setName(e.target.value)} />
+          <div className={v2 ? v2s.fields : undefined} style={{ marginTop: 12 }}>
+            <div className="field">
+              <label htmlFor="nome">Nome</label>
+              <input id="nome" value={nameValue} onChange={(e) => setName(e.target.value)} />
+            </div>
+            {v2 && (
+              <div className="field">
+                <label htmlFor="email">E-mail de acesso</label>
+                <input id="email" value={email ?? ""} readOnly disabled title="O e-mail de acesso não pode ser alterado aqui." />
+              </div>
+            )}
           </div>
           <button
             className="btn primary"
@@ -259,7 +283,7 @@ export default function MinhaContaPage() {
             <h3 style={{ fontSize: 15 }}>Objetivo e nível</h3>
             <span className="muted">seu diagnóstico de entrada</span>
           </div>
-          <div style={{ marginTop: 6 }}>
+          <div className={v2 ? v2s.pair : undefined} style={{ marginTop: 6 }}>
             <div className="m-item" style={{ cursor: "default" }}>
               <span className="m-ic tint-navy" style={{ fontSize: 18 }}>
                 🎯
@@ -295,6 +319,42 @@ export default function MinhaContaPage() {
           </button>
         </div>
         </div>
+        </div>
+        </div>
+
+        {v2 && (
+          <aside className={v2s.side} aria-label="Minha matrícula">
+            <div className={`card ${v2s.sideCard}`}>
+              <div className="eyebrow">Minha matrícula</div>
+              <dl className={v2s.facts}>
+                <div>
+                  <dt>Situação</dt>
+                  <dd>{trialEnds
+                    ? <span className={`${v2s.badge} ${v2s.trial}`}>Teste grátis até {new Date(trialEnds).toLocaleDateString("pt-BR")}</span>
+                    : <span className={v2s.badge}>Ativo</span>}</dd>
+                </div>
+                <div>
+                  <dt>Nível</dt>
+                  <dd>{(profile.level && levelDisplay(profile.level)) || "Não definido"}</dd>
+                </div>
+                {user?.created_at && (
+                  <div>
+                    <dt>Aluno desde</dt>
+                    <dd>{new Date(user.created_at).toLocaleDateString("pt-BR")}</dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+            <div className={`card ${v2s.sideCard}`}>
+              <div className="eyebrow">Atalhos</div>
+              <nav className={v2s.links}>
+                <Link href="/aluno/progresso">Meu progresso <span aria-hidden>→</span></Link>
+                <Link href="/aluno/curso">Meu curso <span aria-hidden>→</span></Link>
+                <Link href="/aluno/professor">Fale com o professor <span aria-hidden>→</span></Link>
+              </nav>
+            </div>
+          </aside>
+        )}
         </div>
       </div>
     </div>

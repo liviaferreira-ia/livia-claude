@@ -1,5 +1,7 @@
 "use client";
 
+import { GoogleSignIn } from "@/components/GoogleSignIn";
+import { GOOGLE_LOGIN_ATIVO } from "@/lib/auth-google";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -76,6 +78,19 @@ export default function ExperimentePage() {
             </label>
             {error && <p className="auth-msg err" role="alert">{error}</p>}
             <button className="btn primary" style={{ width: "100%" }} disabled={loading}>{loading ? "Criando conta…" : "Começar meus 7 dias grátis →"}</button>
+            {GOOGLE_LOGIN_ATIVO && (
+              <>
+                <div className="auth-divider"><span>ou</span></div>
+                <GoogleSignIn
+                  label="Começar com o Google"
+                  beforeStart={() => {
+                    if (accepted) return true;
+                    setError("Confirme as condições do período gratuito para continuar.");
+                    return false;
+                  }}
+                />
+              </>
+            )}
           </form>
         )}
         <p className="muted" style={{ textAlign: "center", fontSize: 13, marginTop: 18 }}>Já possui uma conta? <Link href="/login">Entrar</Link></p>

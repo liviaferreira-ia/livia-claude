@@ -214,7 +214,8 @@ export function useProfile() {
     name: metaString(user, "name"),
     goal: metaString(user, "goal"),
     level: metaString(user, "level"),
-    avatarUrl: metaString(user, "avatar_url"),
+    // Foto escolhida pelo aluno em photo_url; avatar_url fica como reserva (o Google sobrescreve esse campo a cada login).
+    avatarUrl: metaString(user, "photo_url") || metaString(user, "avatar_url"),
     stats,
   };
 
@@ -280,7 +281,7 @@ export function useProfile() {
       // ?t= força o navegador a recarregar a imagem quando ela é trocada.
       const url = `${pub.publicUrl}?t=${Date.now()}`;
 
-      const { data, error } = await supabase.auth.updateUser({ data: { avatar_url: url } });
+      const { data, error } = await supabase.auth.updateUser({ data: { photo_url: url } });
       if (error) return { error: error.message };
       if (data.user) setUser(data.user);
       return { error: null };

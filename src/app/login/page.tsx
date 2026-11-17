@@ -7,6 +7,8 @@ import { BrandLockup } from "@/components/BrandLockup";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { createClient } from "@/lib/supabase/client";
 import { markSessionActivity } from "@/lib/sessionActivity";
+import { GoogleSignIn } from "@/components/GoogleSignIn";
+import { GOOGLE_LOGIN_ATIVO } from "@/lib/auth-google";
 
 function LoginInner() {
   const router = useRouter();
@@ -81,7 +83,21 @@ function LoginInner() {
           {resetMode ? "Informe seu e-mail para criar uma nova senha." : "Entre para continuar seus estudos."}
         </p>
 
-        <form onSubmit={resetMode ? handleReset : handleSubmit} style={{ marginTop: 20 }}>
+        {GOOGLE_LOGIN_ATIVO && !resetMode && (
+          <div style={{ marginTop: 20 }}>
+            <GoogleSignIn label="Entrar com o Google" />
+            {params.get("error") === "google" && (
+              <p className="auth-msg err">Não foi possível entrar com o Google. Tente de novo ou use e-mail e senha.</p>
+            )}
+            <p className="google-note">
+              Primeira vez? Ao continuar com o Google você cria sua conta e começa o teste grátis de 7 dias, conforme as{" "}
+              <Link href="/termos-teste" target="_blank">condições do período gratuito</Link>.
+            </p>
+            <div className="auth-divider"><span>ou entre com e-mail</span></div>
+          </div>
+        )}
+
+        <form onSubmit={resetMode ? handleReset : handleSubmit} style={{ marginTop: GOOGLE_LOGIN_ATIVO && !resetMode ? 4 : 20 }}>
           <div className="field">
             <label htmlFor="email">E-mail</label>
             <input

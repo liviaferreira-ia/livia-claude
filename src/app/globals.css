@@ -2828,6 +2828,17 @@ img.avatar {
   -webkit-mask: radial-gradient(circle at 50% 50%, transparent 49.5%, #000 50%);
   mask: radial-gradient(circle at 50% 50%, transparent 49.5%, #000 50%);
 }
+/* ---------- Login com Google (17/11/2026) ---------- */
+.google-btn { width: 100%; min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 15.5px; font-weight: 700; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.google-btn:hover:not(:disabled) { border-color: var(--navy); box-shadow: 0 4px 14px rgba(10, 49, 97, 0.08); }
+.google-btn:disabled { opacity: 0.7; cursor: default; }
+.google-btn:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+.google-btn svg { flex: none; }
+.google-note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); text-align: center; }
+.google-note a { color: var(--navy); font-weight: 700; text-decoration: underline; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0 6px; font-size: 13px; color: var(--ink-faint); }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
 /* ---------- Privacidade e consentimento ---------- */
 .privacy-consent {
   position: fixed;

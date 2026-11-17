@@ -8,7 +8,7 @@
  * (DraftLessonReview + LessonReviewDecision + A1GuidedPractice).
  */
 import Image from "next/image";
-import { SpeakCheck } from "@/components/SpeakCheck";
+import { SpeakingPractice } from "@/components/SpeakingPractice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
@@ -212,22 +212,25 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "", out
         <div className={styles.head}>
           <span className={styles.eyebrow}>Etapa 5 de 6 · Sua vez</span>
           <h2>Sua vez de falar</h2>
-          <p className={styles.lead}>Responda em inglês durante cada pausa do vídeo. Depois, use o microfone em cada pergunta: a IA diz se entendeu sua resposta e sugere como melhorar. A Central School não grava sua voz.</p>
+          <p className={styles.lead}>Assista ao vídeo e responda em inglês nas pausas. Depois, converse com a Livia: uma pergunta por vez, você responde no microfone e a IA confere. Sua voz é usada só para conferir a resposta e não fica guardada.</p>
         </div>
         <LessonVideoV2 refEl={practiceRef} src={`${media.base}/sua-vez.mp4`} poster={`${media.base}/poster.png`} track={`${media.base}/practice.vtt`}
           watchKey={watchKey("pratica")} onProgress={(f) => setWatched((w) => ({ ...w, pratica: Math.max(w.pratica, f) }))} />
-        <div className={styles.sectionHead}><h3>Perguntas da Livia</h3></div>
+        <div className={styles.sectionHead}><h3>Converse com a Livia</h3></div>
+        <SpeakingPractice lessonId={lesson.id} lines={lesson.practice} />
+        {teacher && <>
+        <div className={styles.sectionHead}><h3>Todas as perguntas (visão da professora)</h3></div>
         <div className={styles.prompts}>
           {lesson.practice.map((line, i) => {
             const start = media.practiceChapters[i]?.start;
             return <div key={i} className={`card ${styles.promptCard}`}>
               <button type="button" className={styles.playBtn} disabled={start === undefined} onClick={() => start !== undefined && seek(practiceRef, start)} aria-label={`Tocar: ${line.en}`}>{I.play}</button>
               <div><span className={styles.en} lang="en" translate="no">{line.en}</span><span className={styles.pt}>{line.pt}</span>
-                <span className={styles.tip}>{I.bulb}<span>{line.hint}</span></span>
-                <SpeakCheck lessonId={lesson.id} index={i} /></div>
+                <span className={styles.tip}>{I.bulb}<span>{line.hint}</span></span></div>
             </div>;
           })}
         </div>
+        </>}
         <Application text={lesson.application} model={lesson.model} />
       </section>}
 

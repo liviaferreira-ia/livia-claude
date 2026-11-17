@@ -5,11 +5,13 @@ import OpenAI from "openai";
 /**
  * Confere a resposta falada do aluno nas "Perguntas da Livia" (etapa "Sua vez" das aulas em vídeo).
  * Pedido do Fabio em 17/11/2026: microfone em cada pergunta e a IA dizendo se a resposta foi entendida
- * e está adequada. A fala vira texto no navegador (reconhecimento de voz); aqui só chega o texto.
+ * e está adequada. O áudio é transcrito pela OpenAI e descartado (nada é guardado).
  * Não avalia cada som (fonema) — isso exigiria um serviço de avaliação de pronúncia (ex.: Azure).
  */
 
 const MODEL = process.env.OPENAI_TUTOR_MODEL || "gpt-4o-mini";
+/** Transcrição do áudio do aluno; se o modelo principal falhar, tenta o whisper-1. */
+const TRANSCRIBE_MODEL = process.env.OPENAI_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe";
 const TIMEOUT_MS = 15_000;
 
 let client: OpenAI | null = null;
@@ -82,4 +84,23 @@ export async function checkSpokenAnswer(prompt: SpeakingPrompt, heard: string): 
   const suggestion = typeof parsed.suggestion === "string" ? parsed.suggestion.trim().slice(0, 200) : "";
   if (!feedback) throw new Error("Resposta do modelo sem retorno para o aluno.");
   return { result, feedback, suggestion, model: MODEL, usage: response.usage };
+}
+
+/**
+ * Transcreve a resposta gravada (sem dar a pergunta como contexto, para não "corrigir" a pronúncia do aluno).
+ * O áudio só passa por aqui: não é salvo em disco nem no banco.
+ */
+export async function transcribeAnswer(audio: File): Promise<{ text: string; model: string }> {
+  const openai = getClient();
+  const models = [...new Set([TRANSCRIBE_MODEL, "whisper-1"])];
+  let lastError: unknown = null;
+  for (const model of models) {
+    try {
+      const result = await openai.audio.transcriptions.create({ file: audio, model, language: "en" });
+      return { text: (result.text ?? "").replace(/\s+/g, " ").trim(), model };
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Falha ao transcrever o áudio.");
 }

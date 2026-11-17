@@ -3352,3 +3352,29 @@ img.avatar {
 @media (prefers-reduced-motion: reduce) {
   .v2-chev, :root[data-design="v2"] .btn { transition: none; }
 }
+
+/* Design v2 — cores das telas existentes (4e, 17/11/2026).
+   Regra: azul = ação, progresso e item atual; vermelho só como detalhe
+   (avisos, novidades, correção). O antigo dourado virou vermelho nos tokens,
+   então aqui devolvemos para azul/neutro o que não é detalhe. */
+:root[data-design="v2"] .unit-bar > i,
+:root[data-design="v2"] .teacher-progress-track.time i,
+:root[data-design="v2"] .dots i.cur { background: var(--primary-2); }
+:root[data-design="v2"] .m-state.now,
+:root[data-design="v2"] .lesson-ic.now,
+:root[data-design="v2"] .tint-gold { background: var(--navy-soft); color: var(--navy); }
+:root[data-design="v2"] .level-badge { background: var(--navy-soft); color: var(--ink); }
+:root[data-design="v2"] .lesson-cta,
+:root[data-design="v2"] .q-prompt .blank { color: var(--navy); }
+:root[data-design="v2"] .self-introduction-phrase { border-left-color: var(--primary-2); }
+:root[data-design="v2"][data-theme="dark"] .profile-stats b { color: var(--ink); }
+:root[data-design="v2"] .badge-item.got { border-color: var(--good); }
+:root[data-design="v2"] .msg.me .who { background: var(--gold-soft); color: var(--gold); }
+:root[data-design="v2"] .conversation-student-select option { background: var(--panel); color: var(--ink); }
+/* Cores dourado aplicadas direto nas telas (style=...): rótulos ficam neutros, nomes e etiquetas ficam azuis. */
+:root[data-design="v2"] .eyebrow[style*="--gold"] { color: var(--ink-faint) !important; }
+:root[data-design="v2"] span[style*="--gold)"] { color: var(--navy) !important; }
+:root[data-design="v2"] [style*="--gold-soft"] { background: var(--navy-soft) !important; color: var(--navy) !important; }
+/* Áreas que usavam o dourado como cor de destaque (Central Games, Meu curso, Especial para você):
+   no v2 o destaque delas é o azul, para não virarem blocos grandes vermelhos. */
+:root[data-design="v2"] :is(.v2-accent-navy, .special-student-hero, .special-detail-hero, .special-coming-soon) { --gold: var(--navy); --gold-soft: var(--navy-soft); }

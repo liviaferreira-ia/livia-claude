@@ -377,12 +377,12 @@ export default function JogosPage() {
   }
 
   if (!ready) {
-    return <div className="view"><p className="muted">Carregando jogos…</p></div>;
+    return <div className="view v2-accent-navy"><p className="muted">Carregando jogos…</p></div>;
   }
 
   if (!activeGame) {
     return (
-      <div className="view">
+      <div className="view v2-accent-navy">
         <section className={styles.intro}>
           <div>
             <div className="eyebrow">Central Games · nível {contentLevel}</div>
@@ -419,7 +419,7 @@ export default function JogosPage() {
   const fillRound = fill.rounds[fill.index];
 
   return (
-    <div className="view">
+    <div className="view v2-accent-navy">
       <div className={styles.gameTopbar}>
         <button className={styles.backButton} onClick={closeGame}>← Todos os jogos</button>
         <span className={styles.levelPill}>Nível {contentLevel}</span>

@@ -39,14 +39,14 @@ export default function CursoPage() {
 
   if (!ready) {
     return (
-      <div className="view">
+      <div className="view v2-accent-navy">
         <p className="muted">Carregando…</p>
       </div>
     );
   }
 
   return (
-    <div className="view" style={{ maxWidth: 760 }}>
+    <div className="view v2-accent-navy" style={{ maxWidth: 760 }}>
       <LessonVideoEntry review={isTeacher} />
       <div className="eyebrow" style={{ marginBottom: 8 }}>
         Meu curso

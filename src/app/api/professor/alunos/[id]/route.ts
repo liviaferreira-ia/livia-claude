@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/site";
 import { recordAudit, recordIncident } from "@/lib/operational-server";
 import { requireStaff as teacherSession } from "@/lib/staff-server";
+import { chosenName } from "@/lib/display-name";
 
 const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -89,7 +90,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       return NextResponse.json({ error: "Este e-mail já está vinculado a outra conta." }, { status: 409 });
     }
   }
-  const metadata = { ...existing.user.user_metadata, name, level };
+  const metadata = { ...existing.user.user_metadata, name, display_name: name, level };
   const authValues = emailChanged ? { user_metadata: metadata, email } : { user_metadata: metadata };
 
   const [authUpdate, activityUpdate, settingsUpdate] = await Promise.all([
@@ -146,11 +147,11 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     // segundo caso geramos um token "recovery", que também abre a página de
     // definição de senha e evita tentar cadastrar a mesma pessoa novamente.
     if (!data.user.last_sign_in_at) {
-      const name = typeof data.user.user_metadata?.name === "string" ? data.user.user_metadata.name : undefined;
+      const name = chosenName(data.user.user_metadata) || undefined;
       const linkType = data.user.email_confirmed_at ? "recovery" : "invite";
       const { data: linkData, error: linkError } = linkType === "recovery"
         ? await admin.auth.admin.generateLink({ type: "recovery", email, options: { redirectTo } })
-        : await admin.auth.admin.generateLink({ type: "invite", email, options: { data: { name }, redirectTo } });
+        : await admin.auth.admin.generateLink({ type: "invite", email, options: { data: { name, display_name: name }, redirectTo } });
       if (linkError) {
         await admin.from("student_activity").update({ invite_status: "error", invite_error: linkError.message.slice(0, 500), updated_at: new Date().toISOString() }).eq("user_id", id);
         return NextResponse.json({ error: linkError.message }, { status: 500 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { chosenName } from "@/lib/display-name";
 
 export const MAX_MESSAGE_LENGTH = 2000;
 
@@ -34,10 +35,7 @@ export async function sendMessage(body: string): Promise<{ error: string | null 
   const { data: userData } = await supabase.auth.getUser();
   const uid = userData.user?.id;
   if (!uid) return { error: "Você precisa estar logado." };
-  const studentName =
-    typeof userData.user?.user_metadata?.name === "string"
-      ? (userData.user.user_metadata.name as string)
-      : null;
+  const studentName = chosenName(userData.user?.user_metadata) || null;
 
   const { error } = await supabase
     .from("messages")

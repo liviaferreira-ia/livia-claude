@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Crest } from "@/components/Crest";
 import { PlacementTest } from "@/components/PlacementTest";
 import { createClient } from "@/lib/supabase/client";
+import { chosenName } from "@/lib/display-name";
 
 type Option = { emoji: string; label: string; desc: string };
 
@@ -39,8 +40,8 @@ export default function OnboardingPage() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
-      const n = data.user?.user_metadata?.name;
-      if (typeof n === "string" && n) setName(n);
+      const n = chosenName(data.user?.user_metadata);
+      if (n) setName(n);
     });
   }, []);
 
@@ -48,7 +49,7 @@ export default function OnboardingPage() {
     setSaving(true);
     const supabase = createClient();
     const { error } = await supabase.auth.updateUser({
-      data: { onboarded: true, name: name.trim(), goal, level },
+      data: { onboarded: true, name: name.trim(), display_name: name.trim(), goal, level },
     });
     if (error) {
       setSaving(false);

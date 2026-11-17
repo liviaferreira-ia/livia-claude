@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-      data: { name },
+      data: { name, display_name: name },
       redirectTo: `${SITE_URL}/definir-senha`,
     });
     if (inviteError || !invited.user) return NextResponse.json({ error: inviteError?.message || "Não foi possível criar a conta." }, { status: 400 });

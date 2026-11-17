@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   // — cria o usuário e usa o SMTP configurado no Supabase, seja o padrão do
   // Supabase ou um customizado no futuro). Isso não muda.
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-    data: { name },
+    data: { name, display_name: name },
     // Vai direto pra /definir-senha (página client-side): o link de convite do
     // Supabase entrega a sessão via #access_token na URL, que só o navegador lê
     // — uma rota de servidor nunca chega a ver esse pedaço da URL.
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     const { data: linkData } = await admin.auth.admin.generateLink({
       type: "invite",
       email,
-      options: { data: { name }, redirectTo },
+      options: { data: { name, display_name: name }, redirectTo },
     });
     const hashedToken = linkData.properties?.hashed_token;
     inviteLink = hashedToken ? `${redirectTo}?token_hash=${hashedToken}&type=invite` : null;

@@ -9,6 +9,7 @@ import { bumpDaily, readDaily, readStreak, touchStreak } from "@/lib/daily";
 import { countCompletedLessons } from "@/lib/lessonProgress";
 import { createClient } from "@/lib/supabase/client";
 import { clearSessionActivity } from "@/lib/sessionActivity";
+import { chosenName } from "@/lib/display-name";
 
 const CEFR_RE = /^[ABC][12]$/;
 
@@ -170,7 +171,7 @@ export function useProfile() {
       if (!mounted) return;
       setUser(data.user);
       if (data.user) {
-        touchLogin(metaString(data.user, "name"), metaString(data.user, "level")).catch(() => {});
+        touchLogin(chosenName(data.user.user_metadata), metaString(data.user, "level")).catch(() => {});
         // profiles.role e o snapshot de aprendizado não dependem um do outro -
         // paralelizar corta um round-trip sequencial ao Supabase logo após o
         // login, quando isso já é o gargalo percebido (tudo na tela espera `ready`).
@@ -211,7 +212,7 @@ export function useProfile() {
 
   const profile: Profile = {
     onboarded: user?.user_metadata?.onboarded === true,
-    name: metaString(user, "name"),
+    name: chosenName(user?.user_metadata),
     goal: metaString(user, "goal"),
     level: metaString(user, "level"),
     // Foto escolhida pelo aluno em photo_url; avatar_url fica como reserva (o Google sobrescreve esse campo a cada login).
@@ -225,7 +226,7 @@ export function useProfile() {
   const updateIdentity = useCallback(
     async (patch: { name?: string; goal?: string; level?: string; onboarded?: boolean }) => {
       const supabase = createClient();
-      const { data, error } = await supabase.auth.updateUser({ data: patch });
+      const { data, error } = await supabase.auth.updateUser({ data: patch.name ? { ...patch, display_name: patch.name } : patch });
       if (!error && data.user) setUser(data.user);
       return { error };
     },

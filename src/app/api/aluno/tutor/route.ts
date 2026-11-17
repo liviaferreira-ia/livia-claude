@@ -3,6 +3,7 @@ import { getTutorReply, type TutorTurn } from "@/lib/ai/tutor-provider";
 import { recordIncident } from "@/lib/operational-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { chosenName } from "@/lib/display-name";
 
 const OBJECTIVE = "Falar sobre uma viagem recente usando o passado simples.";
 const MAX_TURNS = 16;
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
     .eq("user_id", user.id)
     .maybeSingle();
   const level = activity?.level && /^[ABC][12]$/.test(activity.level) ? activity.level : "A2";
-  const firstName = (activity?.student_name || user.user_metadata?.name || "aluno(a)").split(" ")[0];
+  const firstName = (activity?.student_name || chosenName(user.user_metadata) || "aluno(a)").split(" ")[0];
 
   const startedAt = Date.now();
   try {

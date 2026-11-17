@@ -34,7 +34,7 @@ export default function ExperimentePage() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/confirm?next=/onboarding`,
-        data: { name: name.trim(), trial_requested: true },
+        data: { name: name.trim(), display_name: name.trim(), trial_requested: true },
       },
     });
     setLoading(false);

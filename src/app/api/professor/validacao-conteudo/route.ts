@@ -3,6 +3,7 @@ import { LEVEL_ORDER, type CefrLevel } from "@/data/placement";
 import { recordAudit } from "@/lib/operational-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStaff as teacher } from "@/lib/staff-server";
+import { chosenName } from "@/lib/display-name";
 
 export async function GET() {
   const session = await teacher();
@@ -14,7 +15,7 @@ export async function GET() {
   const validatorIds = [...new Set((data ?? []).map((item) => item.validated_by).filter((id): id is string => Boolean(id)))];
   const validatorEntries = await Promise.all(validatorIds.map(async (id) => {
     const { data: result } = await admin.auth.admin.getUserById(id);
-    const name = typeof result.user?.user_metadata?.name === "string" ? result.user.user_metadata.name : result.user?.email ?? null;
+    const name = chosenName(result.user?.user_metadata) || result.user?.email || null;
     return [id, name] as const;
   }));
   const validatorNames = new Map(validatorEntries);

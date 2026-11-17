@@ -161,7 +161,7 @@ export function LessonPlayerV2({ lesson, mode, review = null, revision = "" }: P
         <div className={styles.head}>
           <span className={styles.eyebrow}>Etapa 4 de 6 · Pratique</span>
           <h2>{teacher ? "Exercícios e gabarito" : "Pratique"}</h2>
-          <p className={styles.lead}>{teacher ? "Como os alunos veem: uma pergunta por vez, com nova tentativa. Abaixo, o gabarito completo." : `${lesson.questions.length} perguntas rápidas. Pode tentar quantas vezes precisar.`}</p>
+          <p className={styles.lead}>{teacher ? "Como os alunos veem: uma pergunta por vez, com nova tentativa. Abaixo, o gabarito completo." : `${lesson.questions.length} perguntas rápidas. Se errar, você recebe uma dica; no segundo erro, a resposta certa.`}</p>
         </div>
         {teacher ? <AnswerKey questions={lesson.questions} /> : <Quiz questions={lesson.questions} />}
       </section>}
@@ -254,31 +254,44 @@ function Transcript({ media, onSeek }: { media: A1Draft["media"]; onSeek: (start
   </>;
 }
 
+/**
+ * Exercícios um por vez. Regra de erro (decidida com o Fabio em 17/11/2026):
+ * 1º erro mostra só a dica e a pessoa tenta de novo; 2º erro mostra a resposta
+ * certa com a explicação e libera a próxima pergunta. Ninguém fica preso.
+ */
 function Quiz({ questions }: { questions: A1Draft["questions"] }) {
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
-  const [state, setState] = useState<"answer" | "right" | "wrong">("answer");
-  const [tried, setTried] = useState(false);
+  const [state, setState] = useState<"answer" | "right" | "wrong" | "revealed">("answer");
+  const [wrongCount, setWrongCount] = useState(0);
   const [firstTry, setFirstTry] = useState(0);
 
+  function reset() { setAnswer(""); setState("answer"); setWrongCount(0); }
   if (index >= questions.length) {
     return <div className={`card ${styles.pad} ${styles.doneBox}`}>
       <div className={styles.big}>{I.check}</div>
       <h3>Prática concluída</h3>
       <p className={styles.muted}>Você acertou {firstTry} de {questions.length} na primeira tentativa.</p>
-      <button type="button" className={styles.linkBtn} onClick={() => { setIndex(0); setAnswer(""); setState("answer"); setTried(false); setFirstTry(0); }}>Refazer as perguntas</button>
+      <button type="button" className={styles.linkBtn} onClick={() => { setIndex(0); reset(); setFirstTry(0); }}>Refazer as perguntas</button>
     </div>;
   }
   const q = questions[index];
+  const answerText = q.options ? q.options[Number(q.answer)] ?? q.answer : q.answer;
+  const locked = state === "right" || state === "revealed";
   function check() {
-    const ok = normalize(answer) === normalize(q.answer);
-    if (ok && !tried) setFirstTry((n) => n + 1);
-    setTried(true); setState(ok ? "right" : "wrong");
+    if (normalize(answer) === normalize(q.answer)) {
+      if (wrongCount === 0) setFirstTry((n) => n + 1);
+      setState("right");
+      return;
+    }
+    const errors = wrongCount + 1;
+    setWrongCount(errors);
+    setState(errors >= 2 ? "revealed" : "wrong");
   }
-  function next() { setIndex((i) => i + 1); setAnswer(""); setState("answer"); setTried(false); }
+  function next() { setIndex((i) => i + 1); reset(); }
   function pick(value: string) { setAnswer(value); if (state === "wrong") setState("answer"); }
 
-  return <form className={`card ${styles.pad}`} onSubmit={(e) => { e.preventDefault(); if (state === "right") next(); else if (answer.trim()) check(); }}>
+  return <form className={`card ${styles.pad}`} onSubmit={(e) => { e.preventDefault(); if (locked) next(); else if (answer.trim()) check(); }}>
     <div className={styles.quizTop}>
       <span className={styles.eyebrow}>Pergunta {index + 1} de {questions.length}</span>
       <span className={styles.dots} aria-hidden>{questions.map((_, i) => <i key={i} className={i < index ? styles.dotDone : i === index ? styles.dotCur : undefined} />)}</span>
@@ -289,23 +302,22 @@ function Quiz({ questions }: { questions: A1Draft["questions"] }) {
         ? <div className={styles.opts} role="radiogroup">
           {q.options.map((option, i) => {
             const value = String(i);
-            const cls = state === "right" && value === q.answer ? styles.isOk : state === "wrong" && value === answer ? styles.isBad : "";
-            return <button key={i} type="button" role="radio" aria-checked={answer === value} disabled={state === "right"} className={`${styles.opt} ${cls}`} onClick={() => pick(value)}>
+            const cls = locked && value === q.answer ? styles.isOk : (state === "wrong" || state === "revealed") && value === answer ? styles.isBad : "";
+            return <button key={i} type="button" role="radio" aria-checked={answer === value} disabled={locked} className={`${styles.opt} ${cls}`} onClick={() => pick(value)}>
               <span className={styles.mark} /><span lang="en">{option}</span>
             </button>;
           })}
         </div>
-        : <>
-          <input className={styles.fill} lang="en" autoComplete="off" aria-label={`Resposta para ${q.prompt}`} placeholder="Digite sua resposta" value={answer} disabled={state === "right"} onChange={(e) => pick(e.target.value)} />
-          {q.hint && <p className={styles.small}>Dica: {q.hint}</p>}
-        </>}
+        : <input className={`${styles.fill}${state === "revealed" ? ` ${styles.fillBad}` : ""}`} lang="en" autoComplete="off" aria-label={`Resposta para ${q.prompt}`} placeholder="Digite sua resposta" value={answer} disabled={locked} onChange={(e) => pick(e.target.value)} />}
     </fieldset>
     {state === "right" && <div className={`${styles.feedback} ${styles.ok}`} role="status"><b>Isso mesmo!</b>{q.feedback}</div>}
-    {state === "wrong" && <div className={`${styles.feedback} ${styles.bad}`} role="status"><b>Ainda não.</b>{q.hint ?? "Leia a explicação da etapa Entenda e tente outra resposta."}</div>}
+    {wrongCount === 1 && !locked && <div className={`${styles.feedback} ${styles.bad}`} role="status"><b>Ainda não. Tente de novo.</b>{q.hint ? `Dica: ${q.hint}` : "Releia a etapa Entenda e escolha outra resposta."}</div>}
+    {state === "revealed" && <div className={`${styles.feedback} ${styles.reveal}`} role="status">
+      <b>A resposta certa é: <span lang="en" translate="no">{answerText}</span></b>{q.feedback}</div>}
     <div className={styles.quizActions}>
-      {state === "right"
+      {locked
         ? <button type="submit" className="btn primary">{index === questions.length - 1 ? "Ver resultado" : "Próxima pergunta"}{I.arrow}</button>
-        : <button type="submit" className="btn primary" disabled={!answer.trim()}>Conferir</button>}
+        : <button type="submit" className="btn primary" disabled={!answer.trim()}>{wrongCount > 0 ? "Conferir de novo" : "Conferir"}</button>}
     </div>
   </form>;
 }
@@ -318,7 +330,8 @@ function AnswerKey({ questions }: { questions: A1Draft["questions"] }) {
         ? <ol type="a">{q.options.map((option, j) => <li key={j} className={String(j) === q.answer ? styles.correct : undefined}><span lang="en">{option}</span>{String(j) === q.answer && <span className={styles.tag}>resposta</span>}</li>)}</ol>
         : <p className={styles.answer}>Resposta: <span lang="en">{q.answer}</span></p>}
       <p>{q.feedback}</p>
-      {q.hint && <p className={styles.small}>Dica mostrada ao aluno: {q.hint}</p>}
+      {q.hint && <p className={styles.small}>Dica mostrada ao aluno no 1º erro: {q.hint}</p>}
+      <p className={styles.small}>No 2º erro, o aluno vê a resposta certa e esta explicação.</p>
     </div>)}
   </div>;
 }

@@ -134,7 +134,11 @@
 .ok b { color: var(--good); }
 .bad { background: var(--gold-soft); }
 .bad b { color: var(--gold); }
+.reveal { background: var(--navy-soft); border-left: 3px solid var(--primary-2); }
+.reveal b { color: var(--ink); }
+.fillBad { border-color: var(--gold); background: var(--gold-soft); }
 .quizActions { margin-top: 18px; display: flex; justify-content: flex-end; }
+.quizActions svg { width: 18px; height: 18px; }
 .doneBox { text-align: center; padding: 32px 22px; }
 .big { width: 56px; height: 56px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; background: var(--good-soft); color: var(--good); }
 .big svg { width: 28px; height: 28px; }

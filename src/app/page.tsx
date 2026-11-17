@@ -64,7 +64,7 @@ export default function LandingPage() {
         </nav>
         <div className="lp-header-cta">
           <ThemeToggle />
-          <Link href="/login" className="lp-login-link">Já sou aluno</Link>
+          <Link href="/login" className="lp-login-link" aria-label="Entrar: já sou aluno"><span className="lp-login-long">Já sou aluno</span><span className="lp-login-short">Entrar</span></Link>
           <Link href="/experimente" className="btn primary lp-header-trial">Testar grátis</Link>
         </div>
       </header>

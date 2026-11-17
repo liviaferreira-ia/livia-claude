@@ -2844,22 +2844,22 @@ img.avatar {
   padding: 20px 22px;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: var(--card);
+  background: var(--panel);
   color: var(--ink);
   box-shadow: 0 18px 60px rgba(6, 25, 48, .22);
 }
 
 .privacy-consent b { display: block; margin-bottom: 5px; font-size: 16px; }
-.privacy-consent p { max-width: 660px; margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.55; }
-.privacy-consent a { color: var(--blue); font-weight: 700; }
+.privacy-consent p { max-width: 660px; margin: 0; color: var(--ink-soft); font-size: 13.5px; line-height: 1.55; }
+.privacy-consent a { color: var(--navy); font-weight: 700; }
 .privacy-consent-actions { display: flex; gap: 9px; flex-shrink: 0; }
 .privacy-consent-actions .btn { white-space: nowrap; }
 .privacy-options { display: grid; gap: 8px; margin-top: 14px; }
 .privacy-options label { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; }
-.privacy-options input { margin-top: 3px; accent-color: var(--blue); }
+.privacy-options input { margin-top: 3px; accent-color: var(--navy); }
 .privacy-options span, .privacy-options small { display: block; }
 .privacy-options b { margin: 0; font-size: 13px; }
-.privacy-options small { margin-top: 1px; color: var(--muted); font-size: 12px; }
+.privacy-options small { margin-top: 1px; color: var(--ink-soft); font-size: 12px; }
 
 .privacy-link-button {
   padding: 0;
@@ -2872,7 +2872,7 @@ img.avatar {
   text-underline-offset: 3px;
 }
 
-.privacy-page { min-height: 100vh; background: var(--paper); color: var(--ink); }
+.privacy-page { min-height: 100vh; background: var(--bg); color: var(--ink); }
 .privacy-header {
   position: sticky;
   z-index: 20;
@@ -2883,19 +2883,21 @@ img.avatar {
   gap: 20px;
   padding: 14px clamp(20px, 5vw, 72px);
   border-bottom: 1px solid var(--line);
-  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
   backdrop-filter: blur(12px);
 }
 .privacy-content { max-width: 820px; margin: 0 auto; padding: 64px 24px 90px; }
 .privacy-content h1 { margin: 10px 0 5px; font: 700 clamp(36px, 6vw, 58px)/1.05 Georgia, serif; }
 .privacy-content h2 { margin: 38px 0 10px; font: 700 24px/1.25 Georgia, serif; }
-.privacy-content p, .privacy-content li { color: var(--muted); line-height: 1.75; }
+.privacy-content p, .privacy-content li { color: var(--ink-soft); line-height: 1.75; }
 .privacy-content li + li { margin-top: 5px; }
-.privacy-content a { color: var(--blue); font-weight: 700; }
+.privacy-content a { color: var(--navy); font-weight: 700; }
 .privacy-updated { margin-top: 0; font-size: 13px; }
 
 @media (max-width: 720px) {
   .privacy-consent { align-items: stretch; flex-direction: column; gap: 14px; right: 12px; bottom: 12px; left: 12px; padding: 17px; }
+  /* O aviso é uma <section>: no site de vendas a regra das seções forçava largura 100% e ele passava da borda. */
+  .lp-page .privacy-consent { width: auto; max-width: none; }
   .privacy-consent-actions { display: grid; grid-template-columns: 1fr; }
   .privacy-header { padding: 12px 16px; }
   .privacy-header .lp-brand small { display: none; }
@@ -2924,6 +2926,7 @@ img.avatar {
   white-space: nowrap;
 }
 .lp-login-link:hover { color: var(--navy); }
+.lp-login-short { display: none; }
 .lp-header-trial { padding: 10px 17px; white-space: nowrap; }
 
 .lp-page .lp-section { max-width: 1200px; }
@@ -3161,7 +3164,11 @@ img.avatar {
   .lp-page p { max-width: 100%; overflow-wrap: anywhere; }
   .lp-page .lp-header { padding: 10px 13px; }
   .lp-page .lp-brand b { font-size: 14px; }
-  .lp-page .lp-header-cta .icon-btn, .lp-login-link { display: none; }
+  .lp-page .lp-header-cta .icon-btn { display: none; }
+  /* Celular: o acesso do aluno continua no topo, com o texto curto (Fabio, 17/11/2026). */
+  .lp-login-link { font-size: 13.5px; }
+  .lp-login-long { display: none; }
+  .lp-login-short { display: inline; }
   .lp-header-trial { padding: 9px 12px; font-size: 12px; }
   .lp-hero { padding-top: 54px; padding-bottom: 68px; }
   .lp-hero .lp-h1 { font-size: clamp(39px, 13vw, 54px); }

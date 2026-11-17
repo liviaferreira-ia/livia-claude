@@ -16,9 +16,10 @@ import {
   type SpeechRecognitionLike,
 } from "@/lib/speech";
 import { useDesignV2 } from "@/lib/useDesignV2";
+import { useAnswerRecorder } from "@/lib/useAnswerRecorder";
 import v2s from "./pronuncia-v2.module.css";
 
-type Phase = "idle" | "listening" | "result";
+type Phase = "idle" | "listening" | "checking" | "result";
 
 export default function PronunciaPage() {
   const { profile, ready } = useProfile();
@@ -67,15 +68,7 @@ export default function PronunciaPage() {
       return;
     }
     recRef.current = rec;
-    rec.onresult = (e) => {
-      const said = e.results[0][0].transcript as string;
-      setTranscript(said);
-      const hw = normalize(said).split(" ");
-      const m = normalize(target).split(" ").filter((w) => hw.includes(w)).length;
-      setScoreSum((s) => s + Math.round((m / targetWords.length) * 100));
-      setAnswered((a) => a + 1);
-      setPhase("result");
-    };
+    rec.onresult = (e) => applyHeard(e.results[0][0].transcript as string);
     rec.onerror = (e) => {
       setError(recognitionErrorMessage(e?.error ?? ""));
       setPhase("idle");
@@ -89,6 +82,45 @@ export default function PronunciaPage() {
     } catch {
       setPhase("idle");
     }
+  }
+
+  function applyHeard(said: string) {
+    setTranscript(said);
+    const hw = normalize(said).split(" ");
+    const m = normalize(target).split(" ").filter((w) => hw.includes(w)).length;
+    setScoreSum((s) => s + Math.round((m / targetWords.length) * 100));
+    setAnswered((a) => a + 1);
+    setPhase("result");
+  }
+
+  async function transcribe(audio: File) {
+    setPhase("checking");
+    try {
+      const form = new FormData();
+      form.append("audio", audio);
+      const response = await fetch("/api/aluno/transcrever", { method: "POST", body: form });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || typeof data?.heard !== "string") {
+        setError(data?.error ?? "Não consegui ouvir agora. Tente de novo.");
+        setPhase("idle");
+        return;
+      }
+      applyHeard(data.heard);
+    } catch {
+      setError("Falha de conexão. Tente de novo.");
+      setPhase("idle");
+    }
+  }
+
+  // Visual novo: grava e transcreve no servidor (o reconhecimento do navegador falhou no teste do Fabio, 17/11/2026).
+  const { supported: canRecord, recording, error: recError, setError: setRecError, start: startRecording, stop: stopRecording, levelRef } =
+    useAnswerRecorder((audio) => void transcribe(audio));
+
+  function listenV2() {
+    setError("");
+    setTranscript("");
+    setRecError("");
+    void startRecording();
   }
 
   function next() {
@@ -191,10 +223,10 @@ export default function PronunciaPage() {
 
           <div className={`${v2s.col} ${v2s.speakCol}`}>
             <span className={v2s.label}><i>2</i> Fale em voz alta</span>
-            {!supported ? (
+            {!canRecord ? (
               <div className={`fb no ${v2s.error}`}>
-                <strong>Microfone não disponível neste navegador. </strong>
-                O reconhecimento de fala funciona no <b>Chrome</b> ou <b>Edge</b>. Você ainda pode ouvir a frase e repetir.
+                <strong>Este navegador não permite gravar áudio. </strong>
+                Use o Chrome, o Edge ou o Safari atualizados. Você ainda pode ouvir a frase e repetir.
               </div>
             ) : phase === "result" ? (
               <div className={`${v2s.result} ${pct >= 70 ? v2s.ok : v2s.no}`}>
@@ -204,7 +236,7 @@ export default function PronunciaPage() {
                 </div>
                 <p className={v2s.heard}>Das palavras da frase, {matched} de {targetWords.length} foram reconhecidas. Eu ouvi: <i>“{transcript}”</i></p>
                 <div className={v2s.actions}>
-                  <button className="btn ghost" onClick={listen}>↺ Tentar de novo</button>
+                  <button className="btn ghost" onClick={listenV2}>↺ Tentar de novo</button>
                   <button className="btn primary" onClick={next}>
                     {index === SENTENCES.length - 1 ? "Ver resultado" : "Próxima →"}
                   </button>
@@ -212,16 +244,19 @@ export default function PronunciaPage() {
               </div>
             ) : (
               <>
-                <button
-                  className={`mic-big${phase === "listening" ? " rec" : ""}`}
-                  onClick={listen}
-                  disabled={phase === "listening"}
-                  aria-label="Falar"
-                >
-                  {micIcon}
-                </button>
-                <p className={v2s.hint}>{phase === "listening" ? "Ouvindo… fale agora" : "Toque no microfone e leia a frase"}</p>
-                {error && <div className={`fb no ${v2s.error}`}>{error}</div>}
+                {recording ? (
+                  <button ref={levelRef} className={`mic-big ${v2s.recording}`} onClick={stopRecording} aria-label="Parar e conferir">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                  </button>
+                ) : (
+                  <button className="mic-big" onClick={listenV2} disabled={phase === "checking"} aria-label="Falar">
+                    {micIcon}
+                  </button>
+                )}
+                <p className={v2s.hint} aria-live="polite">
+                  {recording ? "Gravando… leia a frase. Paro sozinho quando você terminar." : phase === "checking" ? "Conferindo sua fala…" : "Toque no microfone e leia a frase"}
+                </p>
+                {(error || recError) && <div className={`fb no ${v2s.error}`}>{error || recError}</div>}
               </>
             )}
           </div>
@@ -229,7 +264,7 @@ export default function PronunciaPage() {
 
         <p className={v2s.tip}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
-          Dica: fale perto do microfone, num lugar silencioso. O reconhecimento de voz funciona melhor no Chrome ou no Edge.
+          Dica: fale perto do microfone, num lugar silencioso. Toque no microfone, leia a frase inteira e espere: a gravação para sozinha.
         </p>
       </div>
     );

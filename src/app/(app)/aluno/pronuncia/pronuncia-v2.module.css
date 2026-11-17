@@ -22,6 +22,10 @@
 .words :global(.pw) { font-size: 26px; }
 .listen:global(.speak-btn) { font-size: 16px; padding: 11px 20px; gap: 10px; white-space: nowrap; }
 .listen:global(.speak-btn) svg { width: 22px; height: 22px; }
+/* Gravando (visual novo): botão vermelho com anel que acompanha o volume da voz. */
+:global(.mic-big).recording { --lvl: 0; background: var(--bad); box-shadow: 0 10px 30px rgba(179, 25, 66, 0.35); }
+:global(.mic-big).recording svg { width: 34px; height: 34px; }
+:global(.mic-big).recording::after { content: ""; position: absolute; inset: -9px; border-radius: 50%; border: 4px solid var(--bad); opacity: calc(0.25 + var(--lvl) * 0.75); transform: scale(calc(1 + var(--lvl) * 0.22)); transition: transform 0.08s linear, opacity 0.08s linear; }
 .hint { margin: 0; font-size: 16.5px; color: var(--ink-soft); }
 .result { width: 100%; display: flex; flex-direction: column; gap: 14px; text-align: left; }
 .score { display: flex; align-items: baseline; gap: 12px; }

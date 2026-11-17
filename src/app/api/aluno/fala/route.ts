@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { A1_DRAFTS } from "@/data/a1Drafts";
+import { rateLimiter, readAudio, trialState } from "@/lib/ai/answer-request";
 import { checkSpokenAnswer, transcribeAnswer } from "@/lib/ai/speaking-check";
 import { recordIncident } from "@/lib/operational-server";
 import { createClient } from "@/lib/supabase/server";
@@ -12,32 +13,9 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 const MAX_HEARD_LENGTH = 300;
-const MAX_AUDIO_BYTES = 3_000_000;
-const AUDIO_TYPES: Record<string, string> = {
-  "audio/webm": "webm",
-  "audio/ogg": "ogg",
-  "audio/mp4": "mp4",
-  "audio/x-m4a": "m4a",
-  "audio/m4a": "m4a",
-  "audio/mpeg": "mp3",
-  "audio/wav": "wav",
-  "audio/x-wav": "wav",
-};
 const RATE_LIMIT = 60;
 const TRIAL_RATE_LIMIT = 20;
-const RATE_WINDOW_MS = 60 * 60 * 1000;
-const usage = new Map<string, { count: number; windowStart: number }>();
-
-function rateLimited(userId: string, limit: number): boolean {
-  const now = Date.now();
-  const entry = usage.get(userId);
-  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
-    usage.set(userId, { count: 1, windowStart: now });
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > limit;
-}
+const limited = rateLimiter(60 * 60 * 1000);
 
 function cleanText(value: unknown): string {
   return typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, MAX_HEARD_LENGTH) : "";
@@ -48,15 +26,8 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 });
 
-  const { data: trial } = await supabase
-    .from("student_trials")
-    .select("status,ends_at")
-    .eq("student_id", user.id)
-    .maybeSingle();
-  const trialEnded = trial?.ends_at ? new Date(trial.ends_at).getTime() <= Date.now() : false;
-  if (trial && trial.status !== "converted" && (trialEnded || trial.status === "expired" || trial.status === "cancelled")) {
-    return NextResponse.json({ error: "Seu período gratuito terminou. Escolha um plano para continuar." }, { status: 403 });
-  }
+  const trial = await trialState(supabase, user.id);
+  if (trial.blocked) return NextResponse.json({ error: "Seu período gratuito terminou. Escolha um plano para continuar." }, { status: 403 });
 
   let lessonId = "";
   let index = -1;
@@ -67,18 +38,9 @@ export async function POST(request: Request) {
     const form = await request.formData().catch(() => null);
     lessonId = String(form?.get("lessonId") ?? "");
     index = Number(form?.get("index"));
-    const file = form?.get("audio");
-    if (!(file instanceof File) || file.size === 0) {
-      return NextResponse.json({ error: "Não recebi o áudio. Toque no microfone e responda de novo." }, { status: 400 });
-    }
-    if (file.size > MAX_AUDIO_BYTES) {
-      return NextResponse.json({ error: "A gravação ficou longa demais. Responda com uma frase curta." }, { status: 413 });
-    }
-    const baseType = file.type.split(";")[0].trim().toLowerCase();
-    const ext = AUDIO_TYPES[baseType];
-    if (!ext) return NextResponse.json({ error: "Formato de áudio não suportado neste navegador." }, { status: 415 });
-    // Nome e tipo definidos aqui (não pelo navegador): a transcrição usa a extensão para ler o áudio.
-    audio = new File([await file.arrayBuffer()], `resposta.${ext}`, { type: baseType });
+    const read = await readAudio(form?.get("audio"));
+    if ("error" in read) return NextResponse.json({ error: read.error }, { status: read.status });
+    audio = read.audio;
   } else {
     const body = await request.json().catch(() => null);
     lessonId = typeof body?.lessonId === "string" ? body.lessonId : "";
@@ -91,8 +53,7 @@ export async function POST(request: Request) {
   const line = lesson && Number.isInteger(index) && index >= 0 ? lesson.practice[index] : undefined;
   if (!lesson || !line) return NextResponse.json({ error: "Pergunta não encontrada." }, { status: 404 });
 
-  const rateLimit = trial && trial.status !== "converted" ? TRIAL_RATE_LIMIT : RATE_LIMIT;
-  if (rateLimited(user.id, rateLimit)) {
+  if (limited(user.id, trial.inTrial ? TRIAL_RATE_LIMIT : RATE_LIMIT)) {
     return NextResponse.json({ error: "Muitas respostas em pouco tempo. Tente de novo daqui a pouco." }, { status: 429 });
   }
 

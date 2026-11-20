@@ -8,7 +8,7 @@
 /* Azul-marinho é a cor primária (fundo padrão); marfim/branco é secundária, reservada aos cards. */
 :root {
   /* Largura máxima geral do site e da plataforma (pedido do Fabio, 20/11/2026). Textos e telas de exercício continuam estreitos. */
-  --largura-max: 1600px;
+  --largura-max: 1500px;
   --bg: #0e1a2b;
   --panel: #152538;
   --panel-2: #1c2e44;
@@ -3340,7 +3340,7 @@ img.avatar {
 :root[data-design="v2"] .crumb { font-size: 13.5px; }
 
 /* Conteúdo */
-/* Conteúdo cresce até --largura-max (1600px) e fica centralizado (telas largas não deixam faixa vazia só de um lado). */
+/* Conteúdo cresce até --largura-max (1500px) e fica centralizado (telas largas não deixam faixa vazia só de um lado). */
 :root[data-design="v2"] .view { padding: 32px 44px 72px; max-width: var(--largura-max); margin-inline: auto; width: 100%; }
 :root[data-design="v2"] .eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-faint); }
 :root[data-design="v2"] .card { border-radius: 16px; box-shadow: var(--shadow-sm); }

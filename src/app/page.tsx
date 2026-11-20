@@ -9,6 +9,7 @@ import { LandingMotion } from "@/components/landing/LandingMotion";
 import { RotatingWord } from "@/components/landing/RotatingWord";
 import { QuickQuiz, type QuizQuestion } from "@/components/landing/QuickQuiz";
 import { HeroFlag } from "@/components/landing/HeroFlag";
+import { StarField } from "@/components/landing/StarField";
 
 // Provisório (número pessoal da Livia, sinalizado desde 2026-08-12) — trocar pelo WhatsApp definitivo da Central School assim que houver um.
 const WHATSAPP = "5511933779408";
@@ -140,7 +141,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="lp-product-section" id="plataforma"><div className="lp-section">
+        <section className="lp-product-section" id="plataforma"><StarField /><div className="lp-section">
           <div className="lp-section-heading light" data-reveal><span className="lp-eyebrow">A Central por dentro</span><h2 className="lp-h2">Uma plataforma feita para você voltar amanhã</h2><p>Não é uma coleção solta de exercícios. É um ambiente de prática que combina direção, variedade e constância.</p></div>
           <div className="lp-feature-grid">{features.map((feature) => <article className="lp-feature-card" key={feature.title} data-reveal style={{ ["--i" as string]: features.indexOf(feature) % 3 }}><span className={`lp-feature-symbol ${feature.tone}`}>{feature.symbol}</span><small>{feature.eyebrow}</small><h3>{feature.title}</h3><p>{feature.desc}</p></article>)}</div>
         </div></section>
@@ -166,7 +167,7 @@ export default function LandingPage() {
 
         <section className="lp-section" id="faq"><div className="lp-section-heading" data-reveal><span className="lp-eyebrow">Sem letras miúdas</span><h2 className="lp-h2">Perguntas frequentes</h2></div><div className="lp-faq">{faq.map((item) => <details key={item.q}><summary>{item.q}</summary><p>{item.a}</p></details>)}</div></section>
 
-        <section className="lp-final-cta" id="contato"><div><span className="lp-eyebrow">Você não precisa esperar se sentir pronto</span><h2>Comece pequeno. Comece hoje.</h2><p>Sete dias para explorar a plataforma, praticar no seu ritmo e descobrir se a Central School combina com você.</p></div><div className="lp-final-actions"><Link href="/experimente" className="btn primary">Começar grátis →</Link><a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-wa">{WaIcon} Conversar no WhatsApp</a></div></section>
+        <section className="lp-final-cta" id="contato"><HeroFlag variant="final" /><div><span className="lp-eyebrow">Você não precisa esperar se sentir pronto</span><h2>Comece pequeno. Comece hoje.</h2><p>Sete dias para explorar a plataforma, praticar no seu ritmo e descobrir se a Central School combina com você.</p></div><div className="lp-final-actions"><Link href="/experimente" className="btn primary">Começar grátis →</Link><a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-wa">{WaIcon} Conversar no WhatsApp</a></div></section>
       </main>
       <LandingMotion />
 

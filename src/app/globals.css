@@ -3736,3 +3736,62 @@ img.avatar {
   .lp-hero-flag { left: 0; opacity: .7; }
   .lp-flag-stars { left: auto; right: 6%; width: 150px; }
 }
+
+/* Bandeira no fechamento (fundo azul): vermelho e branco, estrelas brancas */
+.lp-hero-flag .lp-flag-white { fill: #fff; opacity: 0; }
+.lp-final-cta { position: relative; overflow: hidden; }
+.lp-final-cta > :not(.lp-hero-flag) { position: relative; z-index: 1; }
+.lp-final-cta .lp-hero-flag.lp-flag-final {
+  inset: 0 0 0 22%;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 45%, #000 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 45%, #000 100%);
+}
+.lp-flag-final .lp-flag-cloth { inset: -8% 0 -8% 0; height: 116%; }
+.lp-flag-final .lp-flag-red { fill: #ef5a73; opacity: .2; }
+.lp-flag-final .lp-flag-white { opacity: .07; }
+.lp-flag-final .lp-flag-shade { opacity: .18; }
+.lp-flag-final .lp-flag-stars { top: 9%; left: auto; right: 3%; width: 170px; fill: #fff; opacity: .3; }
+.lp-motion .lp-flag-final .lp-flag-stars { animation-name: lp-twinkle-light; }
+@keyframes lp-twinkle-light { 0%, 100% { opacity: .28; } 50% { opacity: .45; } }
+
+/* Estrelas cintilando na seção "A Central por dentro" */
+.lp-product-section { position: relative; overflow: hidden; }
+.lp-product-section > .lp-section { position: relative; z-index: 1; }
+.lp-starfield { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.lp-starfield i {
+  position: absolute;
+  display: block;
+  background: #1c4a85;
+  opacity: .18;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.lp-starfield i.red { background: #b31942; }
+@keyframes lp-star { 0%, 100% { opacity: .1; scale: .8; } 50% { opacity: .42; scale: 1.15; } }
+.lp-motion .lp-starfield i { animation: lp-star 5s ease-in-out infinite; }
+:root[data-theme="dark"] .lp-starfield i { background: #e9eef6; }
+:root[data-theme="dark"] .lp-starfield i.red { background: #ef5a73; }
+
+/* Comemoração no teste rápido */
+.lp-quiz { position: relative; }
+.lp-confetti { position: absolute; inset: 0; z-index: 5; overflow: visible; pointer-events: none; }
+.lp-confetti i { position: absolute; font-style: normal; line-height: 1; translate: -50% -50%; animation: lp-burst 1.1s cubic-bezier(.16, 1, .3, 1) forwards; }
+.lp-confetti i.rain { top: -20px; translate: 0 0; animation: lp-rain 2s ease-in forwards; }
+@keyframes lp-burst {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0) scale(.4); }
+  60% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1); }
+}
+@keyframes lp-rain {
+  0% { opacity: 0; transform: translateY(0) rotate(0); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(420px) rotate(var(--rot)); }
+}
+
+/* Prévia do topo inclina com o mouse (só computador) */
+@media (min-width: 981px) {
+  .lp-motion .lp-product-preview {
+    transform: perspective(1200px) rotateY(calc(-2deg + var(--ry, 0deg))) rotateX(calc(1deg + var(--rx, 0deg)));
+    transition: transform .6s cubic-bezier(.16, 1, .3, 1);
+    will-change: transform;
+  }
+}

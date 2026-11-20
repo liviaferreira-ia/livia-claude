@@ -28,12 +28,14 @@ function stripe(row: number) {
 const STARS = Array.from({ length: 20 }, (_, i) => ({ cx: 20 + (i % 5) * 44 + (Math.floor(i / 5) % 2) * 22, cy: 18 + Math.floor(i / 5) * 30 }));
 const STAR = "M0,-7 L2.06,-2.16 L6.66,-2.16 L2.94,0.82 L4.12,5.66 L0,2.8 L-4.12,5.66 L-2.94,0.82 L-6.66,-2.16 L-2.06,-2.16 Z";
 
-export function HeroFlag() {
+/** variant "final": mesma bandeira na faixa de fechamento (fundo azul), em vermelho e branco. */
+export function HeroFlag({ variant = "hero" }: { variant?: "hero" | "final" }) {
+  const shadeId = `lp-flag-shade-${variant}`;
   return (
-    <div className="lp-hero-flag" aria-hidden>
+    <div className={`lp-hero-flag${variant === "final" ? " lp-flag-final" : ""}`} aria-hidden>
       <svg className="lp-flag-cloth" viewBox={`0 0 ${WAVE} ${ROWS * ROW_H}`} preserveAspectRatio="none" focusable="false">
         <defs>
-          <linearGradient id="lp-flag-shade" x1="0" x2="1" y1="0" y2="0">
+          <linearGradient id={shadeId} x1="0" x2="1" y1="0" y2="0">
             <stop offset="0" stopColor="#0a3161" stopOpacity="0" />
             <stop offset=".25" stopColor="#0a3161" stopOpacity=".55" />
             <stop offset=".5" stopColor="#0a3161" stopOpacity="0" />
@@ -42,9 +44,9 @@ export function HeroFlag() {
           </linearGradient>
         </defs>
         <g className="lp-flag-wave">
-          {Array.from({ length: ROWS }, (_, row) => (row % 2 === 0 ? <path key={row} className="lp-flag-red" d={stripe(row)} /> : null))}
+          {Array.from({ length: ROWS }, (_, row) => <path key={row} className={row % 2 === 0 ? "lp-flag-red" : "lp-flag-white"} d={stripe(row)} />)}
           {/* sombra do tecido (dobras) que anda junto com a onda */}
-          <rect className="lp-flag-shade" x="0" y={-AMP} width={WAVE * 2} height={ROWS * ROW_H + AMP * 2} fill="url(#lp-flag-shade)" />
+          <rect className="lp-flag-shade" x="0" y={-AMP} width={WAVE * 2} height={ROWS * ROW_H + AMP * 2} fill={`url(#${shadeId})`} />
         </g>
       </svg>
       <svg className="lp-flag-stars" viewBox="0 0 240 130" focusable="false">

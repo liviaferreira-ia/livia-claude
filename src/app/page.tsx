@@ -35,10 +35,10 @@ const features = [
 ];
 
 const plans = [
-  { name: "Plataforma", audience: "Para estudar no seu ritmo", frequency: "Sem aulas ao vivo", items: ["Plataforma completa do A1 ao C2", "Tutor com IA, pronúncia e roleplay", "Tira-dúvidas com a professora pela plataforma"] },
-  { name: "Essencial", audience: "Para criar base e consistência", frequency: "2 aulas por semana", items: ["Comunicação do dia a dia", "Material e plataforma digital", "Avaliações mensais de progresso"] },
-  { name: "Carreira", audience: "Para usar inglês no trabalho", frequency: "3 aulas por semana", items: ["Inglês aplicado à sua rotina", "Módulos por área ou setor", "Mentoria personalizada"], featured: true },
-  { name: "Global", audience: "Para avançar com mais intensidade", frequency: "4 aulas por semana", items: ["Conversação avançada", "Feedback contínuo", "Prática e imersão cultural"] },
+  { name: "Plataforma", audience: "Para estudar no seu ritmo", frequency: "Apenas a plataforma", items: ["Plataforma completa do A1 ao C2", "Tutor com IA, pronúncia e roleplay", "Tira-dúvidas com a professora pela plataforma"] },
+  { name: "Essencial", audience: "Para criar base e consistência", frequency: "4 aulas por mês", items: ["Comunicação do dia a dia", "Material e plataforma digital", "Avaliações mensais de progresso"] },
+  { name: "Carreira", audience: "Para usar inglês no trabalho", frequency: "8 aulas por mês", items: ["Inglês aplicado à sua rotina", "Módulos por área ou setor", "Mentoria personalizada"], featured: true },
+  { name: "Personalizado", audience: "Para quem precisa de um plano sob medida", frequency: "De acordo com as suas necessidades", items: ["Quantidade de aulas sob medida", "Conteúdo focado no seu objetivo", "Feedback contínuo"] },
 ];
 
 const faq = [

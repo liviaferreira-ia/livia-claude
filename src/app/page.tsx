@@ -121,7 +121,7 @@ export default function LandingPage() {
         </section>
 
         <section className="lp-proof-strip" aria-label="A plataforma em números" data-reveal>
-          <div><strong data-count="1000">1.000</strong><span>exercícios do A1 ao C2</span></div><div><strong><span data-count="6">6</span> níveis</strong><span>do iniciante ao avançado, no padrão europeu (CEFR)</span></div><div><strong data-count="24">24</strong><span>situações reais para praticar conversa</span></div><div><strong><span data-count="7">7</span> dias</strong><span>para conhecer grátis, sem cartão</span></div>
+          <div><strong data-count="1000">1.000</strong><span>exercícios do A1 ao C2</span></div><div><strong><em className="lp-num" data-count="6">6</em> níveis</strong><span>do iniciante ao avançado, no padrão europeu (CEFR)</span></div><div><strong data-count="24">24</strong><span>situações reais para praticar conversa</span></div><div><strong><em className="lp-num" data-count="7">7</em> dias</strong><span>para conhecer grátis, sem cartão</span></div>
         </section>
 
         <section className="lp-section lp-quiz-section" id="teste">

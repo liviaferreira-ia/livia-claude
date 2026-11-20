@@ -43,7 +43,7 @@ export function QuickQuiz({ questions }: { questions: QuizQuestion[] }) {
           <div className="lp-quiz-top">
             <span className="lp-quiz-level">Nível {q.level}</span>
             <span className="lp-quiz-dots" aria-label={`Pergunta ${step + 1} de ${questions.length}`}>
-              {questions.map((item, i) => <i key={item.id} className={i < step || (i === step && picked !== null) ? "done" : i === step ? "now" : ""} />)}
+              {questions.map((item, i) => <i key={item.id} data-state={i < step || (i === step && picked !== null) ? "feita" : i === step ? "atual" : "proxima"} />)}
             </span>
           </div>
           <p className="lp-quiz-label">Complete a frase</p>

@@ -8,6 +8,7 @@ import { EXERCISES } from "@/data/exercises";
 import { LandingMotion } from "@/components/landing/LandingMotion";
 import { RotatingWord } from "@/components/landing/RotatingWord";
 import { QuickQuiz, type QuizQuestion } from "@/components/landing/QuickQuiz";
+import { HeroFlag } from "@/components/landing/HeroFlag";
 
 // Provisório (número pessoal da Livia, sinalizado desde 2026-08-12) — trocar pelo WhatsApp definitivo da Central School assim que houver um.
 const WHATSAPP = "5511933779408";
@@ -85,6 +86,7 @@ export default function LandingPage() {
 
       <main>
         <section className="lp-hero lp-section">
+          <HeroFlag />
           <div className="lp-hero-grid">
             <div className="lp-hero-copy">
               <span className="lp-eyebrow">Inglês para <RotatingWord words={HERO_WORDS} /></span>

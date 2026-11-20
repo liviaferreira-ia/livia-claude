@@ -3555,3 +3555,151 @@ img.avatar {
 :root[data-design="v2"] .inbox-item-body span { font-size: 13.5px; }
 :root[data-design="v2"] .conversation-student-select { font-size: 16px; padding: 12px 14px; }
 :root[data-design="v2"] .inbox-thread .muted { font-size: 13.5px; }
+
+/* =====================================================================
+   Pagina inicial: movimento, interacao e autoridade (pedido do Fabio, 20/11/2026).
+   Tudo que anima depende de .lp-motion, que o LandingMotion so liga quando o sistema
+   NAO pede "reduzir movimento". Sem JS, a pagina aparece completa e parada.
+   Tempos do design system: enter 500-700ms (ease-apple), cinematic 900-1400ms (ease-expo),
+   ambient 3-8s (loop).
+   ===================================================================== */
+@property --lp-p { syntax: "<number>"; inherits: false; initial-value: 42; }
+
+/* Entrada ao rolar */
+.lp-motion [data-reveal] {
+  opacity: 0;
+  translate: 0 24px;
+  transition: opacity .7s cubic-bezier(.16, 1, .3, 1), translate .7s cubic-bezier(.16, 1, .3, 1);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.lp-motion [data-reveal].is-in { opacity: 1; translate: 0 0; }
+
+/* Topo: texto entra em etapas, previa sobe e depois flutua */
+@keyframes lp-rise { from { opacity: 0; translate: 0 28px; } to { opacity: 1; translate: 0 0; } }
+@keyframes lp-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+@keyframes lp-pop { from { opacity: 0; scale: .85; translate: 0 10px; } to { opacity: 1; scale: 1; translate: 0 0; } }
+@keyframes lp-ring { from { --lp-p: 0; } to { --lp-p: 42; } }
+@keyframes lp-bar { from { scale: 0 1; } to { scale: 1 1; } }
+@keyframes lp-shine { 0%, 72% { translate: -120% 0; } 100% { translate: 120% 0; } }
+@keyframes lp-word { from { opacity: 0; translate: 0 .45em; filter: blur(3px); } to { opacity: 1; translate: 0 0; filter: none; } }
+@keyframes lp-shake { 0%, 100% { translate: 0 0; } 25% { translate: -4px 0; } 75% { translate: 4px 0; } }
+
+.lp-motion .lp-hero-copy > * { animation: lp-rise 1.1s cubic-bezier(.19, 1, .22, 1) both; }
+.lp-motion .lp-hero-copy > :nth-child(2) { animation-delay: .1s; }
+.lp-motion .lp-hero-copy > :nth-child(3) { animation-delay: .22s; }
+.lp-motion .lp-hero-copy > :nth-child(4) { animation-delay: .34s; }
+.lp-motion .lp-hero-copy > :nth-child(5) { animation-delay: .46s; }
+.lp-motion .lp-product-preview { animation: lp-rise 1.3s cubic-bezier(.19, 1, .22, 1) .2s both, lp-float 7s ease-in-out 1.6s infinite; }
+.lp-motion .lp-preview-float { animation: lp-pop .6s cubic-bezier(.34, 1.56, .64, 1) 1.8s both; }
+.lp-motion .lp-preview-metrics i b { transform-origin: left center; animation: lp-bar 1.4s cubic-bezier(.19, 1, .22, 1) 1s both; }
+
+/* Anel de progresso de verdade (42%) */
+:root[data-design="v2"] .lp-preview-welcome > b { position: relative; border: 0; }
+:root[data-design="v2"] .lp-preview-welcome > b::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(#ef5a73 calc(var(--lp-p) * 1%), rgba(255, 255, 255, .22) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4.5px));
+}
+.lp-motion .lp-preview-welcome > b::before { animation: lp-ring 1.8s cubic-bezier(.19, 1, .22, 1) .7s both; }
+
+/* Palavra que troca no topo */
+.lp-rotator { display: inline-block; color: var(--primary-2, var(--navy)); }
+.lp-rotator-word { display: inline-block; }
+.lp-motion .lp-rotator-word { animation: lp-word .55s cubic-bezier(.16, 1, .3, 1) both; }
+
+/* Brilho discreto no botao principal */
+.lp-main-cta { position: relative; overflow: hidden; }
+.lp-motion .lp-main-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, .28) 50%, transparent 65%);
+  animation: lp-shine 6s ease-in-out 2.4s infinite;
+  pointer-events: none;
+}
+
+/* Cards respondem ao mouse */
+.lp-page .lp-plan,
+.lp-page .lp-problem-grid article,
+.lp-page .lp-journey article,
+.lp-page .lp-feature-card { transition: transform .3s cubic-bezier(.16, 1, .3, 1), box-shadow .3s ease, border-color .3s ease; }
+.lp-page .lp-plan:hover,
+.lp-page .lp-journey article:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(11, 27, 51, .10); }
+.lp-page .lp-plan:hover { border-color: var(--primary-2, var(--navy)); }
+.lp-page .lp-feature-symbol { transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+.lp-page .lp-feature-card:hover .lp-feature-symbol { transform: scale(1.08) rotate(-4deg); }
+
+/* Numeros da faixa */
+.lp-proof-strip strong { font-variant-numeric: tabular-nums; }
+
+/* Teste rapido */
+.lp-quiz-section { padding-top: 64px; }
+.lp-quiz {
+  max-width: 780px;
+  margin: 30px auto 0;
+  padding: clamp(22px, 4vw, 36px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--panel);
+  box-shadow: 0 24px 60px rgba(11, 27, 51, .08);
+}
+.lp-quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.lp-quiz-level { padding: 5px 11px; border-radius: 99px; background: var(--navy-soft); color: var(--primary-2, var(--navy)); font-size: 12.5px; font-weight: 700; }
+.lp-quiz-dots { display: flex; gap: 6px; }
+.lp-quiz-dots i { width: 30px; height: 5px; border-radius: 99px; background: var(--line); transition: background .3s ease; }
+.lp-quiz-dots i.now { background: color-mix(in srgb, var(--primary-2, #1c4a85) 35%, var(--line)); }
+.lp-quiz-dots i.done { background: var(--primary-2, var(--navy)); }
+.lp-quiz-label { margin-top: 22px; color: var(--ink-faint); font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.lp-quiz-prompt { margin: 8px 0 20px; color: var(--ink); font: 500 clamp(24px, 3.2vw, 34px)/1.25 var(--font-title, Georgia, serif); }
+.lp-motion .lp-quiz-prompt { animation: lp-word .5s cubic-bezier(.16, 1, .3, 1) both; }
+.lp-quiz-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.lp-quiz-options button {
+  padding: 15px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--ink);
+  font: 600 16px var(--font-ui, inherit);
+  text-align: left;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease, opacity .2s ease;
+}
+.lp-quiz-options button:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--primary-2, var(--navy)); }
+.lp-quiz-options button:disabled { cursor: default; }
+.lp-quiz-options button.ok { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+.lp-quiz-options button.bad { border-color: var(--bad, #b31942); background: var(--bad-soft, #fbe8ed); color: var(--bad, #b31942); }
+.lp-motion .lp-quiz-options button.bad { animation: lp-shake .35s ease; }
+.lp-quiz-options button.dim { opacity: .45; }
+.lp-quiz-feedback {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 18px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--panel-2, var(--bg));
+  border-left: 4px solid var(--good);
+}
+.lp-quiz-feedback.bad { border-left-color: var(--bad, #b31942); }
+.lp-quiz-feedback b { color: var(--ink); font-size: 15.5px; }
+.lp-quiz-feedback span { grid-column: 1; color: var(--ink-soft); font-size: 14.5px; }
+.lp-quiz-feedback .btn { grid-column: 2; grid-row: 1 / span 2; white-space: nowrap; }
+.lp-motion .lp-quiz-feedback { animation: lp-rise .5s cubic-bezier(.16, 1, .3, 1) both; }
+.lp-quiz-result { text-align: center; }
+.lp-quiz-score { display: inline-flex; align-items: baseline; gap: 2px; color: var(--ink-faint); font: 500 28px var(--font-title, Georgia, serif); }
+.lp-quiz-score b { color: var(--primary-2, var(--navy)); font-size: 64px; font-weight: 500; line-height: 1; }
+.lp-motion .lp-quiz-score { animation: lp-pop .6s cubic-bezier(.34, 1.56, .64, 1) both; }
+.lp-quiz-result h3 { margin-top: 10px; color: var(--ink); font: 500 26px var(--font-title, Georgia, serif); }
+.lp-quiz-result p { max-width: 520px; margin: 10px auto 0; color: var(--ink-soft); font-size: 15.5px; line-height: 1.6; }
+.lp-quiz-result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 22px; }
+.lp-quiz-result small { display: block; margin-top: 14px; color: var(--ink-faint); font-size: 13px; }
+@media (max-width: 680px) {
+  .lp-quiz-options { grid-template-columns: 1fr; }
+  .lp-quiz-feedback { grid-template-columns: 1fr; }
+  .lp-quiz-feedback .btn { grid-column: 1; grid-row: auto; margin-top: 10px; }
+}

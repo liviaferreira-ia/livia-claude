@@ -4,6 +4,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { PrivacyConsent, PrivacyPreferencesButton } from "@/components/PrivacyConsent";
 import { SiteKeepV1 } from "@/components/SiteKeepV1";
 import { SITE_DESIGN_V2 } from "@/lib/design";
+import { EXERCISES } from "@/data/exercises";
+import { LandingMotion } from "@/components/landing/LandingMotion";
+import { RotatingWord } from "@/components/landing/RotatingWord";
+import { QuickQuiz, type QuizQuestion } from "@/components/landing/QuickQuiz";
 
 // Provisório (número pessoal da Livia, sinalizado desde 2026-08-12) — trocar pelo WhatsApp definitivo da Central School assim que houver um.
 const WHATSAPP = "5511933779408";
@@ -41,6 +45,15 @@ const plans = [
   { name: "Personalizado", audience: "Para quem precisa de um plano sob medida", frequency: "De acordo com as suas necessidades", items: ["Quantidade de aulas sob medida", "Conteúdo focado no seu objetivo", "Feedback contínuo"] },
 ];
 
+// Teste rápido: perguntas reais do banco da plataforma, uma por nível (do mais fácil ao mais difícil).
+const QUIZ_IDS: [string, string][] = [["A1", "a1-mc5"], ["A2", "mc5"], ["B1", "b1-mc2"], ["B2", "b2-mc1"], ["C1", "c1-mc1"]];
+const quiz: QuizQuestion[] = QUIZ_IDS.flatMap(([level, id]) => {
+  const item = EXERCISES[level as keyof typeof EXERCISES]?.mc.find((q) => q.id === id);
+  return item ? [{ id: item.id, level, prompt: item.prompt, options: item.options, answer: item.answer, explain: item.explain }] : [];
+});
+
+const HERO_WORDS = ["usar no dia a dia", "viajar sem travar", "crescer no trabalho", "conversar com confiança"];
+
 const faq = [
   { q: "O que está incluído nos 7 dias grátis?", a: "Você conhece a plataforma, faz o onboarding de nível e pratica com a trilha, exercícios, jogos, revisão, roleplay e Tutor com IA dentro dos limites do período gratuito." },
   { q: "Preciso colocar cartão para experimentar?", a: "Não. O cadastro não pede cartão e não existe cobrança automática ao final. Você só contrata se decidir continuar e confirmar essa escolha." },
@@ -74,7 +87,7 @@ export default function LandingPage() {
         <section className="lp-hero lp-section">
           <div className="lp-hero-grid">
             <div className="lp-hero-copy">
-              <span className="lp-eyebrow">Inglês para usar, não só para estudar</span>
+              <span className="lp-eyebrow">Inglês para <RotatingWord words={HERO_WORDS} /></span>
               <h1 className="lp-h1">Pare de adiar.<br /><em>Comece a falar.</em></h1>
               <p className="lp-sub">Pratique inglês todos os dias com uma trilha do seu nível, conversas com IA, situações reais e jogos — e conte com acompanhamento humano nos planos da escola.</p>
               <div className="lp-cta-row">
@@ -91,7 +104,7 @@ export default function LandingPage() {
               <div className="lp-preview-body">
                 <div className="lp-preview-sidebar" aria-hidden><i className="active" /><i /><i /><i /><i /></div>
                 <div className="lp-preview-content">
-                  <div className="lp-preview-welcome"><div><small>SUA JORNADA · A1</small><strong>Continue de onde parou</strong><span>Rotina e apresentações</span></div><b>42%</b></div>
+                  <div className="lp-preview-welcome"><div><small>SUA JORNADA · A1</small><strong>Continue de onde parou</strong><span>Rotina e apresentações</span></div><b data-count="42" data-suffix="%">42%</b></div>
                   <div className="lp-preview-metrics">
                     <div><span>Meta diária</span><strong>3/5</strong><i><b style={{ width: "60%" }} /></i></div>
                     <div><span>Sequência</span><strong>4 dias</strong><small>Continue assim!</small></div>
@@ -107,47 +120,53 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="lp-proof-strip" aria-label="Resumo da experiência">
-          <div><strong>A1–C2</strong><span>trilha para todos os níveis</span></div><div><strong>15 min</strong><span>já ajudam a manter o hábito</span></div><div><strong>7 dias</strong><span>para conhecer sem cartão</span></div><div><strong>Humano + IA</strong><span>prática e orientação juntas</span></div>
+        <section className="lp-proof-strip" aria-label="A plataforma em números" data-reveal>
+          <div><strong data-count="1000">1.000</strong><span>exercícios do A1 ao C2</span></div><div><strong><span data-count="6">6</span> níveis</strong><span>do iniciante ao avançado, no padrão europeu (CEFR)</span></div><div><strong data-count="24">24</strong><span>situações reais para praticar conversa</span></div><div><strong><span data-count="7">7</span> dias</strong><span>para conhecer grátis, sem cartão</span></div>
+        </section>
+
+        <section className="lp-section lp-quiz-section" id="teste">
+          <div className="lp-section-heading" data-reveal><span className="lp-eyebrow">Experimente agora, sem cadastro</span><h2 className="lp-h2">Teste seu inglês em 30 segundos</h2><p>Cinco perguntas de verdade da plataforma, do básico ao avançado. Responda e veja a explicação na hora.</p></div>
+          <div data-reveal style={{ ["--i" as string]: 1 }}><QuickQuiz questions={quiz} /></div>
         </section>
 
         <section className="lp-section lp-problem-section">
-          <div className="lp-section-heading"><span className="lp-eyebrow">Se estudar não virou conversa…</span><h2 className="lp-h2">Talvez não falte esforço.<br />Falte uma forma melhor de praticar.</h2><p>Na Central School, o inglês deixa de ser uma matéria distante e entra na sua rotina com passos pequenos, contexto real e continuidade.</p></div>
+          <div className="lp-section-heading" data-reveal><span className="lp-eyebrow">Se estudar não virou conversa…</span><h2 className="lp-h2">Talvez não falte esforço.<br />Falte uma forma melhor de praticar.</h2><p>Na Central School, o inglês deixa de ser uma matéria distante e entra na sua rotina com passos pequenos, contexto real e continuidade.</p></div>
           <div className="lp-problem-grid">
-            <article><span>01</span><h3>Você sabe, mas trava</h3><p>A prática de conversa ajuda a transformar conhecimento passivo em resposta espontânea.</p></article>
-            <article><span>02</span><h3>Você começa e para</h3><p>Metas curtas, jogos e progresso visível tornam mais fácil voltar no dia seguinte.</p></article>
-            <article><span>03</span><h3>O conteúdo parece genérico</h3><p>A trilha respeita seu nível e os planos conectam o estudo aos seus objetivos reais.</p></article>
+            <article data-reveal style={{ ["--i" as string]: 1 }}><span>01</span><h3>Você sabe, mas trava</h3><p>A prática de conversa ajuda a transformar conhecimento passivo em resposta espontânea.</p></article>
+            <article data-reveal style={{ ["--i" as string]: 2 }}><span>02</span><h3>Você começa e para</h3><p>Metas curtas, jogos e progresso visível tornam mais fácil voltar no dia seguinte.</p></article>
+            <article data-reveal style={{ ["--i" as string]: 3 }}><span>03</span><h3>O conteúdo parece genérico</h3><p>A trilha respeita seu nível e os planos conectam o estudo aos seus objetivos reais.</p></article>
           </div>
         </section>
 
         <section className="lp-product-section" id="plataforma"><div className="lp-section">
-          <div className="lp-section-heading light"><span className="lp-eyebrow">A Central por dentro</span><h2 className="lp-h2">Uma plataforma feita para você voltar amanhã</h2><p>Não é uma coleção solta de exercícios. É um ambiente de prática que combina direção, variedade e constância.</p></div>
-          <div className="lp-feature-grid">{features.map((feature) => <article className="lp-feature-card" key={feature.title}><span className={`lp-feature-symbol ${feature.tone}`}>{feature.symbol}</span><small>{feature.eyebrow}</small><h3>{feature.title}</h3><p>{feature.desc}</p></article>)}</div>
+          <div className="lp-section-heading light" data-reveal><span className="lp-eyebrow">A Central por dentro</span><h2 className="lp-h2">Uma plataforma feita para você voltar amanhã</h2><p>Não é uma coleção solta de exercícios. É um ambiente de prática que combina direção, variedade e constância.</p></div>
+          <div className="lp-feature-grid">{features.map((feature) => <article className="lp-feature-card" key={feature.title} data-reveal style={{ ["--i" as string]: features.indexOf(feature) % 3 }}><span className={`lp-feature-symbol ${feature.tone}`}>{feature.symbol}</span><small>{feature.eyebrow}</small><h3>{feature.title}</h3><p>{feature.desc}</p></article>)}</div>
         </div></section>
 
         <section className="lp-section" id="como-funciona">
-          <div className="lp-section-heading"><span className="lp-eyebrow">Começar é simples</span><h2 className="lp-h2">Sete dias para sentir a diferença na prática</h2></div>
+          <div className="lp-section-heading" data-reveal><span className="lp-eyebrow">Começar é simples</span><h2 className="lp-h2">Sete dias para sentir a diferença na prática</h2></div>
           <div className="lp-journey">
-            <article><span>1</span><div><small>EM POUCOS MINUTOS</small><h3>Crie sua conta</h3><p>Informe nome e e-mail. Não pedimos cartão.</p></div></article>
-            <article><span>2</span><div><small>NO PRIMEIRO ACESSO</small><h3>Monte sua jornada</h3><p>Escolha seu nível, objetivo e ritmo de estudo.</p></div></article>
-            <article><span>3</span><div><small>POR SETE DIAS</small><h3>Pratique de verdade</h3><p>Explore aulas, exercícios, Tutor, roleplays e Central Games.</p></div></article>
-            <article><span>4</span><div><small>SEM SURPRESA</small><h3>Decida se quer continuar</h3><p>Seu progresso fica salvo. Só existe cobrança se você contratar.</p></div></article>
+            <article data-reveal style={{ ["--i" as string]: 1 }}><span>1</span><div><small>EM POUCOS MINUTOS</small><h3>Crie sua conta</h3><p>Informe nome, e-mail, WhatsApp e CPF. Não pedimos cartão.</p></div></article>
+            <article data-reveal style={{ ["--i" as string]: 2 }}><span>2</span><div><small>NO PRIMEIRO ACESSO</small><h3>Monte sua jornada</h3><p>Escolha seu nível, objetivo e ritmo de estudo.</p></div></article>
+            <article data-reveal style={{ ["--i" as string]: 3 }}><span>3</span><div><small>POR SETE DIAS</small><h3>Pratique de verdade</h3><p>Explore aulas, exercícios, Tutor, roleplays e Central Games.</p></div></article>
+            <article data-reveal style={{ ["--i" as string]: 4 }}><span>4</span><div><small>SEM SURPRESA</small><h3>Decida se quer continuar</h3><p>Seu progresso fica salvo. Só existe cobrança se você contratar.</p></div></article>
           </div>
-          <div className="lp-trial-offer"><div><span className="lp-eyebrow">Experimente agora</span><h2>Seu primeiro passo não precisa ser uma compra.</h2><p>Conheça a plataforma por sete dias e decida com a experiência, não com uma promessa.</p></div><div className="lp-trial-offer-action"><strong>R$ 0</strong><span>por 7 dias</span><Link href="/experimente" className="btn primary">Criar minha conta grátis →</Link><small>Sem cartão · sem cobrança automática</small></div></div>
+          <div className="lp-trial-offer" data-reveal><div><span className="lp-eyebrow">Experimente agora</span><h2>Seu primeiro passo não precisa ser uma compra.</h2><p>Conheça a plataforma por sete dias e decida com a experiência, não com uma promessa.</p></div><div className="lp-trial-offer-action"><strong>R$ 0</strong><span>por 7 dias</span><Link href="/experimente" className="btn primary">Criar minha conta grátis →</Link><small>Sem cartão · sem cobrança automática</small></div></div>
         </section>
 
         <section className="lp-section" id="planos">
-          <div className="lp-section-heading"><span className="lp-eyebrow">Planos</span><h2 className="lp-h2">Escolha o nível de acompanhamento</h2><p>Os planos são personalizados conforme objetivo, disponibilidade e ritmo. Fale com a escola para receber valores e horários.</p></div>
-          <div className="lp-plans">{plans.map((plan) => <article className={`lp-plan ${plan.featured ? "featured" : ""}`} key={plan.name}>{plan.featured && <span className="lp-plan-badge">MAIS ACOMPANHAMENTO</span>}<small>{plan.audience}</small><h3>{plan.name}</h3><div className="lp-plan-frequency">{plan.frequency}</div><ul>{plan.items.map((item) => <li key={item}>{item}</li>)}</ul><a href={waPlanLink(plan.name)} target="_blank" rel="noopener noreferrer" className={plan.featured ? "btn primary" : "btn ghost"}>Receber valores e horários</a></article>)}</div>
-          <div className="lp-senior-callout"><div className="lp-senior-mark">60+</div><div><span className="lp-eyebrow">Programa individual</span><h3>Inglês também é para a sua próxima fase.</h3><p>Aulas personalizadas, ritmo respeitado e tecnologia sem complicação para alunos com 60 anos ou mais.</p></div><a href={waPlanLink("60+")} target="_blank" rel="noopener noreferrer" className="btn ghost">Conhecer o programa</a></div>
+          <div className="lp-section-heading" data-reveal><span className="lp-eyebrow">Planos</span><h2 className="lp-h2">Escolha o nível de acompanhamento</h2><p>Os planos são personalizados conforme objetivo, disponibilidade e ritmo. Fale com a escola para receber valores e horários.</p></div>
+          <div className="lp-plans">{plans.map((plan) => <article className={`lp-plan ${plan.featured ? "featured" : ""}`} key={plan.name} data-reveal style={{ ["--i" as string]: plans.indexOf(plan) }}>{plan.featured && <span className="lp-plan-badge">MAIS ACOMPANHAMENTO</span>}<small>{plan.audience}</small><h3>{plan.name}</h3><div className="lp-plan-frequency">{plan.frequency}</div><ul>{plan.items.map((item) => <li key={item}>{item}</li>)}</ul><a href={waPlanLink(plan.name)} target="_blank" rel="noopener noreferrer" className={plan.featured ? "btn primary" : "btn ghost"}>Receber valores e horários</a></article>)}</div>
+          <div className="lp-senior-callout" data-reveal><div className="lp-senior-mark">60+</div><div><span className="lp-eyebrow">Programa individual</span><h3>Inglês também é para a sua próxima fase.</h3><p>Aulas personalizadas, ritmo respeitado e tecnologia sem complicação para alunos com 60 anos ou mais.</p></div><a href={waPlanLink("60+")} target="_blank" rel="noopener noreferrer" className="btn ghost">Conhecer o programa</a></div>
         </section>
 
-        <section className="lp-philosophy"><div className="lp-section lp-philosophy-grid"><div className="lp-philosophy-crest"><Crest size={150} /></div><div><span className="lp-eyebrow">English as a Lifestyle</span><h2 className="lp-h2">Inglês que encontra espaço na sua vida.</h2><p>Aprender um idioma não precisa ser uma corrida nem uma coleção de regras. A Central School une conversação, personalização, cultura e prática digital para que o inglês se torne familiar — um pouco a cada dia.</p></div></div></section>
+        <section className="lp-philosophy"><div className="lp-section lp-philosophy-grid" data-reveal><div className="lp-philosophy-crest"><Crest size={150} /></div><div><span className="lp-eyebrow">English as a Lifestyle</span><h2 className="lp-h2">Inglês que encontra espaço na sua vida.</h2><p>Aprender um idioma não precisa ser uma corrida nem uma coleção de regras. A Central School une conversação, personalização, cultura e prática digital para que o inglês se torne familiar — um pouco a cada dia.</p></div></div></section>
 
-        <section className="lp-section" id="faq"><div className="lp-section-heading"><span className="lp-eyebrow">Sem letras miúdas</span><h2 className="lp-h2">Perguntas frequentes</h2></div><div className="lp-faq">{faq.map((item) => <details key={item.q}><summary>{item.q}</summary><p>{item.a}</p></details>)}</div></section>
+        <section className="lp-section" id="faq"><div className="lp-section-heading" data-reveal><span className="lp-eyebrow">Sem letras miúdas</span><h2 className="lp-h2">Perguntas frequentes</h2></div><div className="lp-faq">{faq.map((item) => <details key={item.q}><summary>{item.q}</summary><p>{item.a}</p></details>)}</div></section>
 
         <section className="lp-final-cta" id="contato"><div><span className="lp-eyebrow">Você não precisa esperar se sentir pronto</span><h2>Comece pequeno. Comece hoje.</h2><p>Sete dias para explorar a plataforma, praticar no seu ritmo e descobrir se a Central School combina com você.</p></div><div className="lp-final-actions"><Link href="/experimente" className="btn primary">Começar grátis →</Link><a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-wa">{WaIcon} Conversar no WhatsApp</a></div></section>
       </main>
+      <LandingMotion />
 
       <footer className="lp-footer"><Link href="/" className="lp-brand"><Crest size={32} /><div><b>Central School</b><small>ENGLISH AS A LIFESTYLE</small></div></Link><div className="lp-footer-links"><a href="#plataforma">Plataforma</a><a href="#planos">Planos</a><Link href="/login">Área do aluno</Link><Link href="/privacidade">Privacidade</Link><PrivacyPreferencesButton /><a href={waLink} target="_blank" rel="noopener noreferrer">WhatsApp</a></div><div>© {new Date().getFullYear()} Central School · Desenvolvido por <a href="https://bigbangagencia.com.br" target="_blank" rel="noopener">Big Bang Agência</a> ❤️</div></footer>
       <PrivacyConsent />

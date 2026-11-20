@@ -1,5 +1,5 @@
 /* Tela inicial do aluno — design v2. Usa os tokens v2 do globals.css. */
-.home { max-width: 1440px; }
+.home { max-width: var(--largura-max); }
 .head { margin-bottom: 26px; }
 .head h1 { font-size: 34px; line-height: 1.15; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }

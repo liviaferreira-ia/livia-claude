@@ -1,5 +1,5 @@
 /* Minha conta — design v2 (ajuste do Fabio em 17/11/2026: tirar o espaço vazio à direita). */
-.page { max-width: 1400px; container-type: inline-size; }
+.page { max-width: var(--largura-max); container-type: inline-size; }
 .page > h1 { margin-bottom: 6px; }
 .page > p { font-size: 17px; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; align-items: start; }

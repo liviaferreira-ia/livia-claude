@@ -8,11 +8,14 @@ import { useState } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { createClient } from "@/lib/supabase/client";
+import { formatCpf, formatPhone, isValidCpf, isValidPhone, onlyDigits } from "@/lib/billing-contact";
 
 export default function ExperimentePage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,6 +26,8 @@ export default function ExperimentePage() {
     event.preventDefault();
     setError("");
     if (!accepted) return setError("Confirme as condições do período gratuito para continuar.");
+    if (!isValidPhone(whatsapp)) return setError("Informe o WhatsApp com DDD.");
+    if (!isValidCpf(cpf)) return setError("Confira o CPF: os números não conferem.");
     if (!/[A-Z]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
       return setError("A senha precisa ter uma letra maiúscula e um caractere especial.");
     }
@@ -34,7 +39,7 @@ export default function ExperimentePage() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/confirm?next=/onboarding`,
-        data: { name: name.trim(), display_name: name.trim(), trial_requested: true },
+        data: { name: name.trim(), display_name: name.trim(), trial_requested: true, whatsapp: formatPhone(whatsapp), cpf: onlyDigits(cpf) },
       },
     });
     setLoading(false);
@@ -71,6 +76,8 @@ export default function ExperimentePage() {
           <form onSubmit={submit} style={{ marginTop: 20 }}>
             <div className="field"><label htmlFor="trial-name">Nome</label><input id="trial-name" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required minLength={2} /></div>
             <div className="field"><label htmlFor="trial-email">E-mail</label><input id="trial-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required /></div>
+            <div className="field"><label htmlFor="trial-whatsapp">WhatsApp</label><input id="trial-whatsapp" type="tel" inputMode="numeric" value={whatsapp} onChange={(event) => setWhatsapp(formatPhone(event.target.value))} autoComplete="tel-national" placeholder="(11) 98765-4321" required /></div>
+            <div className="field"><label htmlFor="trial-cpf">CPF</label><input id="trial-cpf" inputMode="numeric" value={cpf} onChange={(event) => setCpf(formatCpf(event.target.value))} placeholder="000.000.000-00" required /><small className="muted">Usado só para o cadastro e a cobrança, se você decidir continuar depois do teste.</small></div>
             <div className="field"><label htmlFor="trial-password">Crie uma senha</label><input id="trial-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" required minLength={8} /><small className="muted">Mínimo de 8 caracteres, com maiúscula e caractere especial.</small></div>
             <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 13.5, margin: "16px 0" }}>
               <input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} style={{ marginTop: 3 }} />

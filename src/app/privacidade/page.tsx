@@ -39,7 +39,7 @@ export default function PrivacyPage() {
 
         <h2>2. Quais dados podemos tratar</h2>
         <ul>
-          <li>identificação e contato, como nome, e-mail e foto de perfil;</li>
+          <li>identificação e contato, como nome, e-mail, WhatsApp, CPF e foto de perfil (o CPF é usado só para o cadastro e a cobrança);</li>
           <li>objetivo de aprendizagem, nível de inglês e preferências informadas pelo aluno;</li>
           <li>progresso, exercícios, atividades, frequência e tempo de uso da plataforma;</li>
           <li>mensagens enviadas ao professor e textos enviados ao tutor com inteligência artificial;</li>

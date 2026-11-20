@@ -35,6 +35,7 @@ const features = [
 ];
 
 const plans = [
+  { name: "Plataforma", audience: "Para estudar no seu ritmo", frequency: "Sem aulas ao vivo", items: ["Plataforma completa do A1 ao C2", "Tutor com IA, pronúncia e roleplay", "Tira-dúvidas com a professora pela plataforma"] },
   { name: "Essencial", audience: "Para criar base e consistência", frequency: "2 aulas por semana", items: ["Comunicação do dia a dia", "Material e plataforma digital", "Avaliações mensais de progresso"] },
   { name: "Carreira", audience: "Para usar inglês no trabalho", frequency: "3 aulas por semana", items: ["Inglês aplicado à sua rotina", "Módulos por área ou setor", "Mentoria personalizada"], featured: true },
   { name: "Global", audience: "Para avançar com mais intensidade", frequency: "4 aulas por semana", items: ["Conversação avançada", "Feedback contínuo", "Prática e imersão cultural"] },
@@ -136,7 +137,7 @@ export default function LandingPage() {
         </section>
 
         <section className="lp-section" id="planos">
-          <div className="lp-section-heading"><span className="lp-eyebrow">Aulas + plataforma</span><h2 className="lp-h2">Escolha o nível de acompanhamento</h2><p>Os planos são personalizados conforme objetivo, disponibilidade e ritmo. Fale com a escola para receber valores e horários.</p></div>
+          <div className="lp-section-heading"><span className="lp-eyebrow">Planos</span><h2 className="lp-h2">Escolha o nível de acompanhamento</h2><p>Os planos são personalizados conforme objetivo, disponibilidade e ritmo. Fale com a escola para receber valores e horários.</p></div>
           <div className="lp-plans">{plans.map((plan) => <article className={`lp-plan ${plan.featured ? "featured" : ""}`} key={plan.name}>{plan.featured && <span className="lp-plan-badge">MAIS ACOMPANHAMENTO</span>}<small>{plan.audience}</small><h3>{plan.name}</h3><div className="lp-plan-frequency">{plan.frequency}</div><ul>{plan.items.map((item) => <li key={item}>{item}</li>)}</ul><a href={waPlanLink(plan.name)} target="_blank" rel="noopener noreferrer" className={plan.featured ? "btn primary" : "btn ghost"}>Receber valores e horários</a></article>)}</div>
           <div className="lp-senior-callout"><div className="lp-senior-mark">60+</div><div><span className="lp-eyebrow">Programa individual</span><h3>Inglês também é para a sua próxima fase.</h3><p>Aulas personalizadas, ritmo respeitado e tecnologia sem complicação para alunos com 60 anos ou mais.</p></div><a href={waPlanLink("60+")} target="_blank" rel="noopener noreferrer" className="btn ghost">Conhecer o programa</a></div>
         </section>
